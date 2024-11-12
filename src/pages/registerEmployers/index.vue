@@ -66,6 +66,20 @@ onMounted(() => {
     .catch(function (error) {
         // handle error
         console.log(error);
+        console.error('Call API Error:', error);
+                // Hiển thị thông báo lỗi nếu có lỗi trong quá trình đăng ký
+      
+            Swal.fire({
+                title: 'website error !',
+                text: 'Please try again later.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            }).then((result) => {
+            
+            
+                router.push('/'); 
+                
+            });
     })
     .finally(function () {
         // always executed
@@ -106,7 +120,7 @@ const onCompanyChange = (event) => {
         .catch(error => {
             console.error('Register Error:', error);
                 // Hiển thị thông báo lỗi nếu có lỗi trong quá trình đăng ký
-            const errorMessage = error.response?.data || 'Vui lòng thử lại sau.'; // Default message if no error data
+            const errorMessage = error.response?.data || 'Please try again later!.'; // Default message if no error data
 
             Swal.fire({
                 title: 'Registration failed!',

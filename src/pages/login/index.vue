@@ -1,12 +1,9 @@
 <script setup>
-import { onUnmounted, ref } from 'vue';
+import { ref } from 'vue';
 import { useForm, useField } from 'vee-validate';
 import * as yup from 'yup';
-import axios from 'axios';
-import Swal from 'sweetalert2';
 import { useRouter } from 'vue-router';
-import { jwtDecode } from 'jwt-decode';
-
+import { useAuthStore } from '../../stores/auth.js'; 
 
 
 
@@ -21,7 +18,6 @@ const schema = yup.object({
     ),
     password: yup
         .string()
-        .min(6, 'Password must be at least 6 characters')
         .required('Password is required'),
 });
 
@@ -38,68 +34,31 @@ const { value: password, errorMessage: passwordError } = useField('password');
 // Trạng thái ẩn/hiện mật khẩu
 const isPasswordVisible = ref(false);
 
+ // Lấy store auth
+ const authStore = useAuthStore();
+
 // Hàm submit form
 const onSubmit = handleSubmit((values) => {
     console.log('Form submitted:', values);
-    axios.post('/api/account/login', values, {
-            cancelToken: new axios.CancelToken(function (c) 
-            {
-                cancelRequest = c;  // Gán hàm hủy vào biến cancelRequest khi có request
-            })
-        })
-        .then(response => {
-            console.log('Login Success:', response.data);
-          
-             // Xử lý khi đăng nhập thành công
-            const token = response.data.token;
-            const decodedToken = jwtDecode(token);
-            const expiresIn = decodedToken.exp;
-            const userRole = decodedToken.role; // Giả sử bạn đã thêm role vào token
-
-            localStorage.setItem('token', token);
-            localStorage.setItem('expiresIn', expiresIn * 1000);  
-
-            console.log("decoded token:", decodedToken);
-            console.log("role token:", userRole);
-
-            // Chuyển trang sau khi đăng nhập thành công
-            // Hiển thị thông báo thành công
-            Swal.fire({
-                title: 'Login successful!',
-                text: 'Welcome to Career Vibe',
-                icon: 'success',
-                confirmButtonText: 'OK',
-               
-            }).then((result) => {
-               
-                handleReset();
-               
-                // Chuyển trang sau khi người dùng đóng thông báo
-                // if (result.isConfirmed) {
-                //     router.push('/');
-                // } 
-            });
-
-        })
-        .catch(error => {
-            console.error('Register Error:', error);
-            // Hiển thị thông báo lỗi nếu có lỗi trong quá trình đăng ký
-            const errorMessage = error.response?.data || 'Vui lòng thử lại sau.'; // Default message if no error data
-
-            Swal.fire({
-                title: 'Login failed!',
-                text: errorMessage,
-                icon: 'error',
-                confirmButtonText: 'OK'
-            });
-        });
-});
-
-onUnmounted(() => {
-    if (cancelRequest) {
-        cancelRequest('Component unmounted, request canceled');
+    try {
+        authStore.login('/api/account/login',values);
+        if(authStore.role === 'Admin'){
+            window.location.href = 'https://localhost:7283/home'; 
+        }else {
+            router.push('/');
+        }
+    }catch (error) {
+        console.error('Đăng nhập thất bại:', error);
     }
+
+   
 });
+
+// onUnmounted(() => {
+//     if (cancelRequest) {
+//         cancelRequest('Component unmounted, request canceled');
+//     }
+// });
 </script>
 
 <template>

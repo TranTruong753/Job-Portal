@@ -1,3 +1,31 @@
+<script setup>
+import { onBeforeMount,onMounted, ref } from 'vue';
+import { getCookie } from '../assets/js/cookieUtils.js';
+import { jwtDecode } from 'jwt-decode';
+import { useAuthStore } from '../stores/auth.js';
+
+
+const authStore = useAuthStore();
+
+
+// Kiểm tra token khi chuyển trang
+onBeforeMount(() => {
+  
+  console.log("header");
+//  const cookieToken = getCookie(authStore.token);
+  if (authStore.isAuthenticated) {
+    console.log("ĐĂNG NHẬP THÀNH CÔNG", decodedToken.value);
+  } 
+
+});
+
+function handleLogout() {
+  authStore.logout();
+}
+
+
+</script>
+
 <template>
     <header>
       <nav class="navbar navbar-expand-lg navbar-light bg-white shadow py-3">
@@ -56,12 +84,8 @@
               </li>
             </ul>
   
-            <router-link class="btn btn-outline-primary me-2" to="/login">Login/Register</router-link>
-            <router-link class="btn btn-primary" to="/register-employers">For Employers</router-link>
-        
-                   
-            <!-- Phần này bạn có thể điều chỉnh lại theo Vue -->
-            <!-- <div class="w-25 ms-sm-0 ps-xxl-5 ps-xl-3 ps-lg-1">
+            <!-- đã đăng nhập -->
+            <div v-if="authStore.isAuthenticated" class="w-25 ms-sm-0 ps-xxl-5 ps-xl-3 ps-lg-1">
               <div class="dropdown d-flex align-items-center gap-3 justify-content-lg-end">
                 <a href="#!" class="fs-5">
                   <i class="fa-solid fa-bell"></i>
@@ -79,7 +103,7 @@
                       class="dropdown-item d-flex flex-lg-column flex-xl-row align-items-xl-center align-items-lg-start gap-2 pb-2  border-bottom">
                       <img class="object-fit-cover img-thumbnail rounded-circle" style="max-width: 40px;" src="../assets/img/avatar7.png"
                         alt="avatar7" />
-                      <span class="fs-6">Trần Quang Trường</span>
+                      <span class="fs-6">{{ authStore.user }}</span>
                     </div>
                   </li>
                   <li>
@@ -89,15 +113,27 @@
                     <router-link class="dropdown-item" to="/blog/post">Post a Blog</router-link>
                   </li>
                   <li>
-                    <a class="dropdown-item" href="#">Log out</a>
+                    <a class="dropdown-item" href="#" @click="()=>{
+                      handleLogout();
+                    }">Log out</a>
                   </li>
                 </ul>
               </div>
-            </div> -->
+            </div>
+            <!-- chưa đăng nhập -->
+           <div v-else>
+              <router-link class="btn btn-outline-primary me-2" to="/login">Login/Register</router-link>
+              <router-link class="btn btn-primary" to="/register-employers">For Employers</router-link>
+           </div>
+        
+                  
 
           </div> <!-- navbar-collapse.// -->
         </div> <!-- container-fluid.// -->
       </nav>
     </header>
   </template>
-  
+
+
+
+

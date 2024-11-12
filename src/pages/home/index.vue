@@ -8,18 +8,9 @@ import axios from 'axios';
 const apiData = ref(null);
 const error = ref(null);
 
-const fetchData = async () => {
-    // try {
-    //     const response = await axios.get('https://localhost:7092/api/Home'); // Thay bằng URL của bạn
-    //     apiData.value = response.data;
-    // } catch (err) {
-    //     error.value = err;
-    //     console.error("Lỗi khi gọi API:", err);
-    // }
-};
 
 onMounted(() => {
-    fetchData();
+  
 });
 
 

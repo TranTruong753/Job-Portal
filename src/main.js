@@ -9,12 +9,13 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './assets/css/footer.css';
 import './assets/css/style.css';
 import './assets/css/mycss.css';
+import { createPinia } from 'pinia';
 
 
-
-
+const pinia = createPinia()
 const app = createApp(App)
 
+app.use(pinia)
 app.use(router)
 
 app.use(Antd).mount('#app');

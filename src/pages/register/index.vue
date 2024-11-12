@@ -5,7 +5,7 @@
     import axios from 'axios';
     import Swal from 'sweetalert2';
     import { useRouter } from 'vue-router';
-    
+    import { jwtDecode } from 'jwt-decode';
 
     const router = useRouter(); // Sử dụng router
     let cancelRequest;  // Định nghĩa cancelRequest ở phạm vi này
@@ -57,6 +57,19 @@
                 console.log('Register Success:', response.data);
                  // Chuyển trang sau khi đăng ký thành công
                  // Hiển thị thông báo thành công
+
+                //    // Xử lý khi đăng nhập thành công
+                //     const token = response.data.token;
+                //     const decodedToken = jwtDecode(token);
+                //     const expiresIn = decodedToken.exp;
+                //     const userRole = decodedToken.role; // Giả sử bạn đã thêm role vào token
+
+                //     localStorage.setItem('token', token);
+                //     localStorage.setItem('expiresIn', expiresIn * 1000);  
+
+                //     console.log("decoded token:", decodedToken);
+                //     console.log("role token:", userRole);
+
                 Swal.fire({
                     title: 'Registration successful!',
                     text: 'Do you want to go to the login page?.',
