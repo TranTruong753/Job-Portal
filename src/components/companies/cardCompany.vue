@@ -1,6 +1,6 @@
 <template>
    
-    <div v-show="cardData.isShow" :class="cardData.cssStyle">
+    <div v-show="cardData.isShow" :class="cardData.cssStyle" :id="cardData.id">
         <div class="card card-h-100 shadow border-0">
             <div class="card-header bg-white">
                 <div class="card-img__grou d-flex justify-content-between align-content-start gap-3 ">
@@ -27,11 +27,11 @@
                         <p class="card-title text-black-50 mb-0">{{ cardData.title }}</p>
                     </a>
 
-                    <a class="card-link " href="#!">
+                    <!-- <a class="card-link " href="#!">
                         <span class="text-primary small fw-bolder text-decoration-underline">
                             {{ cardData.salary }}
                         </span>
-                    </a>
+                    </a> -->
 
                 </div>
 
@@ -39,15 +39,16 @@
 
             <div class="card-body pt-2 pb-3">
                 <div class="mb-1">
-                    <p class="mb-0">
-                        <span class="fw-bolder fs-5"><i class="fa fa-map-marker"></i></span>
-                        <span class="ps-1"> {{ cardData.location }} </span>
-                    </p>
-                    <div class="d-flex justify-content-between">
+                  
+                    <div class="d-flex justify-content-between align-items-center">
                         <p class="mb-0">
+                            <span class="fw-bolder fs-5"><i class="fa fa-map-marker"></i></span>
+                            <span class="ps-1"> {{ cardData.location }} </span>
+                        </p>
+                        <!-- <p class="mb-0">
                             <span class="fw-bolder "><i class="fa fa-clock-o"></i></span>
                             <span class="ps-1"> {{ cardData.type }} </span>
-                        </p>
+                        </p> -->
                         <a href="#!">
                             <span class="text-primary small fw-bolder">
                                 {{ cardData.jobs }} jobs
@@ -70,6 +71,7 @@ export default {
             type: Object,
             required: true,
             default: () => ({
+                id:'',
                 imgSrc: '',
                 imgAlt: 'Default Image',
                 name: 'default',

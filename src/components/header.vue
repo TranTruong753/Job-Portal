@@ -10,12 +10,16 @@ const authStore = useAuthStore();
 
 // Kiểm tra token khi chuyển trang
 onBeforeMount(() => {
-  
-  console.log("header");
-//  const cookieToken = getCookie(authStore.token);
-  if (authStore.isAuthenticated) {
-    console.log("ĐĂNG NHẬP THÀNH CÔNG", decodedToken.value);
-  } 
+  const cookieToken = getCookie('token');
+  // authStore.checklogin("/api/account/checktoken");
+  console.log("cookie",cookieToken);
+  if( cookieToken !== ""){
+    authStore.checklogin(cookieToken);
+    if (authStore.isAuthenticated) {
+      console.log("ĐĂNG NHẬP THÀNH CÔNG!")
+    } 
+
+  }
 
 });
 

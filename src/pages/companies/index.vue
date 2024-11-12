@@ -1,5 +1,26 @@
 <script setup>
 import CardCompany from '@/components/companies/cardCompany.vue';
+import axios from 'axios';
+import { onMounted } from 'vue';
+import { useCompanyStore } from '../../stores/company.js';
+
+const companyStore = useCompanyStore();
+
+onMounted(()=>{
+    axios.get('/api/company').then(
+        response => {
+            const companies = response.data;
+            console.log(companies);
+            // companies.forEach(company => {
+            //     const cardCompany = new CardCompany();
+            //     cardCompany.company = company;
+            //     cardCompany.$mount('#companySlideID.carousel-inner');
+            // });
+        }
+    );
+    companyStore.getCompany("/api/company");
+})
+
 </script>
 
 <template>
@@ -156,8 +177,25 @@ import CardCompany from '@/components/companies/cardCompany.vue';
             <h2>Featured Company</h2>
             <div class="row pt-5 pt-sm-4 g-3">
 
-                <!-- card 01 -->
-                <CardCompany :cardData="{
+                 <!-- Lặp qua danh sách các công ty -->
+                <CardCompany
+                    v-for="(company, index) in companyStore.listcompany"
+                    :key="index"
+                    :cardData="{
+                        imgSrc: company.logo ,  
+                        imgAlt: company.name || 'Default Company',
+                        name: company.name || 'Default Position',
+                        title: company.industry || 'Default Title',
+                        location: company.location || 'Default Location',
+                        type: company.type || 'Default Type',
+                        jobs: 4,
+                        cssStyle: 'col-12 col-lg-4 col-md-6',
+                        isShow: true,
+                        isSave: false
+                    }"
+                />
+                            <!-- card 01 -->
+                <!-- <CardCompany :cardData="{
                     imgSrc: '/src/assets/img/fpt_corporation_logo.jpg',
                     imgAlt: 'FPT',
                     name: 'Software Engineer',
@@ -169,10 +207,10 @@ import CardCompany from '@/components/companies/cardCompany.vue';
                     cssStyle: 'col-12 col-lg-4 col-md-6 ',
                     isShow: true,
                     isSave: false
-                }" />
+                }" /> -->
 
                 <!-- card 02 -->
-                <CardCompany :cardData="{
+                <!-- <CardCompany :cardData="{
                     imgSrc: '/src/assets/img/fpt_corporation_logo.jpg',
                     imgAlt: 'FPT',
                     name: 'Software Engineer',
@@ -184,10 +222,10 @@ import CardCompany from '@/components/companies/cardCompany.vue';
                     cssStyle: 'col-12 col-lg-4 col-md-6 ',
                     isShow: true,
                     isSave: false
-                }" />
+                }" /> -->
 
                 <!-- card 03 -->
-                <CardCompany :cardData="{
+                <!-- <CardCompany :cardData="{
                     imgSrc: '/src/assets/img/fpt_corporation_logo.jpg',
                     imgAlt: 'FPT',
                     name: 'Software Engineer',
@@ -199,7 +237,7 @@ import CardCompany from '@/components/companies/cardCompany.vue';
                     cssStyle: 'col-12 col-lg-4 col-md-6 ',
                     isShow: true,
                     isSave: false
-                }" />
+                }" /> -->
 
             </div>
         </div>
@@ -211,50 +249,23 @@ import CardCompany from '@/components/companies/cardCompany.vue';
             <h2>Company with latest jobs</h2>
             <div class="row pt-5 pt-sm-4 g-3">
 
-                <!-- card 01 -->
-                <CardCompany :cardData="{
-                    imgSrc: '/src/assets/img/fpt_corporation_logo.jpg',
-                    imgAlt: 'FPT',
-                    name: 'Software Engineer',
-                    title: 'FPT Technology',
-                    salary: ' Sign in to view salary ',
-                    location: 'Default Location',
-                    type: 'Default Type',
-                    jobs: 4,
-                    cssStyle: 'col-12 col-lg-4 col-md-6 ',
-                    isShow: true,
-                    isSave: false
-                }" />
-
-                <!-- card 02 -->
-                <CardCompany :cardData="{
-                    imgSrc: '/src/assets/img/fpt_corporation_logo.jpg',
-                    imgAlt: 'FPT',
-                    name: 'Software Engineer',
-                    title: 'FPT Technology',
-                    salary: ' Sign in to view salary ',
-                    location: 'Default Location',
-                    type: 'Default Type',
-                    jobs: 4,
-                    cssStyle: 'col-12 col-lg-4 col-md-6 ',
-                    isShow: true,
-                    isSave: false
-                }" />
-
-                <!-- card 03 -->
-                <CardCompany :cardData="{
-                    imgSrc: '/src/assets/img/fpt_corporation_logo.jpg',
-                    imgAlt: 'FPT',
-                    name: 'Software Engineer',
-                    title: 'FPT Technology',
-                    salary: ' Sign in to view salary ',
-                    location: 'Default Location',
-                    type: 'Default Type',
-                    jobs: 4,
-                    cssStyle: 'col-12 col-lg-4 col-md-6 ',
-                    isShow: true,
-                    isSave: false
-                }" />
+                <CardCompany
+                    v-for="(company, index) in companyStore.listcompany"
+                    :key="index"
+                    :cardData="{
+                        imgSrc: company.logo ,  
+                        imgAlt: company.name || 'Default Company',
+                        name: company.name || 'Default Position',
+                        title: company.industry || 'Default Title',
+                        location: company.location || 'Default Location',
+                        type: company.type || 'Default Type',
+                        jobs: 4,
+                        cssStyle: 'col-12 col-lg-4 col-md-6',
+                        isShow: true,
+                        isSave: false
+                    }"
+                />
+                
             </div>
         </div>
     </section>
@@ -265,95 +276,24 @@ import CardCompany from '@/components/companies/cardCompany.vue';
             <h2>Most followed company</h2>
             <div class="row pt-5 pt-sm-4 g-3">
 
-                <!-- card 01 -->
-                <CardCompany :cardData="{
-                    imgSrc: '/src/assets/img/fpt_corporation_logo.jpg',
-                    imgAlt: 'FPT',
-                    name: 'Software Engineer',
-                    title: 'FPT Technology',
-                    salary: ' Sign in to view salary ',
-                    location: 'Default Location',
-                    type: 'Default Type',
-                    jobs: 4,
-                    cssStyle: 'col-12 col-lg-4 col-md-6 ',
-                    isShow: true,
-                    isSave: false
-                }" />
-
-                <!-- card 02 -->
-                <CardCompany :cardData="{
-                    imgSrc: '/src/assets/img/fpt_corporation_logo.jpg',
-                    imgAlt: 'FPT',
-                    name: 'Software Engineer',
-                    title: 'FPT Technology',
-                    salary: ' Sign in to view salary ',
-                    location: 'Default Location',
-                    type: 'Default Type',
-                    jobs: 4,
-                    cssStyle: 'col-12 col-lg-4 col-md-6 ',
-                    isShow: true,
-                    isSave: false
-                }" />
-
-                <!-- card 03 -->
-                <CardCompany :cardData="{
-                    imgSrc: '/src/assets/img/fpt_corporation_logo.jpg',
-                    imgAlt: 'FPT',
-                    name: 'Software Engineer',
-                    title: 'FPT Technology',
-                    salary: ' Sign in to view salary ',
-                    location: 'Default Location',
-                    type: 'Default Type',
-                    jobs: 4,
-                    cssStyle: 'col-12 col-lg-4 col-md-6 ',
-                    isShow: true,
-                    isSave: false
-                }" />
-
-                <!-- card 04 -->
-                <CardCompany :cardData="{
-                    imgSrc: '/src/assets/img/fpt_corporation_logo.jpg',
-                    imgAlt: 'FPT',
-                    name: 'Software Engineer',
-                    title: 'FPT Technology',
-                    salary: ' Sign in to view salary ',
-                    location: 'Default Location',
-                    type: 'Default Type',
-                    jobs: 4,
-                    cssStyle: 'col-12 col-lg-4 col-md-6 ',
-                    isShow: true,
-                    isSave: false
-                }" />
-
-                <!-- card 05 -->
-                <CardCompany :cardData="{
-                    imgSrc: '/src/assets/img/fpt_corporation_logo.jpg',
-                    imgAlt: 'FPT',
-                    name: 'Software Engineer',
-                    title: 'FPT Technology',
-                    salary: ' Sign in to view salary ',
-                    location: 'Default Location',
-                    type: 'Default Type',
-                    jobs: 4,
-                    cssStyle: 'col-12 col-lg-4 col-md-6 ',
-                    isShow: true,
-                    isSave: false
-                }" />
-
-                <!-- card 06 -->
-                <CardCompany :cardData="{
-                    imgSrc: '/src/assets/img/fpt_corporation_logo.jpg',
-                    imgAlt: 'FPT',
-                    name: 'Software Engineer',
-                    title: 'FPT Technology',
-                    salary: ' Sign in to view salary ',
-                    location: 'Default Location',
-                    type: 'Default Type',
-                    jobs: 4,
-                    cssStyle: 'col-12 col-lg-4 col-md-6 ',
-                    isShow: true,
-                    isSave: false
-                }" />
+                <CardCompany
+                    v-for="(company, index) in companyStore.listcompany"
+                    :key="index"
+                    :cardData="{
+                        id: company.id,
+                        imgSrc: company.logo ,  
+                        imgAlt: company.name || 'Default Company',
+                        name: company.name || 'Default Position',
+                        title: company.industry || 'Default Title',
+                        location: company.location || 'Default Location',
+                        type: company.type || 'Default Type',
+                        jobs: 4,
+                        cssStyle: 'col-12 col-lg-4 col-md-6',
+                        isShow: true,
+                        isSave: false
+                    }"
+                />
+               
 
             </div>
             <!-- pagination -->

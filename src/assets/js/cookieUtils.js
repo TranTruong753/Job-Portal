@@ -27,8 +27,10 @@ function getCookie(cname) {
   }
   
   function deleteCookie(cname) {
-    document.cookie = `username=${cname}; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+    // Đặt lại cookie với thời gian hết hạn trong quá khứ để xóa cookie
+    document.cookie = `${cname}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
   }
+  
   // Xuất các hàm để sử dụng ở các file khác
   export { getCookie, setCookie, deleteCookie };
   

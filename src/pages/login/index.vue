@@ -42,10 +42,12 @@ const onSubmit = handleSubmit((values) => {
     console.log('Form submitted:', values);
     try {
         authStore.login('/api/account/login',values);
-        if(authStore.role === 'Admin'){
+        if(authStore.isAuthenticated){
+            if(authStore.role === 'Admin'){
             window.location.href = 'https://localhost:7283/home'; 
-        }else {
-            router.push('/');
+            }else {
+                router.push('/');
+            }
         }
     }catch (error) {
         console.error('Đăng nhập thất bại:', error);
