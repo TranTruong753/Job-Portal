@@ -1,30 +1,34 @@
 <script setup>
 import { onBeforeMount,onMounted, ref } from 'vue';
-import { getCookie } from '../assets/js/cookieUtils.js';
-import { jwtDecode } from 'jwt-decode';
-import { useAuthStore } from '../stores/auth.js';
+import {getCookie } from '@/assets/js/cookieUtils.js'
 
+import { useAuthStore } from '@/stores/auth.js';
+import { useRouter } from 'vue-router';
+   
+
+const router = useRouter(); // Sử dụng router
 
 const authStore = useAuthStore();
 
-
 // Kiểm tra token khi chuyển trang
-onBeforeMount(() => {
-  const cookieToken = getCookie('token');
-  // authStore.checklogin("/api/account/checktoken");
-  console.log("cookie",cookieToken);
-  if( cookieToken !== ""){
-    authStore.checklogin(cookieToken);
-    if (authStore.isAuthenticated) {
-      console.log("ĐĂNG NHẬP THÀNH CÔNG!")
-    } 
+// onBeforeMount(() => {
+//   // const cookieToken = getCookie('token');
+//   // // authStore.checklogin("/api/account/checktoken");
+//   // // console.log("cookie",cookieToken);
+//   // if( cookieToken !== ""){
+//   //   authStore.checklogin(cookieToken);
+//   //   if (authStore.isAuthenticated) {
+//   //     console.log("ĐĂNG NHẬP THÀNH CÔNG!")
+//   //   } 
 
-  }
+//   // }
 
-});
+// });
 
 function handleLogout() {
+  router.push('/home');
   authStore.logout();
+  
 }
 
 
@@ -101,20 +105,23 @@ function handleLogout() {
                  
                 </button>
   
-                <ul class="dropdown-menu mt-2 end-0">
-                  <li>
+                <ul class="dropdown-menu mt-2 end-0" style="    min-width: 16rem;">
+                  <li class=" p-0 overflow-hidden border-bottom ">
                     <div
-                      class="dropdown-item d-flex flex-lg-column flex-xl-row align-items-xl-center align-items-lg-start gap-2 pb-2  border-bottom">
+                      class="  d-flex flex-lg-column flex-xl-row align-items-xl-center align-items-lg-start gap-2 p-0 m-2  overflow-hidden">
                       <img class="object-fit-cover img-thumbnail rounded-circle" style="max-width: 40px;" src="../assets/img/avatar7.png"
                         alt="avatar7" />
-                      <span class="fs-6">{{ authStore.user }}</span>
+                      <span class="small">{{ authStore.fullname }}</span>
                     </div>
                   </li>
                   <li>
                     <router-link class="dropdown-item" to="/account">Account Setting</router-link>
                   </li>
                   <li>
-                    <router-link class="dropdown-item" to="/blog/post">Post a Blog</router-link>
+                    <router-link class="dropdown-item" to="/account/post-blog">Post a Blog</router-link>
+                  </li>
+                  <li>
+                    <router-link class="dropdown-item" to="/account/create-cv">Create CV</router-link>
                   </li>
                   <li>
                     <a class="dropdown-item" href="#" @click="()=>{
@@ -126,7 +133,7 @@ function handleLogout() {
             </div>
             <!-- chưa đăng nhập -->
            <div v-else>
-              <router-link class="btn btn-outline-primary me-2" to="/login">Login/Register</router-link>
+              <router-link class="btn btn-outline-primary me-2" to="/login">Login</router-link>
               <router-link class="btn btn-primary" to="/register-employers">For Employers</router-link>
            </div>
         

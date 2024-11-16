@@ -3,8 +3,8 @@ import { ref } from 'vue';
 import { useForm, useField } from 'vee-validate';
 import * as yup from 'yup';
 import { useRouter } from 'vue-router';
-import { useAuthStore } from '../../stores/auth.js'; 
-
+import { useAuthStore } from '../../stores/auth.js';
+import Swal from 'sweetalert2';
 
 
 const router = useRouter(); // Sử dụng router
@@ -34,26 +34,48 @@ const { value: password, errorMessage: passwordError } = useField('password');
 // Trạng thái ẩn/hiện mật khẩu
 const isPasswordVisible = ref(false);
 
- // Lấy store auth
- const authStore = useAuthStore();
+// Lấy store auth
+const authStore = useAuthStore();
 
 // Hàm submit form
-const onSubmit = handleSubmit((values) => {
+const onSubmit = handleSubmit(async (values) => {
     console.log('Form submitted:', values);
     try {
-        authStore.login('/api/account/login',values);
-        if(authStore.isAuthenticated){
-            if(authStore.role === 'Admin'){
-            window.location.href = 'https://localhost:7283/home'; 
-            }else {
+        await authStore.login('/api/account/login', values);
+        console.log(authStore.role);
+        if (authStore.isAuthenticated) {
+
+
+
+            if (authStore.role === 'Admin') {
+                window.location.href = 'https://localhost:7283/home';
+            } else {
+
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: "top-end",
+                    showConfirmButton: false,
+                    timer: 2000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.onmouseenter = Swal.stopTimer;
+                        toast.onmouseleave = Swal.resumeTimer;
+                    }
+                });
+                Toast.fire({
+                    icon: "success",
+                    title: "Signed in successfully"
+                });
+
                 router.push('/');
             }
         }
-    }catch (error) {
+
+    } catch (error) {
         console.error('Đăng nhập thất bại:', error);
     }
 
-   
+
 });
 
 // onUnmounted(() => {
@@ -72,7 +94,7 @@ const onSubmit = handleSubmit((values) => {
                     <div class="card shadow border-0 p-5">
                         <h1 class="h3">Login</h1>
                         <form @submit.prevent="onSubmit" autocomplete="off">
-                    
+
                             <div class="">
                                 <label for="username" class="mb-2">User Name <span
                                         class="text-danger d-inline fs-5">*</span></label>

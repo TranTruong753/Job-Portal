@@ -52,9 +52,10 @@
                 <div class="col-lg-3">
                     <div class="d-flex flex-column m-4 align-items-center gap-3">
                         <div class="">
-                            <img class="img-thumbnai object-fit-cover shadow" src="/src/assets/img/edutech_logo.png" alt="">
+                            <img class="img-thumbnai object-fit-cover shadow" src="/src/assets/img/edutech_logo.png"
+                                alt="">
                         </div>
-                        <button  class=" btn btn-primary w-75" data-bs-toggle="modal" data-bs-target="#changeLogo"
+                        <button class=" btn btn-primary w-75" data-bs-toggle="modal" data-bs-target="#changeLogo"
                             type="button">change</button>
                     </div>
                 </div>
@@ -93,5 +94,31 @@
         <div class="card-footer  p-4">
             <button type="button" class="btn btn-primary">Update</button>
         </div>
+
+        <div class="modal fade" id="changeLogo" tabindex="-1" aria-labelledby="changeLogoLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title pb-0" id="changeLogoLabel">Change Logo Picture</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="mb-3">
+                                <label for="exampleInputEmail1" class="form-label">Logo Image</label>
+                                <input type="file" class="form-control" id="image" name="image">
+                            </div>
+                            <div class="d-flex justify-content-end">
+                                <button type="submit" class="btn btn-primary mx-3">Update</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
     </div>
+
 </template>

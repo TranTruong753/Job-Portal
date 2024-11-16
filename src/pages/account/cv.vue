@@ -1,71 +1,27 @@
 <script setup>
-import NavAccount from "@/components/account/navAccount.vue";
+    import { useModalStore } from '../../stores/useModalStore'; // Đường dẫn store của bạn
+    import { ref } from 'vue';
 
-import { useAuthStore } from '@/stores/auth.js';
+    const modalStore = useModalStore();
 
-import {reactive} from 'vue'
+    const workExperienceModal = ref({
+      title: '',
+      description: '',
+    });
 
-
-const authStore = useAuthStore();
-
-const userObj = reactive({
-    fullname: authStore.fullname,
-    email: authStore.email,
-    birthday: null,
-    sex: null
-})
+    const saveItem = () => {
+      modalStore.addItem({ ...workExperienceModal.value });
+      workExperienceModal.value.title = '';
+      workExperienceModal.value.description = '';
+    };
 
 </script>
 
 <template>
-
-    <!-- Personal Information -->
-    <div class="card border-0 shadow mb-4  ">
-        <div class="card-body p-4">
-            <h3 class="mt-3 fs-4 mb-1">Personal Information</h3>
-            <div class="pt-0 row g-3">
-                <div class="col-lg-6">
-                    <label for="fullname" class="mb-2">Full Name<span class="text-primary">*</span></label>
-                    <input type="text" placeholder="Enter Name" class="form-control" id="fullname" v-model="userObj.fullname">
-                </div>
-                <div class="col-lg-6">
-                    <label for="email" class="mb-2">Email<span class="text-primary">*</span></label>
-                    <input type="text" placeholder="Enter Email" id="email" v-model="userObj.email" class="form-control">
-                </div>
-                <div class="col-lg-6">
-                    <label for="birthday" class="mb-2">Date of Birth<span class="text-primary">*</span></label>
-                    <input id="birthday" type="date" placeholder="Designation" class="form-control" v-model="userObj.birthday" >
-                </div>
-                <div class="col-lg-6">
-                    <label for="" class="mb-2">Sex<span class="text-primary">*</span></label>
-                    <div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1"
-                                value="Men" v-model="userObj.sex">
-                            <label class="form-check-label" for="inlineRadio1">Men</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2"
-                                value="Women" v-model="userObj.sex">
-                            <label class="form-check-label" for="inlineRadio2">Women</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio3"
-                                value="Other" v-model="userObj.sex">
-                            <label class="form-check-label" for="inlineRadio3">Other</label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-        <div class="card-footer p-4">
-            <button type="button" class="btn btn-primary">Update</button>
-        </div>
-    </div>
+   
 
     <!-- General information-->
-    <!-- <div class="card border-0 shadow mb-4">
+    <div class="card border-0 shadow mb-4">
         <div class="card-body p-4">
             <h3 class="mt-3 fs-4 mb-1">General Information</h3>
             <div class="row g-3 pt-0">
@@ -120,13 +76,15 @@ const userObj = reactive({
                 </div>
             </div>
         </div>
-        <div class="card-footer  p-4">
+        
+        
+        <!-- <div class="card-footer  p-4">
             <button type="button" class="btn btn-primary">Update</button>
-        </div>
-    </div> -->
+        </div> -->
+    </div>
 
     <!-- item demo -->
-    <!-- <div class="card border-0 shadow mb-4  ">
+    <div class="card border-0 shadow mb-4  ">
         <div class="card-body p-0">
             <div class="d-flex align-items-sm-start justify-content-between ps-4 pe-2 pt-2 ">
                 <h3 class="mt-3 fs-4 mb-1 pb-0">Demo</h3>
@@ -138,7 +96,7 @@ const userObj = reactive({
             </div>
             <div class="m-3 border border-2">
                 <div class="p-3 ">
-
+                    <!-- <p class="card-text">you often add demo</p> -->
                     <div class="mb-3 ">
                         <div class="d-flex gap-3 align-items-center">
                             <span class="rounded-circle bg-1" style="height: 13px; width: 13px;"></span>
@@ -183,10 +141,10 @@ const userObj = reactive({
                 </div>
             </div>
         </div>
-    </div> -->
+    </div>
 
     <!-- work experience -->
-    <!-- <div class="card border-0 shadow mb-4  ">
+    <div class="card border-0 shadow mb-4  ">
         <div class="card-body p-0">
             <div class="d-flex align-items-sm-start justify-content-between ps-4 pe-2 pt-2 ">
                 <h3 class="mt-3 fs-4 mb-1 pb-0">Work experience</h3>
@@ -202,10 +160,10 @@ const userObj = reactive({
                 </div>
             </div>
         </div>
-    </div> -->
+    </div>
 
     <!-- educational information -->
-    <!-- <div class="card border-0 shadow mb-4  ">
+    <div class="card border-0 shadow mb-4  ">
         <div class="card-body p-0">
             <div class="d-flex align-items-sm-start justify-content-between ps-4 pe-2 pt-2 ">
                 <h3 class="mt-3 fs-4 mb-1 pb-0">Educational Information</h3>
@@ -221,10 +179,10 @@ const userObj = reactive({
                 </div>
             </div>
         </div>
-    </div> -->
+    </div>
 
     <!-- certificate -->
-    <!-- <div class="card border-0 shadow mb-4  ">
+    <div class="card border-0 shadow mb-4  ">
         <div class="card-body p-0">
             <div class="d-flex align-items-sm-start justify-content-between ps-4 pe-2 pt-2 ">
                 <h3 class="mt-3 fs-4 mb-1 pb-0">Certificate</h3>
@@ -240,10 +198,10 @@ const userObj = reactive({
                 </div>
             </div>
         </div>
-    </div> -->
+    </div>
 
     <!-- Specialized skills -->
-    <!-- <div class="card border-0 shadow mb-4  ">
+    <div class="card border-0 shadow mb-4  ">
         <div class="card-body p-0">
             <div class="d-flex align-items-sm-start justify-content-between ps-4 pe-2 pt-2 ">
                 <h3 class="mt-3 fs-4 mb-1 pb-0">Specialized skills</h3>
@@ -259,10 +217,10 @@ const userObj = reactive({
                 </div>
             </div>
         </div>
-    </div> -->
+    </div>
 
     <!-- Other skills -->
-    <!-- <div class="card border-0 shadow mb-4  ">
+    <div class="card border-0 shadow mb-4  ">
         <div class="card-body p-0">
             <div class="d-flex align-items-sm-start justify-content-between ps-4 pe-2 pt-2 ">
                 <h3 class="mt-3 fs-4 mb-1 pb-0">Other skills</h3>
@@ -278,11 +236,14 @@ const userObj = reactive({
                 </div>
             </div>
         </div>
-    </div> -->
+    </div>
 
+    <div class="mb-4 ">
+        <button type="button" class="btn btn-primary ">Create CV</button>
+    </div>
     <!-- modal -->
     <!-- modal demo -->
-    <!-- <div class="modal fade" id="demoModal" tabindex="-1" aria-labelledby="demoModalLabel" aria-hidden="true">
+    <div class="modal fade" id="demoModal" tabindex="-1" aria-labelledby="demoModalLabel" aria-hidden="true">
         <div class="modal-dialog  modal-dialog-centered  modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
@@ -332,10 +293,10 @@ const userObj = reactive({
                 </div>
             </div>
         </div>
-    </div> -->
+    </div>
 
     <!-- modal Work experience  -->
-    <!-- <div class="modal fade" id="workExperienceModal" tabindex="-1" aria-labelledby="workExperienceModalLabel"
+    <div class="modal fade" id="workExperienceModal" tabindex="-1" aria-labelledby="workExperienceModalLabel"
         aria-hidden="true">
         <div class="modal-dialog  modal-dialog-centered  modal-lg">
             <div class="modal-content">
@@ -381,10 +342,10 @@ const userObj = reactive({
                 </div>
             </div>
         </div>
-    </div> -->
+    </div>
 
     <!-- modal Educational Information -->
-    <!-- <div class="modal fade" id="educationalInformationModal" tabindex="-1"
+    <div class="modal fade" id="educationalInformationModal" tabindex="-1"
         aria-labelledby="educationalInformationModalLabel" aria-hidden="true">
         <div class="modal-dialog  modal-dialog-centered  modal-lg">
             <div class="modal-content">
@@ -437,10 +398,10 @@ const userObj = reactive({
                 </div>
             </div>
         </div>
-    </div> -->
+    </div>
 
     <!-- modal certificate -->
-    <!-- <div class="modal fade" id="certificateModal" tabindex="-1" aria-labelledby="certificateModalLabel"
+    <div class="modal fade" id="certificateModal" tabindex="-1" aria-labelledby="certificateModalLabel"
         aria-hidden="true">
         <div class="modal-dialog  modal-dialog-centered  modal-lg">
             <div class="modal-content">
@@ -452,18 +413,13 @@ const userObj = reactive({
                     <form action="">
                         <div class="row g-3 ">
                             <div class=" col-lg-12">
-                                <label for="" class="mb-2">input 1<span class="text-primary">*</span></label>
-                                <input type="text" placeholder="not updated" class="form-control">
+                                <label for="" class="mb-2">Certificate Name<span class="text-primary">*</span></label>
+                                <input type="text" placeholder="Certificate Name...." class="form-control">
                             </div>
 
                             <div class=" col-lg-6">
-                                <label for="" class="mb-2">input 2<span class="text-primary">*</span></label>
-                                <input type="text" placeholder="not updated" class="form-control">
-                            </div>
-
-                            <div class=" col-lg-6">
-                                <label for="" class="mb-2">input 3<span class="text-primary">*</span></label>
-                                <input type="text" placeholder="not updated" class="form-control">
+                                <label for="" class="mb-2">School/Training Center<span class="text-primary">*</span></label>
+                                <input type="text" placeholder="School/Training Center...." class="form-control">
                             </div>
 
                             <div class=" col-lg-6">
@@ -476,12 +432,6 @@ const userObj = reactive({
                                 <input type="date" placeholder="not updated" class="form-control">
                             </div>
 
-
-                            <div class=" col-lg-12">
-                                <label for="" class="mb-2"> More Description <span class="text-primary">*</span></label>
-                                <textarea class="form-control" placeholder="Leave a Description here" id=""
-                                    style="height: 200px; resize: none;"></textarea>
-                            </div>
                         </div>
                     </form>
                 </div>
@@ -491,10 +441,10 @@ const userObj = reactive({
                 </div>
             </div>
         </div>
-    </div> -->
+    </div>
 
-    <!-- Specialized skills -->
-    <!-- <div class="modal fade" id="specializedSkillsModal" tabindex="-1" aria-labelledby="specializedSkillsModalLabel"
+    <!-- modal Specialized skills -->
+    <div class="modal fade" id="specializedSkillsModal" tabindex="-1" aria-labelledby="specializedSkillsModalLabel"
         aria-hidden="true">
         <div class="modal-dialog  modal-dialog-centered  modal-lg">
             <div class="modal-content">
@@ -545,10 +495,10 @@ const userObj = reactive({
                 </div>
             </div>
         </div>
-    </div> -->
+    </div>
 
-    <!-- Other skills -->
-    <!-- <div class="modal fade" id="otherSkillsModal" tabindex="-1" aria-labelledby="otherSkillsModalLabel"
+    <!-- modal Other skills -->
+    <div class="modal fade" id="otherSkillsModal" tabindex="-1" aria-labelledby="otherSkillsModalLabel"
         aria-hidden="true">
         <div class="modal-dialog  modal-dialog-centered  modal-lg">
             <div class="modal-content">
@@ -599,6 +549,6 @@ const userObj = reactive({
                 </div>
             </div>
         </div>
-    </div> -->
+    </div>
 
 </template>

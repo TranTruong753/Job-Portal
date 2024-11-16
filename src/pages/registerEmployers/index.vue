@@ -74,8 +74,7 @@ onMounted(() => {
                 text: 'Please try again later.',
                 icon: 'error',
                 confirmButtonText: 'OK'
-            }).then((result) => {
-            
+            }).then((result) => { 
             
                 router.push('/'); 
                 

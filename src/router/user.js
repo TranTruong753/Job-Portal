@@ -1,108 +1,197 @@
+import { getCookie } from '@/assets/js/cookieUtils.js'
+import {checkAuth} from '@/assets/js/jsUtils.js';
+import { useAuthStore } from '@/stores/auth.js'
+
+
+
 const user = [
     {
-        path:"/",
+        path: "/",
         component: () => import("../layouts/user.vue"),
+        beforeEnter: (to, from, next) => {
+            const token = getCookie('token');
+            if (token) {
+                checkAuth(next);  // Kiểm tra xác thực
+                next();
+               
+            } else {
+                next();  // Nếu không có token, cho phép tiếp tục vào route
+            }
+        },
         children: [
             {
-                path:"/",
-                name:"user-home-default",
+                path: "/",
+                name: "user-home-default",
                 component: () => import("../pages/home/index.vue")
             },
             {
-                path:"/home",
-                name:"user-home",
+                path: "/home",
+                name: "user-home",
                 component: () => import("../pages/home/index.vue")
             },
             {
-                path:"/job",
-                name:"user-jobs",
+                path: "/job",
+                name: "user-jobs",
                 component: () => import("../pages/jobs/index.vue"),
             },
             {
-                path:"/job/detail",
-                name:"job-detail",
+                path: "/job/detail",
+                name: "job-detail",
                 component: () => import("../pages/jobs/detail.vue"),
             },
             {
-                path:"/account",
-                name:"user-accounts",
+                path: "/account",
+                name: "user-accounts",
                 component: () => import("../pages/account/index.vue"),
+                beforeEnter: (to, from, next) => {
+                    const role = checkAuth(next);         
+                   
+                    if (role === 'User' || role === 'Employer') {
+                        next();
+                    } else {
+                        next({ name: 'user-login' });
+                    }
+                },
                 children: [
                     {
-                        path:"",
-                        name:"account-settings",
+                        path: "",
+                        name: "account-settings",
                         component: () => import("../pages/account/setting.vue"),
                     },
                     {
-                        path:"profile",
-                        name:"account-profile",
+                        path: "profile",
+                        name: "account-profile",
                         component: () => import("../pages/account/profile.vue"),
+                        beforeEnter: (to, from, next) => {
+                            const role = checkAuth(next);         
+                           
+                            if (role === 'User') {
+                                next();
+                            } else {
+                                next({name:'account-settings'})
+                            }
+                        },
                     },
                     {
-                        path:"profile-employer",
-                        name:"account-profile-employer",
+                        path: "profile-employer",
+                        name: "account-profile-employer",
                         component: () => import("../pages/account/profileEmployer.vue"),
+                        beforeEnter: (to, from, next) => {
+                            const role = checkAuth(next);         
+                           
+                            if (role === 'Employer') {
+                                next();
+                            } else {
+                                next({name:'account-settings'})
+                            }
+                        },
                     },
                     {
-                        path:"post-job",
-                        name:"account-post-job",
+                        path: "post-job",
+                        name: "account-post-job",
                         component: () => import("../pages/account/postJobs.vue"),
+                        beforeEnter: (to, from, next) => {
+                            const role = checkAuth(next);         
+                           
+                            if (role === 'Employer') {
+                                next();
+                            } else {
+                                next({name:'account-settings'})
+                            }
+                        },
                     },
                     {
-                        path:"my-jobs",
-                        name:"account-my-jobs",
+                        path: "my-jobs",
+                        name: "account-my-jobs",
                         component: () => import("../pages/account/myJobs.vue"),
+                        beforeEnter: (to, from, next) => {
+                            const role = checkAuth(next);         
+                           
+                            if (role === 'Employer') {
+                                next();
+                            } else {
+                                next({name:'account-settings'})
+                            }
+                        },
                     },
                     {
-                        path:"jobs-applied",
-                        name:"account-jobs-applied",
+                        path: "jobs-applied",
+                        name: "account-jobs-applied",
                         component: () => import("../pages/account/jobsApplied.vue"),
+                        beforeEnter: (to, from, next) => {
+                            const role = checkAuth(next);         
+                           
+                            if (role === 'User') {
+                                next();
+                            } else {
+                                next({name:'account-settings'})
+                            }
+                        },
                     },
                     {
-                        path:"saved-jobs",
-                        name:"account-saved-jobs",
+                        path: "saved-jobs",
+                        name: "account-saved-jobs",
                         component: () => import("../pages/account/savedJobs.vue"),
+                        beforeEnter: (to, from, next) => {
+                            const role = checkAuth(next);         
+                           
+                            if (role === 'User') {
+                                next();
+                            } else {
+                                next({name:'account-settings'})
+                            }
+                        },
                     },
                     {
-                        path:"post-blog",
-                        name:"account-post-blog",
+                        path: "post-blog",
+                        name: "account-post-blog",
                         component: () => import("../pages/blogs/post.vue"),
+                    },
+                    {
+                        path: "create-cv-test",
+                        name: "account-create-cv-test",
+                        component: () => import("../pages/account/testCv.vue"),
+                    },
+                    {
+                        path: "create-cv",
+                        name: "account-create-cv",
+                        component: () => import("../pages/account/cv.vue"),
                     },
                 ]
             },
             {
-                path:"/company",
-                name:"user-companies",
+                path: "/company",
+                name: "user-companies",
                 component: () => import("../pages/companies/index.vue"),
             },
             {
-                path:"/company/detail",
-                name:"company-detail",
+                path: "/company/detail",
+                name: "company-detail",
                 component: () => import("../pages/companies/detail.vue"),
             },
             {
-                path:"/blog",
-                name:"user-blogs",
+                path: "/blog",
+                name: "user-blogs",
                 component: () => import("../pages/blogs/index.vue"),
             },
             {
-                path:"/blog/detail",
-                name:"blog-detail",
+                path: "/blog/detail",
+                name: "blog-detail",
                 component: () => import("../pages/blogs/detail.vue"),
             },
             {
-                path:"/login",
-                name:"user-login",
+                path: "/login",
+                name: "user-login",
                 component: () => import("../pages/login/index.vue")
             },
             {
-                path:"/register",
-                name:"user-register",
+                path: "/register",
+                name: "user-register",
                 component: () => import("../pages/register/index.vue")
             },
             {
-                path:"/register-employers",
-                name:"user-register-employers",
+                path: "/register-employers",
+                name: "user-register-employers",
                 component: () => import("../pages/registerEmployers/index.vue")
             },
         ]

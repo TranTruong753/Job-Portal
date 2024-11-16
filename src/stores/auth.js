@@ -7,6 +7,7 @@ import { jwtDecode } from 'jwt-decode';
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
+    fullname: null,
     user: null,
     email: null,
     isAuthenticated: false,
@@ -15,13 +16,15 @@ export const useAuthStore = defineStore('auth', {
   }),
 
   actions: {
-    async login(url, credentials) {
+
+    async login(url, values) {
       try {
-        const response = await axios.post(url, credentials);
+        const response = await axios.post(url, values);
         this.user = response.data.userName;
         this.email = response.data.email;
         this.token = response.data.token;
         this.isAuthenticated = true;
+        this.fullname = jwtDecode(this.token).name;
         this.role = jwtDecode(this.token).role;
 
         // Lưu token vào cookie để duy trì trạng thái đăng nhập
@@ -30,7 +33,7 @@ export const useAuthStore = defineStore('auth', {
           localStorage.setItem('token', this.token);
         }
         
-        console.log(response);
+
 
       } catch (error) {
         // console.error('Login failed:', error.response.data);
@@ -52,7 +55,7 @@ export const useAuthStore = defineStore('auth', {
         this.isAuthenticated = false
         deleteCookie('token')
         this.role = null
-        this.isAuthenticated = false
+        this.fullname = null
     },
 
     // async checklogin(url) {
@@ -99,7 +102,8 @@ export const useAuthStore = defineStore('auth', {
         this.user = token.given_name;
         this.email = token.email;
         this.role = token.role;
-        console.log("Token is valid:", this.user);
+        this.fullname = token.name;
+        console.log("Token is valid:", this.role);
       }
     }
 

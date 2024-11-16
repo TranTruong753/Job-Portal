@@ -1,5 +1,15 @@
 <script setup>
 import NavAccount from "@/components/account/navAccount.vue";
+
+import { useAuthStore } from '@/stores/auth.js';
+import { onMounted } from "vue";
+
+
+
+const authStore = useAuthStore();
+
+
+
 </script>
 
 <template>
@@ -22,8 +32,8 @@ import NavAccount from "@/components/account/navAccount.vue";
                         <div class="s-body text-center mt-3">
                             <img src="/src/assets/img/avatar7.png" alt="avatar" class="rounded-circle img-fluid"
                                 style="width: 150px;">
-                            <h5 class="mt-3 pb-0">Mohit Singh</h5>
-                            <p class="text-muted mb-1 fs-6">Full Stack Developer</p>
+                            <h5 class="mt-3 pb-0 mb-2 fs-4">{{authStore.fullname}}</h5>
+                            <!-- <p class="text-muted mb-1 fs-6">Full Stack Developer</p> -->
                             <div class="d-flex justify-content-center mb-2">
                                 <button data-bs-toggle="modal" data-bs-target="#exampleModal" type="button"
                                     class="btn btn-primary">Change Profile Picture</button>
@@ -44,17 +54,17 @@ import NavAccount from "@/components/account/navAccount.vue";
                                     {
                                         titleNav: 'My Profile',
                                         linkNav: '/account/profile',
-                                        isShow: true,
+                                        isShow: authStore.role === 'User',
                                     },
                                     {
                                         titleNav: 'My Profile Employer',
                                         linkNav: '/account/profile-employer',
-                                        isShow: true,
+                                        isShow: authStore.role === 'Employer',
                                     },
                                     {
                                         titleNav: 'Post a Job',
                                         linkNav: '/account/post-job',
-                                        isShow: true,
+                                        isShow: authStore.role === 'Employer',
                                     },
                                     {
                                         titleNav: 'Post a Blog',
@@ -64,16 +74,26 @@ import NavAccount from "@/components/account/navAccount.vue";
                                     {
                                         titleNav: 'My Jobs',
                                         linkNav: '/account/my-jobs',
-                                        isShow: true,
+                                        isShow: authStore.role === 'Employer',
                                     },
                                     {
                                         titleNav: 'Jobs Applied',
                                         linkNav: '/account/jobs-applied',
-                                        isShow: true,
+                                        isShow: authStore.role === 'User',
                                     },
                                     {
                                         titleNav: 'Saved Jobs',
                                         linkNav: '/account/saved-jobs',
+                                        isShow: authStore.role === 'User',   
+                                    },
+                                    {
+                                        titleNav: 'Create CV test',
+                                        linkNav: '/account/create-cv-test',
+                                        isShow: true,
+                                    },
+                                    {
+                                        titleNav: 'Create CV',
+                                        linkNav: '/account/create-cv',
                                         isShow: true,
                                     },
                                 ]
@@ -89,339 +109,19 @@ import NavAccount from "@/components/account/navAccount.vue";
         </div>
     </section>
 
-    <!-- DEMO -->
-    <!-- modal demo -->
-    <div class="modal fade" id="demoModal" tabindex="-1" aria-labelledby="demoModalLabel" aria-hidden="true">
-        <div class="modal-dialog  modal-dialog-centered  modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-4 p-0" id="demoModalLabel">Demo</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form action="">
-                        <div class="row g-3 ">
-                            <div class=" col-lg-12">
-                                <label for="" class="mb-2">input 1<span class="text-primary">*</span></label>
-                                <input type="text" placeholder="not updated" class="form-control">
-                            </div>
-
-                            <div class=" col-lg-6">
-                                <label for="" class="mb-2">input 2<span class="text-primary">*</span></label>
-                                <input type="text" placeholder="not updated" class="form-control">
-                            </div>
-
-                            <div class=" col-lg-6">
-                                <label for="" class="mb-2">input 3<span class="text-primary">*</span></label>
-                                <input type="text" placeholder="not updated" class="form-control">
-                            </div>
-
-                            <div class=" col-lg-6">
-                                <label for="" class="mb-2">Start Date<span class="text-primary">*</span></label>
-                                <input type="date" placeholder="not updated" class="form-control">
-                            </div>
-
-                            <div class=" col-lg-6">
-                                <label for="" class="mb-2">End date<span class="text-primary">*</span></label>
-                                <input type="date" placeholder="not updated" class="form-control">
-                            </div>
-
-
-                            <div class=" col-lg-12">
-                                <label for="" class="mb-2"> More Description <span class="text-primary">*</span></label>
-                                <textarea class="form-control" placeholder="Leave a Description here" id=""
-                                    style="height: 200px; resize: none;"></textarea>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- modal Work experience  -->
-    <div class="modal fade" id="workExperienceModal" tabindex="-1" aria-labelledby="workExperienceModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog  modal-dialog-centered  modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-4 p-0" id="workExperienceModalLabel">Work experience</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form action="">
-                        <div class="row g-3 ">
-                            <div class=" col-lg-12">
-                                <label for="" class="mb-2">Job Title/Position<span class="text-primary">*</span></label>
-                                <input type="text" placeholder="not updated" class="form-control">
-                            </div>
-
-                            <div class=" col-lg-12">
-                                <label for="" class="mb-2">Company Name<span class="text-primary">*</span></label>
-                                <input type="text" placeholder="not updated" class="form-control">
-                            </div>
-
-                            <div class=" col-lg-6">
-                                <label for="" class="mb-2">Start Date<span class="text-primary">*</span></label>
-                                <input type="date" placeholder="not updated" class="form-control">
-                            </div>
-
-                            <div class=" col-lg-6">
-                                <label for="" class="mb-2">End date<span class="text-primary">*</span></label>
-                                <input type="date" placeholder="not updated" class="form-control">
-                            </div>
-
-
-                            <div class=" col-lg-12">
-                                <label for="" class="mb-2"> More Description <span class="text-primary">*</span></label>
-                                <textarea class="form-control" placeholder="Leave a Description here" id=""
-                                    style="height: 200px; resize: none;"></textarea>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- modal Educational Information -->
-    <div class="modal fade" id="educationalInformationModal" tabindex="-1"
-        aria-labelledby="educationalInformationModalLabel" aria-hidden="true">
-        <div class="modal-dialog  modal-dialog-centered  modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-4 p-0" id="educationalInformationModalLabel">Educational Information</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form action="">
-                        <div class="row g-3 ">
-                            <div class=" col-lg-12">
-                                <label for="" class="mb-2">Name of Degree/Certificate<span
-                                        class="text-primary">*</span></label>
-                                <input type="text" placeholder="not updated" class="form-control">
-                            </div>
-
-                            <div class=" col-lg-6">
-                                <label for="" class="mb-2">Training major<span class="text-primary">*</span></label>
-                                <input type="text" placeholder="not updated" class="form-control">
-                            </div>
-
-                            <div class=" col-lg-6">
-                                <label for="" class="mb-2">School/Training Center<span
-                                        class="text-primary">*</span></label>
-                                <input type="text" placeholder="not updated" class="form-control">
-                            </div>
-
-                            <div class=" col-lg-6">
-                                <label for="" class="mb-2">Start Date<span class="text-primary">*</span></label>
-                                <input type="date" placeholder="not updated" class="form-control">
-                            </div>
-
-                            <div class=" col-lg-6">
-                                <label for="" class="mb-2">End date<span class="text-primary">*</span></label>
-                                <input type="date" placeholder="not updated" class="form-control">
-                            </div>
-
-
-                            <div class=" col-lg-12">
-                                <label for="" class="mb-2"> More Description <span class="text-primary">*</span></label>
-                                <textarea class="form-control" placeholder="Leave a Description here" id=""
-                                    style="height: 200px; resize: none;"></textarea>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- modal certificate -->
-    <div class="modal fade" id="certificateModal" tabindex="-1" aria-labelledby="certificateModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog  modal-dialog-centered  modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-4 p-0" id="certificateModalLabel">Certificate</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form action="">
-                        <div class="row g-3 ">
-                            <div class=" col-lg-12">
-                                <label for="" class="mb-2">input 1<span class="text-primary">*</span></label>
-                                <input type="text" placeholder="not updated" class="form-control">
-                            </div>
-
-                            <div class=" col-lg-6">
-                                <label for="" class="mb-2">input 2<span class="text-primary">*</span></label>
-                                <input type="text" placeholder="not updated" class="form-control">
-                            </div>
-
-                            <div class=" col-lg-6">
-                                <label for="" class="mb-2">input 3<span class="text-primary">*</span></label>
-                                <input type="text" placeholder="not updated" class="form-control">
-                            </div>
-
-                            <div class=" col-lg-6">
-                                <label for="" class="mb-2">Start Date<span class="text-primary">*</span></label>
-                                <input type="date" placeholder="not updated" class="form-control">
-                            </div>
-
-                            <div class=" col-lg-6">
-                                <label for="" class="mb-2">End date<span class="text-primary">*</span></label>
-                                <input type="date" placeholder="not updated" class="form-control">
-                            </div>
-
-
-                            <div class=" col-lg-12">
-                                <label for="" class="mb-2"> More Description <span class="text-primary">*</span></label>
-                                <textarea class="form-control" placeholder="Leave a Description here" id=""
-                                    style="height: 200px; resize: none;"></textarea>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Specialized skills -->
-    <div class="modal fade" id="specializedSkillsModal" tabindex="-1" aria-labelledby="specializedSkillsModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog  modal-dialog-centered  modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-4 p-0" id="specializedSkillsModalLabel">Specialized skills</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form action="">
-                        <div class="row g-3 ">
-                            <div class=" col-lg-12">
-                                <label for="" class="mb-2">input 1<span class="text-primary">*</span></label>
-                                <input type="text" placeholder="not updated" class="form-control">
-                            </div>
-
-                            <div class=" col-lg-6">
-                                <label for="" class="mb-2">input 2<span class="text-primary">*</span></label>
-                                <input type="text" placeholder="not updated" class="form-control">
-                            </div>
-
-                            <div class=" col-lg-6">
-                                <label for="" class="mb-2">input 3<span class="text-primary">*</span></label>
-                                <input type="text" placeholder="not updated" class="form-control">
-                            </div>
-
-                            <div class=" col-lg-6">
-                                <label for="" class="mb-2">Start Date<span class="text-primary">*</span></label>
-                                <input type="date" placeholder="not updated" class="form-control">
-                            </div>
-
-                            <div class=" col-lg-6">
-                                <label for="" class="mb-2">End date<span class="text-primary">*</span></label>
-                                <input type="date" placeholder="not updated" class="form-control">
-                            </div>
-
-
-                            <div class=" col-lg-12">
-                                <label for="" class="mb-2"> More Description <span class="text-primary">*</span></label>
-                                <textarea class="form-control" placeholder="Leave a Description here" id=""
-                                    style="height: 200px; resize: none;"></textarea>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Other skills -->
-    <div class="modal fade" id="otherSkillsModal" tabindex="-1" aria-labelledby="otherSkillsModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog  modal-dialog-centered  modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-4 p-0" id="otherSkillsModalLabel">Other skills</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form action="">
-                        <div class="row g-3 ">
-                            <div class=" col-lg-12">
-                                <label for="" class="mb-2">input 1<span class="text-primary">*</span></label>
-                                <input type="text" placeholder="not updated" class="form-control">
-                            </div>
-
-                            <div class=" col-lg-6">
-                                <label for="" class="mb-2">input 2<span class="text-primary">*</span></label>
-                                <input type="text" placeholder="not updated" class="form-control">
-                            </div>
-
-                            <div class=" col-lg-6">
-                                <label for="" class="mb-2">input 3<span class="text-primary">*</span></label>
-                                <input type="text" placeholder="not updated" class="form-control">
-                            </div>
-
-                            <div class=" col-lg-6">
-                                <label for="" class="mb-2">Start Date<span class="text-primary">*</span></label>
-                                <input type="date" placeholder="not updated" class="form-control">
-                            </div>
-
-                            <div class=" col-lg-6">
-                                <label for="" class="mb-2">End date<span class="text-primary">*</span></label>
-                                <input type="date" placeholder="not updated" class="form-control">
-                            </div>
-
-
-                            <div class=" col-lg-12">
-                                <label for="" class="mb-2"> More Description <span class="text-primary">*</span></label>
-                                <textarea class="form-control" placeholder="Leave a Description here" id=""
-                                    style="height: 200px; resize: none;"></textarea>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- CHange logo -->
-    <div class="modal fade" id="changeLogo" tabindex="-1" aria-labelledby="changeLogoLabel" aria-hidden="true">
+    <!-- Modal -->
+    
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title pb-0" id="changeLogoLabel">Change Logo Picture</h5>
+                    <h5 class="modal-title pb-0" id="exampleModalLabel">Change Profile Picture</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <form>
                         <div class="mb-3">
-                            <label for="exampleInputEmail1" class="form-label">Logo Image</label>
+                            <label for="exampleInputEmail1" class="form-label">Profile Image</label>
                             <input type="file" class="form-control" id="image" name="image">
                         </div>
                         <div class="d-flex justify-content-end">
@@ -434,6 +134,8 @@ import NavAccount from "@/components/account/navAccount.vue";
             </div>
         </div>
     </div>
+    
+    
 
 </template>
 
