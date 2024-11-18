@@ -3,12 +3,12 @@ import { ref } from 'vue';
 import { useForm, useField } from 'vee-validate';
 import * as yup from 'yup';
 import { useRouter } from 'vue-router';
-import { useAuthStore } from '../../stores/auth.js';
+import { useAuthStore } from '@/stores/auth.js';
 import Swal from 'sweetalert2';
 
 
 const router = useRouter(); // Sử dụng router
-let cancelRequest;  // Định nghĩa cancelRequest ở phạm vi này
+
 // Định nghĩa schema validation với Yup
 const schema = yup.object({
     username: yup.string().required('User Name is required').test(

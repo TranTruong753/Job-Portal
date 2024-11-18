@@ -1,6 +1,5 @@
 import { getCookie } from '@/assets/js/cookieUtils.js'
 import {checkAuth} from '@/assets/js/jsUtils.js';
-import { useAuthStore } from '@/stores/auth.js'
 
 
 
@@ -136,6 +135,20 @@ const user = [
                             const role = checkAuth(next);         
                            
                             if (role === 'User') {
+                                next();
+                            } else {
+                                next({name:'account-settings'})
+                            }
+                        },
+                    },
+                    {
+                        path: "list-applicants",
+                        name: "account-list-applicants",
+                        component: () => import("../pages/account/ListApplicants.vue"),
+                        beforeEnter: (to, from, next) => {
+                            const role = checkAuth(next);         
+                           
+                            if (role === 'Employer') {
                                 next();
                             } else {
                                 next({name:'account-settings'})

@@ -5,6 +5,9 @@ import { getCookie ,setCookie, deleteCookie } from '../assets/js/cookieUtils.js'
 import Swal from 'sweetalert2';
 import { jwtDecode } from 'jwt-decode';
 
+   
+
+
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     fullname: null,
@@ -13,6 +16,7 @@ export const useAuthStore = defineStore('auth', {
     isAuthenticated: false,
     token: null,
     role: null,
+    password: null,
   }),
 
   actions: {
@@ -20,6 +24,7 @@ export const useAuthStore = defineStore('auth', {
     async login(url, values) {
       try {
         const response = await axios.post(url, values);
+
         this.user = response.data.userName;
         this.email = response.data.email;
         this.token = response.data.token;
@@ -29,8 +34,8 @@ export const useAuthStore = defineStore('auth', {
 
         // Lưu token vào cookie để duy trì trạng thái đăng nhập
         if (this.token) {
-          setCookie('token', this.token);
-          localStorage.setItem('token', this.token);
+          setCookie('token', this.token);       
+          this.password = values.password;
         }
         
 
@@ -48,64 +53,72 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
-
-    logout(){
-        this.user = null
-        this.token = null
-        this.isAuthenticated = false
-        deleteCookie('token')
-        this.role = null
-        this.fullname = null
+    async changePasswor(values){
+      const url = '/api/account/change-pass'
+        try{
+          const response = await axios.post(url, values, {
+            headers: {
+              Authorization: `Bearer ${this.token}`, // Thêm token vào header
+            },
+          });
+          this.password = values.newPass;
+     
+          console.log(response);
+          Swal.fire({
+            title: 'Change Pass!',
+            text: response.data,
+            icon: 'success',
+            confirmButtonText: 'OK',
+          });
+        }
+        catch(error){
+          const errorMessage = error.response?.data | "Can't change passwork!";
+          Swal.fire({
+            title: 'Change Pass failed!',
+            text: errorMessage,
+            icon: 'error',
+            confirmButtonText: 'OK',
+          });
+          throw error;
+        }
     },
 
-    // async checklogin(url) {
-    //   const token = getCookie('token'); 
-    //   if (token) {
-    //     try {
-    //       const response = await axios.post(
-    //         url,
-    //         { token: token }, // Token được gửi như một thuộc tính trong đối tượng JSON
-    //         {
-    //           headers: { 
-    //             'Content-Type': 'application/json' // Đảm bảo header đúng
-    //           }
-    //         }
-    //       );
+    logout(){
+        this.user = null;
+        this.token = null;
+        this.isAuthenticated = false;
+        deleteCookie('token');
+        this.role = null;
+        this.fullname = null;
+        this.password = null;
+    },
 
-    //       // Nếu token hợp lệ, cập nhật lại thông tin người dùng
-    //       this.user = response.data.user.username;
-    //       this.email = response.data.user.email;
-    //       this.role = response.data.user.roles;
-    //       this.isAuthenticated = true;
-
-    //       console.log("Token is valid:", this.role);
-    //     } catch (error) {
-    //       console.error('Token validation failed:', error.response?.data || error.message);
-    //       Swal.fire({
-    //         title: 'Session expired',
-    //         text: 'Please log in again.',
-    //         icon: 'error',
-    //         confirmButtonText: 'OK',
-    //       });
-    //       this.logout(); // Đăng xuất nếu token không hợp lệ
-    //     }
-    //   } else {
-    //     console.log("No token found, user is not logged in.");
-    //     this.isAuthenticated = false;
-    //   }
-    // },   
+ 
     
     checklogin(cookie) {
       const token = jwtDecode(cookie) ;
       if (token) {
+        this.token = cookie;
         this.isAuthenticated = true;
         this.user = token.given_name;
         this.email = token.email;
         this.role = token.role;
         this.fullname = token.name;
         console.log("Token is valid:", this.role);
+      }else{
+        this.state();
       }
     }
 
+  },
+
+  persist: {
+    enabled: true, // Bật lưu trữ
+    strategies: [
+      {
+        key: 'auth', // Tên khóa lưu trữ
+        storage: localStorage, // Hoặc sessionStorage
+      },
+    ],
   },
 });

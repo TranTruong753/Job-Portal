@@ -1,11 +1,8 @@
 <script setup>
 import NavAccount from "@/components/account/navAccount.vue";
-
 import { useAuthStore } from '@/stores/auth.js';
-import { onMounted } from "vue";
 
-
-
+   
 const authStore = useAuthStore();
 
 
@@ -45,59 +42,68 @@ const authStore = useAuthStore();
                             <NavAccount :cardData="{
                                 content: [
                                     {
-                                        id: 1,
+                                        id: 11,
                                         titleNav: 'Account Settings',
                                         linkNav: '/account',
                                         isShow: true,
 
                                     },
                                     {
+                                        id: 2,
                                         titleNav: 'My Profile',
                                         linkNav: '/account/profile',
                                         isShow: authStore.role === 'User',
                                     },
                                     {
+                                        id: 3,
                                         titleNav: 'My Profile Employer',
                                         linkNav: '/account/profile-employer',
                                         isShow: authStore.role === 'Employer',
                                     },
                                     {
+                                        id: 4,
                                         titleNav: 'Post a Job',
                                         linkNav: '/account/post-job',
                                         isShow: authStore.role === 'Employer',
                                     },
                                     {
+                                        id: 5,
                                         titleNav: 'Post a Blog',
                                         linkNav: '/account/post-blog',
                                         isShow: true,
                                     },
                                     {
+                                        id: 6,
                                         titleNav: 'My Jobs',
                                         linkNav: '/account/my-jobs',
                                         isShow: authStore.role === 'Employer',
                                     },
                                     {
+                                        id: 7,
                                         titleNav: 'Jobs Applied',
                                         linkNav: '/account/jobs-applied',
                                         isShow: authStore.role === 'User',
                                     },
                                     {
+                                        id: 8,
                                         titleNav: 'Saved Jobs',
                                         linkNav: '/account/saved-jobs',
                                         isShow: authStore.role === 'User',   
                                     },
                                     {
+                                        id: 9,
                                         titleNav: 'Create CV test',
                                         linkNav: '/account/create-cv-test',
                                         isShow: true,
                                     },
                                     {
+                                        id: 10,
                                         titleNav: 'Create CV',
                                         linkNav: '/account/create-cv',
                                         isShow: true,
                                     },
                                 ]
-                            }" />
+                            }" /> 
                         </div>
                     </div>
                 </div>
@@ -109,8 +115,7 @@ const authStore = useAuthStore();
         </div>
     </section>
 
-    <!-- Modal -->
-    
+    <!-- Modal -->   
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -139,5 +144,26 @@ const authStore = useAuthStore();
 
 </template>
 
-<script>
-</script>
+<style>
+    .text-danger {
+    display: block;
+    height: 24px;
+    padding: 8px 0;
+    font-size: 13px;
+}
+
+
+.password-toggle-different {
+    position: absolute;
+    top: 50%;
+    right: 2%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: rgba(0, 0, 0, 0.4);
+
+}
+
+.input__repassword, .input__password {
+    position: relative;
+}
+</style>

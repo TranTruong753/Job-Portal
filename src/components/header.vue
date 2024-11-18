@@ -10,26 +10,19 @@ const router = useRouter(); // Sử dụng router
 
 const authStore = useAuthStore();
 
-// Kiểm tra token khi chuyển trang
-// onBeforeMount(() => {
-//   // const cookieToken = getCookie('token');
-//   // // authStore.checklogin("/api/account/checktoken");
-//   // // console.log("cookie",cookieToken);
-//   // if( cookieToken !== ""){
-//   //   authStore.checklogin(cookieToken);
-//   //   if (authStore.isAuthenticated) {
-//   //     console.log("ĐĂNG NHẬP THÀNH CÔNG!")
-//   //   } 
 
-//   // }
+const handleLogout = () => {
+  try {
+    authStore.logout();
+    router.push('/home');
+  } catch (error) {
+    console.error('Error during logout:', error);
+  }
+};
 
-// });
 
-function handleLogout() {
-  router.push('/home');
-  authStore.logout();
-  
-}
+
+
 
 
 </script>
@@ -124,9 +117,8 @@ function handleLogout() {
                     <router-link class="dropdown-item" to="/account/create-cv">Create CV</router-link>
                   </li>
                   <li>
-                    <a class="dropdown-item" href="#" @click="()=>{
-                      handleLogout();
-                    }">Log out</a>
+                    <router-link class="dropdown-item" @click.native="handleLogout" to="/home">Log out</router-link>
+
                   </li>
                 </ul>
               </div>

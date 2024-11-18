@@ -58,9 +58,9 @@
                     placeholder="Benefits"></textarea>
             </div>
             <div class="mb-4">
-                <label for="" class="mb-2">Responsibility</label>
-                <textarea class="form-control" name="responsibility" id="responsibility" cols="5" rows="5"
-                    placeholder="Responsibility"></textarea>
+                <label for="" class="mb-2">Requirements</label>
+                <textarea class="form-control" name="requirements" id="requirements" cols="5" rows="5"
+                    placeholder="requirements"></textarea>
             </div>
             <div class="mb-4">
                 <label for="" class="mb-2">Qualifications</label>
