@@ -152,6 +152,11 @@ const authStore = useAuthStore();
     font-size: 13px;
 }
 
+textarea {
+        height: 17vh !important; 
+        resize: none;
+    }
+
 
 .password-toggle-different {
     position: absolute;

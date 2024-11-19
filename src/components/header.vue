@@ -1,7 +1,8 @@
 <script setup>
 import { onBeforeMount,onMounted, ref } from 'vue';
 import {getCookie } from '@/assets/js/cookieUtils.js'
-
+import { useCompanyStore } from '@/stores/company';
+import {useLocationStore} from '@/stores/locationStore';
 import { useAuthStore } from '@/stores/auth.js';
 import { useRouter } from 'vue-router';
    
@@ -10,11 +11,11 @@ const router = useRouter(); // Sử dụng router
 
 const authStore = useAuthStore();
 
-
 const handleLogout = () => {
   try {
     authStore.logout();
-    router.push('/home');
+    // authStore.
+    // router.push('/home');
   } catch (error) {
     console.error('Error during logout:', error);
   }

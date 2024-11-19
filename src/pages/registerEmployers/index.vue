@@ -53,7 +53,7 @@ const isRepasswordVisible = ref(false);
 
 
 onMounted(() => {
-    axios.get('/api/company',{
+    axios.get('/api/company/GetAllForEmployer',{
         cancelToken: new axios.CancelToken(function (c) {
             cancelRequest = c;  // Gán hàm hủy vào biến cancelRequest khi có request
         })

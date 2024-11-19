@@ -2,7 +2,8 @@
 import CardCompany from '@/components/companies/cardCompany.vue';
 import axios from 'axios';
 import { onMounted } from 'vue';
-import { useCompanyStore } from '../../stores/company.js';
+import { useCompanyStore } from '@/stores/company.js';
+
 
 const companyStore = useCompanyStore();
 

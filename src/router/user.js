@@ -1,5 +1,5 @@
 import { getCookie } from '@/assets/js/cookieUtils.js'
-import {checkAuth} from '@/assets/js/jsUtils.js';
+import {checkAuth, checkUserInDb} from '@/assets/js/jsUtils.js';
 
 
 
@@ -7,7 +7,7 @@ const user = [
     {
         path: "/",
         component: () => import("../layouts/user.vue"),
-        beforeEnter: (to, from, next) => {
+        beforeEnter:(to, from, next) => {
             const token = getCookie('token');
             if (token) {
                 checkAuth(next);  // Kiểm tra xác thực
@@ -34,7 +34,7 @@ const user = [
                 component: () => import("../pages/jobs/index.vue"),
             },
             {
-                path: "/job/detail",
+                path: "/job/detail/:id",
                 name: "job-detail",
                 component: () => import("../pages/jobs/detail.vue"),
             },
@@ -42,12 +42,17 @@ const user = [
                 path: "/account",
                 name: "user-accounts",
                 component: () => import("../pages/account/index.vue"),
-                beforeEnter: (to, from, next) => {
-                    const role = checkAuth(next);         
-                   
-                    if (role === 'User' || role === 'Employer') {
-                        next();
-                    } else {
+                beforeEnter: async (to, from, next) => {
+                    const role =  checkAuth(next);         
+                    const isUser = await checkUserInDb();
+                    console.log('isUser',isUser);
+                    if(isUser) {    
+
+                        if (role === 'User' || role === 'Employer') {
+                            next();
+                        } 
+                    }
+                   else {
                         next({ name: 'user-login' });
                     }
                 },
@@ -178,7 +183,7 @@ const user = [
                 component: () => import("../pages/companies/index.vue"),
             },
             {
-                path: "/company/detail",
+                path: "/company/detail/:id",
                 name: "company-detail",
                 component: () => import("../pages/companies/detail.vue"),
             },
@@ -188,7 +193,7 @@ const user = [
                 component: () => import("../pages/blogs/index.vue"),
             },
             {
-                path: "/blog/detail",
+                path: "/blog/detail/:id",
                 name: "blog-detail",
                 component: () => import("../pages/blogs/detail.vue"),
             },
@@ -206,6 +211,12 @@ const user = [
                 path: "/register-employers",
                 name: "user-register-employers",
                 component: () => import("../pages/registerEmployers/index.vue")
+            },
+            // Route lỗi 404
+            {
+                path: "/:pathMatch(.*)*", // Cú pháp đúng cho Vue 3
+                name: "not-found",
+                component: () => import("../pages/error/page404.vue"),
             },
         ]
     }

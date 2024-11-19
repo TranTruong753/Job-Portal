@@ -56,10 +56,10 @@ const onSubmit = handleSubmit(async (values) => {
                     position: "top-end",
                     showConfirmButton: false,
                     timer: 2000,
-                    timerProgressBar: true,
+                    // timerProgressBar: true,
                     didOpen: (toast) => {
-                        toast.onmouseenter = Swal.stopTimer;
-                        toast.onmouseleave = Swal.resumeTimer;
+                        // toast.onmouseenter = Swal.stopTimer;
+                        // toast.onmouseleave = Swal.resumeTimer;
                     }
                 });
                 Toast.fire({

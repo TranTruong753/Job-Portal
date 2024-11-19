@@ -1,3 +1,26 @@
+<script setup>
+import { RouterLink, useRoute,useRouter } from 'vue-router';
+import { useJobtore } from '@/stores/jobs';
+import { onMounted } from 'vue';
+import {formatDateV2} from '@/assets/js/jsUtils.js'
+
+    const route = useRoute();
+    const jobId = route.params.id; // '19'
+    const jobStore = useJobtore();
+
+    onMounted(async ()=>{
+        const isGetJob = await jobStore.getDetailJobs(jobId);
+        if(isGetJob){
+            console.log('get job thành công!')
+            console.log('job',jobStore.job);
+            console.log(jobStore.job.employer.company);
+        }else{
+            console.log('get job thất bại!')
+        }
+    })
+
+</script>
+
 <template>
     <section class="section-4 bg-2">
         <div class="container pt-5">
@@ -6,10 +29,10 @@
                     <nav aria-label="breadcrumb" class=" rounded-3 p-3">
                         <ol class="breadcrumb mb-0">
                             <li class="breadcrumb-item">
-                                <a asp-area="EndUser" asp-controller="Job" asp-action="Index">
+                                <RouterLink to="/job">
                                     <i class="fa fa-arrow-left" aria-hidden="true">
                                     </i> &nbsp;Back to Jobs
-                                </a>
+                                </RouterLink>
                             </li>
                         </ol>
                     </nav>
@@ -26,22 +49,25 @@
                             <div class="single_jobs white-bg d-flex justify-content-between">
                                 <div class="jobs_left d-flex align-items-sm-center gap-4">
                                     <div class="" style="max-width: 150px;">
-                                        <a href="#!" class="card-img ">
+                                        <RouterLink to="" class="card-img ">
                                             <img class="center rounded border object-fit-cover"
-                                                src="/src/assets/img/fpt_corporation_logo.jpg" alt="">
-                                        </a>
+                                                :src="jobStore.job.employer.company.logo " 
+                                            :alt=" jobStore.job.employer.company.name  "
+                                                >
+                                        </RouterLink>
                                     </div>
                                     <div class="jobs_conetent">
-                                        <a href="#">
-                                            <h4>Software Engineer</h4>
-                                        </a>
+                                        
+                                        <RouterLink to="">
+                                            <h4>{{ jobStore.job.employer.company.name }}</h4>
+                                        </RouterLink>
                                         <div class="mb-3">
                                             <a href="#!">
-                                                <p class="card-title text-black-50 mb-0">FPT Technology</p>
+                                                <p class="card-title text-black-50 mb-0">{{ jobStore.job.employer.company.industry }}</p>
                                             </a>
 
                                             <div class="d-flex align-items-center gap-2 mt-2">
-                                                <svg fill="none" height="20" stroke="currentColor" viewBox="0 0 24 24"
+                                                <!-- <svg fill="none" height="20" stroke="currentColor" viewBox="0 0 24 24"
                                                     width="20" xmlns="http://www.w3.org/2000/svg">
                                                     <path d="M12.0044 6V18" stroke-linecap="round"
                                                         stroke-linejoin="round" stroke-width="2"></path>
@@ -51,11 +77,11 @@
                                                         stroke="currentColor"></path>
                                                     <circle cx="12.0002" cy="12.0002" r="9.3" stroke-width="2"
                                                         stroke="currentColor"></circle>
-                                                </svg>
-                                                <a class="card-link " href="#!"> <span
-                                                        class="text-black fs-6 fw-bolder text-decoration-underline">Sign
-                                                        in
-                                                        to view salary</span></a>
+                                                </svg> -->
+                                                <span class="fw-bolder fs-5"><i class="fa fa-map-marker"></i></span>
+                                                 <span class="text-black fs-6 fw-bolder text-decoration-underline">
+                                                    {{ jobStore.job.employer.location }}  
+                                                </span>
                                             </div>
                                         </div>
 
@@ -100,40 +126,31 @@
                         <div class="descript_wrap white-bg">
                             <div class="single_wrap">
                                 <h4>Job description</h4>
-                                <p>There are many variations of passages of Lorem Ipsum available, but the majority have
-                                    suffered alteration in some form, by injected humour, or randomised words which
-                                    don't look even slightly believable. If you are going to use a passage of Lorem
-                                    Ipsum, you need to be sure there isn't anything embarrassing.</p>
-                                <p>Variations of passages of lorem Ipsum available, but the majority have suffered
-                                    alteration in some form, by injected humour, or randomised words which don't look
-                                    even slightly believable. If you are going to use a passage of Lorem Ipsum, you need
-                                    to be sure there isn't anything embarrassing.</p>
+                                <p>{{ jobStore.job.description }}</p>
                             </div>
                             <div class="single_wrap">
-                                <h4>Responsibility</h4>
-                                <ul>
+                                <h4>requirements</h4>
+                                <!-- <ul>
                                     <li>The applicants should have experience in the following areas.</li>
                                     <li>Have sound knowledge of commercial activities.</li>
                                     <li>Leadership, analytical, and problem-solving abilities.</li>
                                     <li>Should have vast knowledge in IAS/ IFRS, Company Act, Income Tax, VAT.</li>
-                                </ul>
+                                </ul> -->
+                                <p>{{ jobStore.job.requirements }}</p>
                             </div>
-                            <div class="single_wrap">
-                                <h4>Qualifications</h4>
-                                <ul>
-                                    <li>The applicants should have experience in the following areas.</li>
-                                    <li>Have sound knowledge of commercial activities.</li>
-                                    <li>Leadership, analytical, and problem-solving abilities.</li>
-                                    <li>Should have vast knowledge in IAS/ IFRS, Company Act, Income Tax, VAT.</li>
-                                </ul>
-                            </div>
+                           
                             <div class="single_wrap">
                                 <h4>Benefits</h4>
-                                <p>There are many variations of passages of Lorem Ipsum available, but the majority have
-                                    suffered alteration in some form, by injected humour, or randomised words which
-                                    don't look even slightly believable. If you are going to use a passage of Lorem
-                                    Ipsum, you need to be sure there isn't anything embarrassing.</p>
+                                <p>{{  jobStore.job.benefits }}</p>
                             </div>
+
+                            <div class="single_wrap">
+                                <h4>Skills Requirements</h4>
+                               <ul  v-for="(item,index) in jobStore.job.skills" :key="index">
+                                    <li>{{item.name}}</li>
+                               </ul>
+                            </div>
+
                             <div class="border-bottom"></div>
                             <div class="pt-3 text-end">
                                 <a href="#" class="btn btn-secondary">Save</a>
@@ -156,11 +173,12 @@
                             </div>
                             <div class="job_content pt-3">
                                 <ul>
-                                    <li>Published on: <span>12 Nov, 2019</span></li>
-                                    <li>Vacancy: <span>2 Position</span></li>
-                                    <li>Salary: <span>50k - 120k/y</span></li>
-                                    <li>Location: <span>California, USA</span></li>
-                                    <li>Job Nature: <span> Full-time</span></li>
+                                    <li>Published on: <span>{{formatDateV2(jobStore.job.createOn)}}</span></li>
+                                    <!-- <li>Vacancy: <span>2 Position</span></li> -->
+                                    <li>Salary: <span>{{ jobStore.job.salary}} VNĐ</span></li>
+                                    <li>Location: <span>{{ jobStore.job.location }}</span></li>
+                                    <li>Street: <span>{{ jobStore.job.locationShort }}</span></li>
+                                    <li>Job Nature: <span> {{jobStore.job.jobType}}</span></li>
                                 </ul>
                             </div>
                         </div>
@@ -172,9 +190,9 @@
                             </div>
                             <div class="job_content pt-3">
                                 <ul>
-                                    <li>Name: <span>XYZ Company</span></li>
-                                    <li>Locaion: <span>Noida</span></li>
-                                    <li>Webite: <span>www.example.com</span></li>
+                                    <li>Name: <span>{{ jobStore.job.employer.company.name }}</span></li>
+                                    <li>Locaion: <span>{{ jobStore.job.employer.company.location }}</span></li>
+                                    <li>Webite: <span>{{ jobStore.job.employer.company.website }}</span></li>
                                 </ul>
                             </div>
                         </div>

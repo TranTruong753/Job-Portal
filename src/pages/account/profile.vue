@@ -3,16 +3,29 @@ import NavAccount from "@/components/account/navAccount.vue";
 
 import { useAuthStore } from '@/stores/auth.js';
 
-import {reactive} from 'vue'
+import {onMounted, reactive} from 'vue'
 
 
 const authStore = useAuthStore();
 
+onMounted(()=>{
+     authStore.getUserData();
+     userObj.birthday = authStore.userData.birthday;
+     userObj.sex = authStore.userData.sex;
+     userObj.phone = authStore.userData.phone;
+     userObj.img = authStore.userData.img;
+     if(authStore.userData.address){
+
+     }
+})
+
 const userObj = reactive({
     fullname: authStore.fullname,
     email: authStore.email,
-    birthday: null,
-    sex: null
+    birthday: '',
+    sex: '',
+    phone: '',
+    img: '',
 })
 
 </script>
@@ -55,6 +68,10 @@ const userObj = reactive({
                             <label class="form-check-label" for="inlineRadio3">Other</label>
                         </div>
                     </div>
+                </div>
+                <div class="col-lg-6">
+                    <label for="" class="mb-2">Phone<span class="text-primary">*</span></label>
+                    <input v-model="userObj.phone" type="text" placeholder="not update" class="form-control">
                 </div>
             </div>
 

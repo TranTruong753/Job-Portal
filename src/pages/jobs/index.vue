@@ -1,6 +1,54 @@
 <script setup>
 
 import CardProduct from '@/components/jobs/cardJob.vue';
+import {useJobtore} from '@/stores/jobs.js'
+import { ref, watch, onMounted } from 'vue';
+import {calculateDaysAgo} from '@/assets/js/jsUtils.js'
+import { useRouter } from 'vue-router';
+
+    const router = useRouter();
+    const jobStore = useJobtore()
+    const pageSize = ref(6);
+    const current = ref(1);
+    const totalJob = ref(500);
+
+    onMounted(async () => {
+        const total = await jobStore.getTotal();
+        const listJob = await jobStore.getJob(pageSize.value,current.value);
+        if(total){
+            totalJob.value = jobStore.total ;
+          
+            console.log(totalJob.value);
+        }
+        if(listJob){
+            // console.log(jobStore.listjobs);
+        }
+    })
+
+    // const onShowSizeChange = (current, pageSize) => {
+    // console.log(current, pageSize);
+    // };
+    // watch(pageSize, () => {
+    //     console.log('pageSize', pageSize.value);
+    // });
+    // watch(current, () => {
+    //     console.log('current', current.value);
+    // });
+
+    const onShowSizeChange = async (current, pageSize) => {
+        
+        await jobStore.getJob(pageSize, current);
+    };
+
+    watch([current, pageSize], async ([newCurrent, newPageSize]) => {
+      
+        await jobStore.getJob(newPageSize, newCurrent);
+    
+    });
+
+    // const goToDetail = (job) => {
+    //     router.push(`/job/detail/${job.id}`);
+    // };
 
 </script>
 <template>
@@ -96,7 +144,51 @@ import CardProduct from '@/components/jobs/cardJob.vue';
                     <div class="job_listing_area">
                         <div class="job_lists">
                             <div class="row g-3">
-                                <!-- card 01 -->
+                                <CardProduct 
+                                     v-for="(job, index) in jobStore.listjobs"
+                                    :key="index"
+                                    :card-data="{
+                                        id: job.id,
+                                        imgSrc: job.employer.company.logo,
+                                        imgAlt: job.employer.company.name,
+                                        name: job.title,
+                                        nameCompany: job.employer.company.name,
+                                        timePost: calculateDaysAgo(job.createOn),
+                                        salary: job.salary + ' VNĐ',
+                                        location: job.locationShort,
+                                        type: job.jobType,
+                                        skill: job.skills.map(skill => ({ msg: skill.name })),
+                                        isShow: true,
+                                        styleCss: 'card-h-100 col-12 col-lg-6'
+                                    }"  
+                                     @card-click=""
+                                
+                                >
+
+                                </CardProduct>
+                                <!-- <CardProduct 
+                                 :cardData="{
+                                    imgSrc: '/src/assets/img/edutech_logo.png',
+                                    imgAlt: 'Edutech',
+                                    name: 'Frontend development',
+                                    nameCompany: 'Edutech',
+                                    timePost: 'Posted 3 days ago',
+                                    salary: 'Salary negotiable',
+                                    location: 'Default Location',
+                                    type: 'Default Type',
+                                    skill: [
+                                        { msg: 'HTML' },
+                                        { msg: 'CSS' },
+                                        { msg: 'JS' },
+                                        { msg: 'REACT' },
+                                        { msg: 'BOOSTRAP 5' },
+
+                                    ],
+                                    isShow: true,
+                                    styleCss: 'card-h-100 col-12 col-lg-6'
+                                }" />
+
+                           
                                 <CardProduct :cardData="{
                                     imgSrc: '/src/assets/img/edutech_logo.png',
                                     imgAlt: 'Edutech',
@@ -118,7 +210,7 @@ import CardProduct from '@/components/jobs/cardJob.vue';
                                     styleCss: 'card-h-100 col-12 col-lg-6'
                                 }" />
 
-                                <!-- card 02 -->
+                           
                                 <CardProduct :cardData="{
                                     imgSrc: '/src/assets/img/edutech_logo.png',
                                     imgAlt: 'Edutech',
@@ -140,7 +232,7 @@ import CardProduct from '@/components/jobs/cardJob.vue';
                                     styleCss: 'card-h-100 col-12 col-lg-6'
                                 }" />
 
-                                <!-- card 03 -->
+                          
                                 <CardProduct :cardData="{
                                     imgSrc: '/src/assets/img/edutech_logo.png',
                                     imgAlt: 'Edutech',
@@ -162,7 +254,7 @@ import CardProduct from '@/components/jobs/cardJob.vue';
                                     styleCss: 'card-h-100 col-12 col-lg-6'
                                 }" />
 
-                                <!-- card 04 -->
+                        >
                                 <CardProduct :cardData="{
                                     imgSrc: '/src/assets/img/edutech_logo.png',
                                     imgAlt: 'Edutech',
@@ -184,7 +276,7 @@ import CardProduct from '@/components/jobs/cardJob.vue';
                                     styleCss: 'card-h-100 col-12 col-lg-6'
                                 }" />
 
-                                <!-- card 05 -->
+                           
                                 <CardProduct :cardData="{
                                     imgSrc: '/src/assets/img/edutech_logo.png',
                                     imgAlt: 'Edutech',
@@ -206,7 +298,7 @@ import CardProduct from '@/components/jobs/cardJob.vue';
                                     styleCss: 'card-h-100 col-12 col-lg-6'
                                 }" />
 
-                                <!-- card 06 -->
+                       
                                 <CardProduct :cardData="{
                                     imgSrc: '/src/assets/img/edutech_logo.png',
                                     imgAlt: 'Edutech',
@@ -228,7 +320,7 @@ import CardProduct from '@/components/jobs/cardJob.vue';
                                     styleCss: 'card-h-100 col-12 col-lg-6'
                                 }" />
 
-                                <!-- card 07 -->
+                            
                                 <CardProduct :cardData="{
                                     imgSrc: '/src/assets/img/edutech_logo.png',
                                     imgAlt: 'Edutech',
@@ -248,29 +340,7 @@ import CardProduct from '@/components/jobs/cardJob.vue';
                                     ],
                                     isShow: true,
                                     styleCss: 'card-h-100 col-12 col-lg-6'
-                                }" />
-
-                                <!-- card 08 -->
-                                <CardProduct :cardData="{
-                                    imgSrc: '/src/assets/img/edutech_logo.png',
-                                    imgAlt: 'Edutech',
-                                    name: 'Frontend development',
-                                    nameCompany: 'Edutech',
-                                    timePost: 'Posted 3 days ago',
-                                    salary: 'Salary negotiable',
-                                    location: 'Default Location',
-                                    type: 'Default Type',
-                                    skill: [
-                                        { msg: 'HTML' },
-                                        { msg: 'CSS' },
-                                        { msg: 'JS' },
-                                        { msg: 'REACT' },
-                                        { msg: 'BOOSTRAP 5' },
-
-                                    ],
-                                    isShow: true,
-                                    styleCss: 'card-h-100 col-12 col-lg-6'
-                                }" />
+                                }" /> -->
 
 
                             </div>
@@ -280,7 +350,7 @@ import CardProduct from '@/components/jobs/cardJob.vue';
             </div>
 
             <!-- pagination -->
-            <div class="mt-3 d-flex justify-content-center">
+            <!-- <div class="mt-3 d-flex justify-content-center">
 
                 <nav aria-label="Page navigation ">
                     <ul class="pagination">
@@ -302,8 +372,16 @@ import CardProduct from '@/components/jobs/cardJob.vue';
                     </ul>
                 </nav>
 
+            </div> -->
+            <div  class="mt-3 d-flex justify-content-center">
+                <a-pagination
+                    v-model:current="current"
+                    v-model:pageSize="pageSize"
+                    show-size-changer
+                    v-model:total="totalJob"
+                    @showSizeChange="onShowSizeChange"
+                />
             </div>
-
         </div>
     </section>
 

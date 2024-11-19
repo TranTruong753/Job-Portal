@@ -1,5 +1,5 @@
 <template>
-    <div  v-show="cardData.isShow"  :class="cardData.styleCss">
+    <div  v-show="cardData.isShow"  :class="cardData.styleCss" >
         <div class="card-h-100 card shadow border-0" >
             <div class="card-header bg-white">
                 <div class="d-flex justify-content-between">
@@ -15,11 +15,12 @@
                         </span>
                     </button>
                 </div>
-                <a href="job-detail.html" class="card-link mb-2 ">
+                <router-link :to="`/job/detail/${cardData.id}`">
                     <p class="card-title h5 fw-bolder ">
                         {{ cardData.name }}
                     </p>
-                </a>
+                </router-link>
+               
                 <div class="card-img__grou d-flex gap-3 align-items-center">
                     <a href="#!" class="card-img border rounded" style="width: 60px;height: 60px; ">
                         <img class="center  object-fit-cover" :src="cardData.imgSrc" :alt="cardData.imgAlt">
@@ -58,8 +59,8 @@
                         <span class="ps-1">{{cardData.type}}</span>
                     </p>
                 </div>
-                <div class="d-flex gap-1">
-                    <button type="button" class="btn btn-outline-secondary btn-skill" v-for="skill in cardData.skill">{{skill.msg}}</button>
+                <div class="">
+                    <button type="button" class="mt-1 me-1 btn btn-outline-secondary btn-skill" v-for="skill in cardData.skill">{{skill.msg}}</button>
                 </div>
             </div>
         </div>
@@ -73,6 +74,7 @@ export default {
             type: Object,
             required: true,
             default: () => ({
+                id: '',
                 imgSrc: '',
                 imgAlt: 'Default Image',
                 name: 'default',
@@ -88,7 +90,17 @@ export default {
 
             })
         }
-    }
+    },
+    methods: {
+        handleClick() {
+        this.$emit('card-click', this.cardData);
+        },
+  },
   
 }
 </script>
+
+<style>
+
+
+</style>
