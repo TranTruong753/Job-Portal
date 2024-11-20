@@ -1,6 +1,6 @@
 <template>
     <div  v-show="cardData.isShow"  :class="cardData.styleCss" >
-        <div class="card-h-100 card shadow border-0" >
+        <div :class="cardData.styleCard" >
             <div class="card-header bg-white">
                 <div class="d-flex justify-content-between">
                     <p class="small mb-1">{{ cardData.timePost }}</p>
@@ -40,23 +40,30 @@
                             stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor"></path>
                         <circle cx="12.0002" cy="12.0002" r="9.3" stroke-width="2" stroke="currentColor"></circle>
                     </svg>
-                    <a class="card-link " href="#!">
-                        <span class="text-black fs-6 fw-bolder text-decoration-underline">
+                   
+                   
+                        <span class="text-black fs-6 fw-bolder ">
                             {{ cardData.salary }}
                         </span>
-                    </a>
+                        <span> - </span >
+                        <span class="text-black fs-6 fw-bolder ">
+                            {{cardData.level}}
+                        </span>
+                   
+                    
                 </div>
         
             </div>
             <div class="card-body pt-2 pb-3">
                 <div class="mb-1">
-                    <p class="mb-0">
+                   
+                    <p class="mb-0 truncate-1">
                         <span class="fw-bolder fs-5"><i class="fa fa-map-marker"></i></span>
-                        <span class="ps-1">{{cardData.location}}</span>
+                        <span class="ps-1">: {{cardData.location}}</span>
                     </p>
                     <p class="mb-0">
                         <span class="fw-bolder "><i class="fa fa-clock-o"></i></span>
-                        <span class="ps-1">{{cardData.type}}</span>
+                        <span class="ps-1">: {{cardData.type}}</span>
                     </p>
                 </div>
                 <div class="">
@@ -83,10 +90,12 @@ export default {
                 salary: 'Salary negotiable',
                 location: 'Default Location',
                 type: 'Default Type',
+                level: 'Default Level',
                 skill: [{msg:'default'}],
                 isSave: false,
                 isShow: true,
-                styleCss: ''
+                styleCss: '',
+                styleCard:''
 
             })
         }

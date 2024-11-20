@@ -1,3 +1,37 @@
+<script setup>
+import { RouterLink, useRoute, useRouter } from 'vue-router';
+import { useCompanyStore } from '@/stores/company.js';
+import { useAuthStore } from '@/stores/auth';
+import { onMounted, ref } from 'vue';
+import CardProduct from '@/components/jobs/cardJob.vue';
+import { calculateDaysAgo } from '@/assets/js/jsUtils.js'
+
+    const route = useRoute();
+
+    const companyId = route.params.id; // '19'
+   
+    const authStore = useAuthStore();
+    const companyStore = useCompanyStore();
+    const listJob = ref([]);
+    const companyDto = ref([]);
+
+    onMounted(async () => {
+    await companyStore.getDetailComapany(companyId);
+    if (companyStore.company) {
+        console.log('get company thành công!')
+        console.log('company', companyStore.company);
+        companyDto.value = companyStore.company
+        listJob.value = companyStore.company.jobs;
+        // companyInfo.value = companyStore.job.employer.company;
+        // employer.value = companyStore.job.employer;
+        console.log("listjob",listJob.value);
+    } else {
+        console.log('get company thất bại!')
+    }
+})
+
+
+</script>
 <template>
     <section class="section-4 bg-2">
         <div class="container pt-5">
@@ -6,8 +40,8 @@
                     <nav aria-label="breadcrumb" class=" rounded-3 p-3">
                         <ol class="breadcrumb mb-0">
                             <li class="breadcrumb-item">
-                                <a asp-area="EndUser" asp-controller="Company" asp-action="Index">
-                                    <i class="fa fa-arrow-left" aria-hidden="true"></i> &nbsp;Back to companys</a>
+                                <RouterLink to="/company" >
+                                    <i class="fa fa-arrow-left" aria-hidden="true"></i> &nbsp;Back to companys</RouterLink>
                             </li>
                         </ol>
                     </nav>
@@ -25,25 +59,26 @@
                                     <div class="" style="max-width: 150px;">
                                         <a href="#!" class="card-img ">
                                             <img class="center rounded border object-fit-cover"
-                                                src="/src/assets/img/fpt_corporation_logo.jpg" alt="">
+                                            :src="companyDto.logo" :alt="companyDto.name"
+                                                >
                                         </a>
                                     </div>
                                     <div class="jobs_conetent">
                                         <a href="#">
-                                            <h4>Software Engineer</h4>
+                                            <h4>{{companyDto.name}}</h4>
                                         </a>
                                         <div class="mb-3">
                                             <a href="#!">
-                                                <p class="card-title text-black-50 mb-0">FPT Technology</p>
+                                                <p class="card-title text-black-50 mb-0">{{ companyDto.industry }}</p>
                                             </a>
 
-                                            <div class="mt-3">
+                                            <!-- <div class="mt-3">
                                                 <a class="card-link " href="#!">
                                                     <button type="button" class="btn btn-primary w-100">
                                                         <span>Follow </span>
                                                     </button>
                                                 </a>
-                                            </div>
+                                            </div> -->
                                         </div>
 
                                     </div>
@@ -64,16 +99,9 @@
                             <div class="single_wrap">
                                 <h4>General information</h4>
                                 <div class="border-bottom mb-3"></div>
-                                <p>There are many variations of passages of Lorem Ipsum available, but the majority have
-                                    suffered alteration in some form, by injected humour, or randomised words which
-                                    don't look even slightly believable. If you are going to use a passage of Lorem
-                                    Ipsum, you need to be sure there isn't anything embarrassing.</p>
-                                <p>Variations of passages of lorem Ipsum available, but the majority have suffered
-                                    alteration in some form, by injected humour, or randomised words which don't look
-                                    even slightly believable. If you are going to use a passage of Lorem Ipsum, you need
-                                    to be sure there isn't anything embarrassing.</p>
+                               <p>{{ companyDto.description }}</p>
                             </div>
-                            <div class="single_wrap">
+                            <!-- <div class="single_wrap">
                                 <h4>Company overview</h4>
                                 <div class="border-bottom mb-3"></div>
                                 <p>There are many variations of passages of Lorem Ipsum available, but the majority have
@@ -84,7 +112,7 @@
                                     alteration in some form, by injected humour, or randomised words which don't look
                                     even slightly believable. If you are going to use a passage of Lorem Ipsum, you need
                                     to be sure there isn't anything embarrassing.</p>
-                            </div>
+                            </div> -->
                         </div>
 
                     </div>
@@ -135,10 +163,10 @@
                                     to be sure there isn't anything embarrassing.</p>
 
                             </div>
-                            <div class="pt-3 text-end">
+                            <!-- <div class="pt-3 text-end">
                                 <a href="#" class="btn btn-secondary">Save</a>
                                 <a href="#" class="ms-2 btn btn-primary">Follow</a>
-                            </div>
+                            </div> -->
                         </div>
 
                     </div>
@@ -146,10 +174,31 @@
                 <!-- column right -->
                 <div class="col-lg-4 col-md-12">
                     <h2>job openings</h2>
-                    <div class="list-jobs my-4">
+                    <div class="list-jobs my-4 p-2" style="height: 100vh; overflow: auto ;">
                         <div class="row g-3">
+                            <CardProduct
+                                v-for="(job, index) in listJob"
+                                :key="index"
+                                :card-data="{
+                                id: job.id,
+                                imgSrc: job.employer.company.logo,
+                                imgAlt: job.employer.company.name,
+                                name: job.title,
+                                nameCompany: job.employer.company.name,
+                                timePost: calculateDaysAgo(job.createOn),
+                                salary: job.salary + ' VNĐ',
+                                location: job.locationShort,
+                                type: job.jobType,
+                                skill: job.skills.map(skill => ({ msg: skill.name })),
+                                level: job.jobLevel,
+                                isShow: true,
+                                styleCss: 'card-h-100 col-12 ',
+                                styleCard: 'card-h-100 card border-1'
+                                }"
+                            
+                            />
                             <!-- card 01 -->
-                            <div class="col-12">
+                            <!-- <div class="col-12">
                                 <div class="card-h-100 card shadow border-0">
                                     <div class="card-header bg-white">
                                         <div class="d-flex justify-content-between">
@@ -222,10 +271,10 @@
                                     </div>
 
                                 </div>
-                            </div>
+                            </div> -->
 
                             <!-- card 02 -->
-                            <div class="card-h-100 col-12">
+                            <!-- <div class="card-h-100 col-12">
                                 <div class="card shadow border-0">
                                     <div class="card-header  bg-white ">
                                         <div class="d-flex justify-content-between">
@@ -297,7 +346,7 @@
                                     </div>
 
                                 </div>
-                            </div>
+                            </div> -->
 
                         </div>
                     </div>
@@ -309,9 +358,9 @@
                             </div>
                             <div class="job_content pt-3">
                                 <ul>
-                                    <li>Name: <span>XYZ Company</span></li>
-                                    <li>Locaion: <span>Noida</span></li>
-                                    <li>Webite: <span>www.example.com</span></li>
+                                    <li>Name: <span>{{ companyDto.name }}</span></li>
+                                    <li>phone: <span>{{companyDto.phone}}</span></li>
+                                    <li>Webite: <span>{{ companyDto.website }}</span></li>
                                 </ul>
                             </div>
                         </div>

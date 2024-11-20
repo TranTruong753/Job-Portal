@@ -20,12 +20,11 @@
                 </div>
 
                 <div>
-                    <a href="#!">
+                    <RouterLink  :to="`/company/detail/${cardData.id}`">
                         <p class="card-title fw-bolder fs-4 mb-0">{{ cardData.name }}</p>
-                    </a>
-                    <a href="#!">
                         <p class="card-title text-black-50 mb-0">{{ cardData.title }}</p>
-                    </a>
+                    </RouterLink>
+                   
 
                     <!-- <a class="card-link " href="#!">
                         <span class="text-primary small fw-bolder text-decoration-underline">

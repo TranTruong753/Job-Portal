@@ -1,23 +1,60 @@
 <script setup>
-import { RouterLink, useRoute,useRouter } from 'vue-router';
+import { RouterLink, useRoute, useRouter } from 'vue-router';
 import { useJobtore } from '@/stores/jobs';
-import { onMounted } from 'vue';
-import {formatDateV2} from '@/assets/js/jsUtils.js'
+import { useAuthStore } from '@/stores/auth';
+import { onMounted, ref } from 'vue';
+import { formatDateV2, closeModal } from '@/assets/js/jsUtils.js'
 
-    const route = useRoute();
-    const jobId = route.params.id; // '19'
-    const jobStore = useJobtore();
 
-    onMounted(async ()=>{
-        const isGetJob = await jobStore.getDetailJobs(jobId);
-        if(isGetJob){
-            console.log('get job thành công!')
-            console.log('job',jobStore.job);
-            console.log(jobStore.job.employer.company);
-        }else{
-            console.log('get job thất bại!')
+const route = useRoute();
+const jobId = route.params.id; // '19'
+const jobStore = useJobtore();
+const authStore = useAuthStore();
+const companyInfo = ref([]);
+const employer = ref([]);
+const file = ref(null);
+
+const errorText = ref("");
+
+onMounted(async () => {
+    await jobStore.getDetailJobs(jobId);
+    if (jobStore.job) {
+        console.log('get job thành công!')
+        console.log('job', jobStore.job);
+        companyInfo.value = jobStore.job.employer.company;
+        employer.value = jobStore.job.employer;
+        console.log("companyInfo",companyInfo);
+    } else {
+        console.log('get job thất bại!')
+    }
+})
+
+
+const handleApply = async() => {
+    if (file.value) {
+        await authStore.applyJob(jobId, file.value);
+        file.value = null;
+        const fileInput = document.getElementById("cv"); 
+        if (fileInput) { 
+            fileInput.value = ''; // Reset input file thực sự 
         }
-    })
+
+        closeModal('#addCvJob')
+    } else {
+        errorText.value = "Please select a file to upload.";
+    }
+}
+
+const handleFileChange = (event) => {
+  file.value = event.target.files[0];  // Lưu trữ file đã chọn
+  if(file.value){
+    errorText.value = "";
+  }
+};
+
+const handleSaveJob = async() => {
+    authStore.SavedJobs(jobId);
+}
 
 </script>
 
@@ -49,21 +86,18 @@ import {formatDateV2} from '@/assets/js/jsUtils.js'
                             <div class="single_jobs white-bg d-flex justify-content-between">
                                 <div class="jobs_left d-flex align-items-sm-center gap-4">
                                     <div class="" style="max-width: 150px;">
-                                        <RouterLink to="" class="card-img ">
-                                            <img class="center rounded border object-fit-cover"
-                                                :src="jobStore.job.employer.company.logo " 
-                                            :alt=" jobStore.job.employer.company.name  "
-                                                >
+                                        <RouterLink  :to="`/company/detail/${companyInfo.id}`" class="card-img ">
+                                            <img class="center rounded border object-fit-cover" :src="companyInfo.logo" :alt=" companyInfo.name ">
                                         </RouterLink>
                                     </div>
                                     <div class="jobs_conetent">
-                                        
-                                        <RouterLink to="">
-                                            <h4>{{ jobStore.job.employer.company.name }}</h4>
+
+                                        <RouterLink :to="`/company/detail/${companyInfo.id}`">
+                                            <h4>{{ companyInfo.name }}</h4>
                                         </RouterLink>
                                         <div class="mb-3">
                                             <a href="#!">
-                                                <p class="card-title text-black-50 mb-0">{{ jobStore.job.employer.company.industry }}</p>
+                                                <p class="card-title text-black-50 mb-0">{{ companyInfo.industry }}</p>
                                             </a>
 
                                             <div class="d-flex align-items-center gap-2 mt-2">
@@ -78,10 +112,10 @@ import {formatDateV2} from '@/assets/js/jsUtils.js'
                                                     <circle cx="12.0002" cy="12.0002" r="9.3" stroke-width="2"
                                                         stroke="currentColor"></circle>
                                                 </svg> -->
-                                                <span class="fw-bolder fs-5"><i class="fa fa-map-marker"></i></span>
-                                                 <span class="text-black fs-6 fw-bolder text-decoration-underline">
-                                                    {{ jobStore.job.employer.location }}  
-                                                </span>
+                                                <!-- <span class="fw-bolder fs-5"><i class="fa fa-map-marker"></i></span>
+                                                 <span class="text-black fs-6 fw-bolder ">
+                                                    {{ employer.location }}  
+                                                </span> -->
                                             </div>
                                         </div>
 
@@ -130,55 +164,54 @@ import {formatDateV2} from '@/assets/js/jsUtils.js'
                             </div>
                             <div class="single_wrap">
                                 <h4>requirements</h4>
-                                <!-- <ul>
-                                    <li>The applicants should have experience in the following areas.</li>
-                                    <li>Have sound knowledge of commercial activities.</li>
-                                    <li>Leadership, analytical, and problem-solving abilities.</li>
-                                    <li>Should have vast knowledge in IAS/ IFRS, Company Act, Income Tax, VAT.</li>
-                                </ul> -->
+
                                 <p>{{ jobStore.job.requirements }}</p>
                             </div>
-                           
+
                             <div class="single_wrap">
                                 <h4>Benefits</h4>
-                                <p>{{  jobStore.job.benefits }}</p>
+                                <p>{{ jobStore.job.benefits }}</p>
                             </div>
 
                             <div class="single_wrap">
                                 <h4>Skills Requirements</h4>
-                               <ul  v-for="(item,index) in jobStore.job.skills" :key="index">
-                                    <li>{{item.name}}</li>
-                               </ul>
+                                <ul v-for="(item, index) in jobStore.job.skills" :key="index">
+                                    <li>{{ item.name }}</li>
+                                </ul>
                             </div>
 
                             <div class="border-bottom"></div>
                             <div class="pt-3 text-end">
-                                <a href="#" class="btn btn-secondary">Save</a>
-                                <a href="#" class="ms-2 btn btn-primary">Apply</a>
+                                <button type="button" class="btn btn-secondary" @click="handleSaveJob">Save</button>
+                                <button v-if="authStore.role === 'User'" type="button" class="ms-2 btn btn-primary" @click="handleApply" data-bs-toggle="modal" data-bs-target="#addCvJob">Apply</button>
                             </div>
                         </div>
                     </div>
                 </div>
                 <!-- column right -->
-                <div class="col-lg-4 col-md-12">
-                    <div class="">
-                        <button type="button" class="btn btn-primary w-100 p-lg-3">
-                            <span>Apply Now</span>
+                <div class="col-lg-4 col-md-12 ">
+                    <div class="mb-4">
+                        <button v-if="authStore.role === 'User'" type="button" class="btn btn-primary w-100 p-lg-3" data-bs-toggle="modal" data-bs-target="#addCvJob">
+                            <span> Apply Now </span>
                         </button>
+                        <router-link v-else-if="authStore.role !== 'Employer'" to="/login"
+                            class="btn btn-primary w-100 p-lg-3">
+                            <span>Login Now</span>
+                        </router-link>
                     </div>
-                    <div class="card shadow border-0 my-4">
+                    <div class="card shadow border-0 my-4 mt-0">
                         <div class="job_sumary">
                             <div class="summery_header pb-1 pt-4">
                                 <h3>Job Summery</h3>
                             </div>
                             <div class="job_content pt-3">
                                 <ul>
-                                    <li>Published on: <span>{{formatDateV2(jobStore.job.createOn)}}</span></li>
-                                    <!-- <li>Vacancy: <span>2 Position</span></li> -->
-                                    <li>Salary: <span>{{ jobStore.job.salary}} VNĐ</span></li>
+                                    <li>Published on: <span>{{ formatDateV2(jobStore.job.createOn) }}</span></li>
+
+                                    <li>Salary: <span>{{ jobStore.job.salary }} VNĐ</span></li>
                                     <li>Location: <span>{{ jobStore.job.location }}</span></li>
                                     <li>Street: <span>{{ jobStore.job.locationShort }}</span></li>
-                                    <li>Job Nature: <span> {{jobStore.job.jobType}}</span></li>
+                                    <li>Job Nature: <span> {{ jobStore.job.jobType }}</span></li>
                                 </ul>
                             </div>
                         </div>
@@ -190,9 +223,11 @@ import {formatDateV2} from '@/assets/js/jsUtils.js'
                             </div>
                             <div class="job_content pt-3">
                                 <ul>
-                                    <li>Name: <span>{{ jobStore.job.employer.company.name }}</span></li>
-                                    <li>Locaion: <span>{{ jobStore.job.employer.company.location }}</span></li>
-                                    <li>Webite: <span>{{ jobStore.job.employer.company.website }}</span></li>
+                                    <li>Name: <span>{{ companyInfo.name }}</span></li>
+                                    <li>Industry: <span>{{ companyInfo.industry }}</span></li>
+                                    <li>Email: <span>{{ companyInfo.email }}</span></li>
+                                    <li>Phone: <span>{{ companyInfo.phone }}</span></li>
+                                    <li>Webite: <span>{{ companyInfo.website }}</span></li>
                                 </ul>
                             </div>
                         </div>
@@ -200,5 +235,42 @@ import {formatDateV2} from '@/assets/js/jsUtils.js'
                 </div>
             </div>
         </div>
-        </section>
+    </section>
+
+      <!-- modal job apply-->
+      <div class="modal fade" id="addCvJob" tabindex="-1" aria-labelledby="addCvJobLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title pb-0" id="addCvJobLabel">Add File CV</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form enctype="multipart/form-data">
+                            <div class="mb-3">
+                                <label for="exampleInputEmail1" class="form-label">File PDF</label>
+                                <input type="file" class="form-control" id="cv" name="cv" @change="handleFileChange" >
+                                <span class="text-danger">{{errorText}}</span>
+                            </div>
+                            <div class="d-flex justify-content-end">
+                                <button type="button" class="btn btn-primary mx-3" @click="handleApply" >Apply</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
 </template>
+
+<style>
+
+.text-danger {
+    display: block;
+    height: 24px;
+    padding: 8px 0;
+    font-size: 13px;
+}
+
+</style>

@@ -18,7 +18,7 @@ export const useAuthStore = defineStore('auth', {
     password: null,
     addressCompany: null,
     userCompany: [],
-    userData:[],
+    userData: [],
   }),
 
   actions: {
@@ -108,84 +108,84 @@ export const useAuthStore = defineStore('auth', {
         });
         console.log(response);
         if (response.status === 200 || response.status === 201 || response.status === 204) {
-           
-            Swal.fire({
-              title: 'Post Job!',
-              text: response.data,
-              icon: 'success',
-              confirmButtonText: 'OK',
-            });
-            return true;  // Trả về true nếu thành công
-        }else {
+
+          Swal.fire({
+            title: 'Post Job!',
+            text: response.data,
+            icon: 'success',
+            confirmButtonText: 'OK',
+          });
+          return true;  // Trả về true nếu thành công
+        } else {
           Swal.fire({
             title: 'Post Job false!',
             text: response.data.error,
             icon: 'error',
             confirmButtonText: 'OK',
           });
-            return false; 
+          return false;
         }
-       
+
 
       } catch (error) {
         console.error(error);
-        return false; 
+        return false;
       }
     },
 
     logout() {
       this.$reset();
       deleteCookie('token');
-  
+
     },
 
     async getEmployer() {
       const url = '/api/appuserjob/Get-User'; // URL API lấy thông tin người dùng đang đăng nhập
-        try{
-          const response = await axios.get(url,{
-            headers: {
-              Authorization: `Bearer ${this.token}`, // Thêm token vào header
-            },
-          });
-          // console.log("response: ",  response.data);
-          if (response.status === 200 || response.data) {  // Kiểm tra nếu thành công
-            this.userData = response.data;
-            // console.log("userData: ",  this.userData);
-            this.addressCompany = response.data.address; 
-            this.userCompany = response.data.company;
-            // console.log("userCompany: ",  this.userCompany);
-            // console.log("address: ",  this.address);
-            return true;  // Trả về true nếu thành công
-          } else {
-            return false;  // Trả về false nếu không thành công
-          }
-        
-        } catch (error) {
-          console.error("Error fetching userCompany:", error);
+      try {
+        const response = await axios.get(url, {
+          headers: {
+            Authorization: `Bearer ${this.token}`, // Thêm token vào header
+          },
+        });
+        // console.log("response: ",  response.data);
+        if (response.status === 200 || response.data) {  // Kiểm tra nếu thành công
+          this.userData = response.data;
+          // console.log("userData: ",  this.userData);
+          this.addressCompany = response.data.address;
+          this.userCompany = response.data.company;
+          // console.log("userCompany: ",  this.userCompany);
+          // console.log("address: ",  this.address);
+          return true;  // Trả về true nếu thành công
+        } else {
+          return false;  // Trả về false nếu không thành công
         }
+
+      } catch (error) {
+        console.error("Error fetching userCompany:", error);
+      }
     },
 
     async getUserData() {
       const url = '/api/appuserjob/Get-User'; // URL API lấy thông tin người dùng đang đăng nhập
-        try{
-          const response = await axios.get(url,{
-            headers: {
-              Authorization: `Bearer ${this.token}`, // Thêm token vào header
-            },
-          });
+      try {
+        const response = await axios.get(url, {
+          headers: {
+            Authorization: `Bearer ${this.token}`, // Thêm token vào header
+          },
+        });
 
-          if (response.status === 200 || response.data) {  // Kiểm tra nếu thành công
-            console.log("response: ",  response.data);
-            this.userData = response.data;
-            return true;  // Trả về true nếu thành công
-          } else {
-            return false;  // Trả về false nếu không thành công
-          }
-         
-      
-        } catch (error) {
-          console.error("Error fetching userCompany:", error);
+        if (response.status === 200 || response.data) {  // Kiểm tra nếu thành công
+          console.log("response: ", response.data);
+          this.userData = response.data;
+          return true;  // Trả về true nếu thành công
+        } else {
+          return false;  // Trả về false nếu không thành công
         }
+
+
+      } catch (error) {
+        console.error("Error fetching userCompany:", error);
+      }
     },
 
     checklogin(cookie) {
@@ -203,30 +203,116 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
-    async checkUser(){
+    async checkUser() {
       const idUser = jwtDecode(this.token).sub; // Decode token để lấy idUser
       const url = `/api/appuserjob/GetUserById`; // Endpoint không cần gắn id trực tiếp
-  
-      try{
+
+      try {
         const response = await axios.get(url, {
           params: { userId: idUser } // Thêm tham số query string
         })
         if (response.status === 200 || response.data) {  // Kiểm tra nếu thành công
-          
+
           return true;  // Trả về true nếu thành công
         } else {
           this.$reset();
           deleteCookie('token')
           return false;  // Trả về false nếu không thành công
         }
-      }catch(error){
+      } catch (error) {
         console.error("Error fetching userCompany:", error);
         this.$reset();
         deleteCookie('token')
         return false;
       }
+    },
+
+    async applyJob(idJob, file) {
+      const url = "/api/appuserjob/create-application";
+
+      // Tạo đối tượng FormData để gửi file và dữ liệu khác
+      const formData = new FormData();
+
+      // Thêm file vào formData
+      formData.append("cvFile", file);
+
+      // Thêm các tham số khác (ví dụ idJob) vào formData
+      formData.append("JobId", idJob);
+
+      try {
+        // Gửi request POST với FormData
+        const response = await axios.post(url, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: `Bearer ${this.token}`, 
+          }
+        });
+
+        if (response.status === 200 || response.status === 201 || response.status === 204) {
+          console.log("Application submitted successfully", response);
+          Swal.fire({
+            title: 'Apply Job!',
+            text: response.data,
+            icon: 'success',
+            confirmButtonText: 'OK',
+          });
+          return true
+        } else {
+          Swal.fire({
+            title: 'Apply Job Fail!',
+            text: response.data,
+            icon: 'error',
+            confirmButtonText: 'OK',
+          });
+          return false
+        }
+
+      } catch (error) {
+        console.error("Error submitting application:", error);
+        return false
+      }
+    },
+
+    async SavedJobs(idJob) {
+      const url = "/api/appuserjob/issave";
+      
+      // Tạo dữ liệu dưới dạng JSON
+      const data = {
+        jobId: idJob,
+        issave: true
+      };
+    
+      try {
+        const response = await axios.post(url, data, {
+          headers: {
+            Authorization: `Bearer ${this.token}`,
+            'Content-Type': 'application/json', // Chỉ định rằng đây là request JSON
+          }
+        });
+    
+        if (response.status === 200 || response.status === 201 || response.status === 204) {
+          Swal.fire({
+            title: 'Save Job!',
+            text: response.data,
+            icon: 'success',
+            confirmButtonText: 'OK',
+          });
+          return true;
+        } else {
+          Swal.fire({
+            title: 'Save Job Fail!',
+            text: response.data,
+            icon: 'error',
+            confirmButtonText: 'OK',
+          });
+          return false;
+        }
+      } catch (error) {
+        console.error(error);
+      }
     }
     
+
 
   },
 

@@ -1,28 +1,83 @@
-<script setup>
+ <script setup>
 import CardCompany from '@/components/companies/cardCompany.vue';
-import axios from 'axios';
-import { onMounted } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { useCompanyStore } from '@/stores/company.js';
-
+import { debounce } from 'lodash';
 
 const companyStore = useCompanyStore();
+const pageSize = ref(6);
+const current = ref(1);
 
-onMounted(()=>{
-    axios.get('/api/company').then(
-        response => {
-            const companies = response.data;
-            console.log(companies);
-            // companies.forEach(company => {
-            //     const cardCompany = new CardCompany();
-            //     cardCompany.company = company;
-            //     cardCompany.$mount('#companySlideID.carousel-inner');
-            // });
+const loading = ref(true);
+
+const queryTextSearch = ref('')
+const queryIndustry = ref('')
+
+
+onMounted(async ()=>{
+ 
+    pageSize.value = 6;
+    current.value = 1;
+    loading.value = true; // Mặc định bật loading trước khi lấy dữ liệu
+    try {
+        await Promise.all([
+            companyStore.getCompany(pageSize.value, current.value),
+            companyStore.getTotal()
+  
+        ]);
+        // Kiểm tra trạng thái dữ liệu
+        loading.value = !(companyStore.total && companyStore.listcompany.length !== 0);
+        if (!loading.value) {
+            console.log("companyStore.listcompany", companyStore.listcompany);
         }
-    );
-    companyStore.getCompany("/api/company");
+    } catch (error) {
+        console.error("Lỗi khi tải dữ liệu:", error);
+        loading.value = true; // Giữ trạng thái loading khi có lỗi
+    }
 })
 
-</script>
+const onShowSizeChange = async (current, pageSize) => {
+
+// await jobStore.getJob(pageSize, current);
+await Promise.all([
+        companyStore.searchJobs(queryTextSearch.value, queryIndustry.value, pageSize, current),
+        companyStore.getTotalWithConditions(queryTextSearch.value, queryIndustry.value)
+    ]);
+// await jobStore.searchJobs(queryTextSearch.value, querylocationSearch.value, queryJobType.value, queryJobLevel.value, pageSize.value, current.value);
+
+
+
+};
+
+watch([current, pageSize], async ([newCurrent, newPageSize]) => {
+
+console.log(newCurrent,newPageSize);
+// await jobStore.getJob(newPageSize, newCurrent);
+await Promise.all([
+        companyStore.searchJobs(queryTextSearch.value, queryIndustry.value, newPageSize, newCurrent),
+        companyStore.getTotalWithConditions(queryTextSearch.value, queryIndustry.value)
+    ]);
+// await jobStore.searchJobs(queryTextSearch.value, querylocationSearch.value, queryJobType.value, queryJobLevel.value, pageSize.value, current.value);
+
+
+
+});
+
+
+// Hàm debounce để trì hoãn tìm kiếm
+const debounceSearch = debounce(async () => {
+await Promise.all([
+        companyStore.searchJobs(queryTextSearch.value, queryIndustry.value, pageSize.value, current.value),
+        companyStore.getTotalWithConditions(queryTextSearch.value, queryIndustry.value)
+    ]);
+}, 300);
+
+const hangleSearch = async () => {
+    debounceSearch(); 
+}
+
+</script> 
+
 
 <template>
     <section class="section-1 py-5 ">
@@ -30,21 +85,21 @@ onMounted(()=>{
             <div class="card border-0 shadow p-5">
                 <div class="row">
                     <div class="col-md-7 mb-3 mb-sm-3 mb-lg-0">
-                        <input type="text" class="form-control" name="search" id="search" placeholder="Keywords">
+                        <input  v-model="queryTextSearch" type="text" class="form-control" name="search" id="search" placeholder="Keywords">
                     </div>
 
-                    <div class="col-md-2 mb-3 mb-sm-3 mb-lg-0">
+                    <!-- <div class="col-md-2 mb-3 mb-sm-3 mb-lg-0">
                         <select name="location" id="location" class="form-control">
                             <option value="">Select a location</option>
                             <option value="">Hồ Chí Minh</option>
                             <option value="">Hà Nội</option>
                             <option value="">Đà Nẵng</option>
                         </select>
-                    </div>
+                    </div> -->
 
                     <div class=" col-md-3 mb-xs-3 mb-sm-3 mb-lg-0">
                         <div class="d-grid gap-2">
-                            <a href="jobs.html" class="btn btn-primary btn-block">Search</a>
+                            <button type="button" class="btn btn-primary btn-block" @click="hangleSearch" >Search</button>
                         </div>
 
                     </div>
@@ -172,17 +227,20 @@ onMounted(()=>{
         </div>
     </section>
 
-    <!-- Featured Company -->
+    <!-- Most followed company -->
     <section class="section-2 py-5 py-sm-4">
         <div class="container">
-            <h2>Featured Company</h2>
+            <h2>List company</h2>
             <div class="row pt-5 pt-sm-4 g-3">
 
-                 <!-- Lặp qua danh sách các công ty -->
-                <CardCompany
+                <div v-if="companyStore.listcompany.length === 0">
+                    <h1 class="text-center text-primary">NOT FUND COMPANY </h1>
+                  </div>
+                <CardCompany v-else
                     v-for="(company, index) in companyStore.listcompany"
                     :key="index"
                     :cardData="{
+                        id: company.id,
                         imgSrc: company.logo ,  
                         imgAlt: company.name || 'Default Company',
                         name: company.name || 'Default Position',
@@ -195,57 +253,26 @@ onMounted(()=>{
                         isSave: false
                     }"
                 />
-                            <!-- card 01 -->
-                <!-- <CardCompany :cardData="{
-                    imgSrc: '/src/assets/img/fpt_corporation_logo.jpg',
-                    imgAlt: 'FPT',
-                    name: 'Software Engineer',
-                    title: 'FPT Technology',
-                    salary: ' Sign in to view salary ',
-                    location: 'Default Location',
-                    type: 'Default Type',
-                    jobs: 4,
-                    cssStyle: 'col-12 col-lg-4 col-md-6 ',
-                    isShow: true,
-                    isSave: false
-                }" /> -->
+               
 
-                <!-- card 02 -->
-                <!-- <CardCompany :cardData="{
-                    imgSrc: '/src/assets/img/fpt_corporation_logo.jpg',
-                    imgAlt: 'FPT',
-                    name: 'Software Engineer',
-                    title: 'FPT Technology',
-                    salary: ' Sign in to view salary ',
-                    location: 'Default Location',
-                    type: 'Default Type',
-                    jobs: 4,
-                    cssStyle: 'col-12 col-lg-4 col-md-6 ',
-                    isShow: true,
-                    isSave: false
-                }" /> -->
-
-                <!-- card 03 -->
-                <!-- <CardCompany :cardData="{
-                    imgSrc: '/src/assets/img/fpt_corporation_logo.jpg',
-                    imgAlt: 'FPT',
-                    name: 'Software Engineer',
-                    title: 'FPT Technology',
-                    salary: ' Sign in to view salary ',
-                    location: 'Default Location',
-                    type: 'Default Type',
-                    jobs: 4,
-                    cssStyle: 'col-12 col-lg-4 col-md-6 ',
-                    isShow: true,
-                    isSave: false
-                }" /> -->
-
+            </div>
+            <!-- pagination -->
+          
+            <div class="mt-3 d-flex justify-content-center">
+            <a-pagination
+                v-model:current="current"
+                v-model:pageSize="pageSize"
+                v-model:total="companyStore.total"
+                show-size-changer
+                @showSizeChange="onShowSizeChange"
+            />
             </div>
         </div>
     </section>
+   
 
     <!-- Company with latest jobs -->
-    <section class="section-2 bg-2 py-5 py-sm-4">
+    <!-- <section class="section-2 bg-2 py-5 py-sm-4">
         <div class="container">
             <h2>Company with latest jobs</h2>
             <div class="row pt-5 pt-sm-4 g-3">
@@ -269,19 +296,19 @@ onMounted(()=>{
                 
             </div>
         </div>
-    </section>
+    </section> -->
 
-    <!-- Most followed company -->
-    <section class="section-2 py-5 py-sm-4">
+     <!-- Featured Company -->
+     <!-- <section class="section-2 py-5 py-sm-4">
         <div class="container">
-            <h2>Most followed company</h2>
+            <h2>Featured Company</h2>
             <div class="row pt-5 pt-sm-4 g-3">
 
+        
                 <CardCompany
                     v-for="(company, index) in companyStore.listcompany"
                     :key="index"
                     :cardData="{
-                        id: company.id,
                         imgSrc: company.logo ,  
                         imgAlt: company.name || 'Default Company',
                         name: company.name || 'Default Position',
@@ -297,28 +324,8 @@ onMounted(()=>{
                
 
             </div>
-            <!-- pagination -->
-            <div class="mt-3 d-flex justify-content-center">
-                <nav aria-label="Page navigation ">
-                    <ul class="pagination">
-                        <li class="page-item disabled">
-                            <a class="page-link h-100 d-flex align-items-center" href="#" aria-label="Previous" git="-1"
-                                aria-disabled="true">
-                                <span aria-hidden="true">&laquo;</span>
-                            </a>
-                        </li>
-                        <li class="page-item active" aria-current="page"><a
-                                class="page-link h-100 d-flex align-items-center" href="#">1</a></li>
-                        <li class="page-item"><a class="page-link h-100 d-flex align-items-center" href="#">2</a></li>
-                        <li class="page-item"><a class="page-link h-100 d-flex align-items-center" href="#">3</a></li>
-                        <li class="page-item">
-                            <a class="page-link" href="#" aria-label="Next">
-                                <span aria-hidden="true">&raquo;</span>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
         </div>
-    </section>
+    </section> -->
+
+    
 </template>
