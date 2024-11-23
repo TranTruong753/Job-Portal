@@ -12,12 +12,18 @@
         <div v-for="item in cardData.content" :key="item.id">
             <li v-if="item.isShow"
                 :class="['list-group-item', 'd-flex', 'justify-content-between', 'align-items-center', 'p-3']">
-                <router-link class="nav-link" :to="item.linkNav" @click="item.isActive = true">{{ item.titleNav }}</router-link>
+                <router-link class="nav-link" :to="item.linkNav" >{{ item.titleNav }}</router-link>
             </li>
         </div>
 
     </ul>
 </template>
+
+<script setup>
+
+
+
+</script>
 
 <script>
 export default {

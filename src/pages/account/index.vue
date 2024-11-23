@@ -1,12 +1,111 @@
+
 <script setup>
-import NavAccount from "@/components/account/navAccount.vue";
 import { useAuthStore } from '@/stores/auth.js';
+import { reactive, watchEffect } from "vue";
+import { useRoute } from 'vue-router';
 
-   
 const authStore = useAuthStore();
+const route = useRoute();
 
+console.log(route.fullPath)
 
+const data = reactive({
+    content: [
+        {
+            id: 11,
+            titleNav: 'Account Settings',
+            linkNav: '/account',
+            isShow: true,
+            isActive: false,
+        },
+        {
+            id: 2,
+            titleNav: 'My Profile',
+            linkNav: '/account/profile',
+            isShow: authStore.role === 'User',
+            isActive: false,
+        },
+        {
+            id: 3,
+            titleNav: 'My Profile Employer',
+            linkNav: '/account/profile-employer',
+            isShow: authStore.role === 'Employer',
+            isActive: false,
+        },
+        {
+            id: 4,
+            titleNav: 'Post a Job',
+            linkNav: '/account/post-job',
+            isShow: authStore.role === 'Employer',
+            isActive: false,
+        },
+        {
+            id: 5,
+            titleNav: 'Post a Blog',
+            linkNav: '/account/post-blog',
+            isShow: authStore.role === 'Employer',
+            isActive: false,
+        },
+        {
+            id: 6,
+            titleNav: 'My Jobs',
+            linkNav: '/account/my-jobs',
+            isShow: authStore.role === 'Employer',
+            isActive: false,
+        },
+        {
+            id: 7,
+            titleNav: 'Jobs Applied',
+            linkNav: '/account/jobs-applied',
+            isShow: authStore.role === 'User',
+            isActive: false,
+        },
+        {
+            id: 8,
+            titleNav: 'Saved Jobs',
+            linkNav: '/account/saved-jobs',
+            isShow: authStore.role === 'User',
+            isActive: false,
+        },
+        {
+            id: 9,
+            titleNav: 'Create CV test',
+            linkNav: '/account/create-cv-test',
+            isShow: true,
+            isActive: false,
+        },
+        {
+            id: 10,
+            titleNav: 'Create CV',
+            linkNav: '/account/create-cv',
+            isShow: true,
+            isActive: false,
+        },
+        {
+            id: 11,
+            titleNav: 'Charts',
+            linkNav: '/account/charts-employer',
+            isShow: authStore.role === 'Employer',
+            isActive: false,
+        },
+    ],
+});
 
+// Watch the route and update isActive accordingly
+watchEffect(() => {
+    data.content.forEach(navItem => {
+        navItem.isActive = route.fullPath === navItem.linkNav;
+    });
+});
+
+const onClick = (item) => {
+    // Resetting all items' isActive to false
+    data.content.forEach(navItem => {
+        navItem.isActive = false;
+    });
+    // Set isActive to true for the clicked item
+    item.isActive = true;
+};
 </script>
 
 <template>
@@ -39,12 +138,22 @@ const authStore = useAuthStore();
                     </div>
                     <div class="card account-nav border-0 shadow mb-4 mb-lg-0">
                         <div class="card-body p-0">
-                            <NavAccount :cardData="{
+                            <ul class="list-group list-group-flush ">
+                                <div v-for="item in data.content" :key="item.id" @click="onClick(item)">
+                                    <router-link :to="item.linkNav"  v-if="item.isShow"
+                                        :class="['nav-link','list-group-item', 'd-flex', 'justify-content-between', 'align-items-center', 'p-3', { 'bg-primary--change': item.isActive } ]">
+                                    
+                                          <span>  {{ item.titleNav }}</span>
+                                        
+                                    </router-link>
+                                </div>
+                            </ul>
+                            <!-- <NavAccount :cardData="{
                                 content: [
                                     {
                                         id: 11,
                                         titleNav: 'Account Settings',
-                                        linkNav: '/account',
+                                        linkNav: '/account', 
                                         isShow: true,
 
                                     },
@@ -70,7 +179,7 @@ const authStore = useAuthStore();
                                         id: 5,
                                         titleNav: 'Post a Blog',
                                         linkNav: '/account/post-blog',
-                                        isShow: true,
+                                        isShow: authStore.role === 'Employer',
                                     },
                                     {
                                         id: 6,
@@ -102,8 +211,17 @@ const authStore = useAuthStore();
                                         linkNav: '/account/create-cv',
                                         isShow: true,
                                     },
-                                ]
-                            }" /> 
+                                    {
+                                        id: 11,
+                                        titleNav: 'Charts ',
+                                        linkNav: '/account/charts-employer',
+                                        isShow: authStore.role === 'Employer',
+            
+                                    },
+                                ],
+                            }" 
+                           
+                            />  -->
                         </div>
                     </div>
                 </div>
@@ -171,4 +289,13 @@ textarea {
 .input__repassword, .input__password {
     position: relative;
 }
+
+.bg-primary--change {
+    background: #d34127;
+    color: #fff !important
+}
+
+
+
+
 </style>

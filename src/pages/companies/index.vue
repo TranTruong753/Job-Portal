@@ -232,8 +232,12 @@ const hangleSearch = async () => {
         <div class="container">
             <h2>List company</h2>
             <div class="row pt-5 pt-sm-4 g-3">
-
-                <div v-if="companyStore.listcompany.length === 0">
+                <div v-if="loading" class="text-center">
+                    <div class="loading">
+                      <a-spin size="large" tip="Loading..."/>
+                    </div>
+                </div>
+                <div v-else-if="companyStore.listcompany.length === 0">
                     <h1 class="text-center text-primary">NOT FUND COMPANY </h1>
                   </div>
                 <CardCompany v-else
@@ -329,3 +333,28 @@ const hangleSearch = async () => {
 
     
 </template>
+
+<style scoped>
+.example {
+  text-align: center;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+  margin-bottom: 20px;
+  padding: 30px 50px;
+  margin: 20px 0;
+  height: 60vh;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background: transparent;
+  border-radius: 4px;
+ 
+  padding: 30px 50px;
+  
+  height: 50vh;
+}
+</style>

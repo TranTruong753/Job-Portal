@@ -1,5 +1,6 @@
 import { getCookie } from '@/assets/js/cookieUtils.js'
 import {checkAuth, checkUserInDb} from '@/assets/js/jsUtils.js';
+import { useAuthStore } from '@/stores/auth';
 
 
 
@@ -8,14 +9,18 @@ const user = [
         path: "/",
         component: () => import("../layouts/user.vue"),
         beforeEnter:(to, from, next) => {
+            const authStore = useAuthStore();
+            // Kiểm tra xác thực
             const token = getCookie('token');
-            if (token) {
-                checkAuth(next);  // Kiểm tra xác thực
-                next();
-               
-            } else {
-                next();  // Nếu không có token, cho phép tiếp tục vào route
+            if(token){
+                next()
+            }else{
+                authStore.$reset();
+                next()
             }
+            
+               
+           
         },
         children: [
             {
@@ -147,7 +152,7 @@ const user = [
                         },
                     },
                     {
-                        path: "list-applicants",
+                        path: "list-applicants/:id",
                         name: "account-list-applicants",
                         component: () => import("../pages/account/ListApplicants.vue"),
                         beforeEnter: (to, from, next) => {
@@ -164,6 +169,15 @@ const user = [
                         path: "post-blog",
                         name: "account-post-blog",
                         component: () => import("../pages/blogs/post.vue"),
+                        beforeEnter: (to, from, next) => {
+                            const role = checkAuth(next);         
+                           
+                            if (role === 'Employer') {
+                                next();
+                            } else {
+                                next({name:'account-settings'})
+                            }
+                        },
                     },
                     {
                         path: "create-cv-test",
@@ -174,6 +188,20 @@ const user = [
                         path: "create-cv",
                         name: "account-create-cv",
                         component: () => import("../pages/account/cv.vue"),
+                    },
+                    {
+                        path: "charts-employer",
+                        name: "account-charts-employer",
+                        component: () => import("../pages/account/charts/charts.vue"),
+                        beforeEnter: (to, from, next) => {
+                            const role = checkAuth(next);         
+                           
+                            if (role === 'Employer') {
+                                next();
+                            } else {
+                                next({name:'account-settings'})
+                            }
+                        },
                     },
                 ]
             },

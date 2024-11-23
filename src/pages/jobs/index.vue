@@ -19,6 +19,7 @@ const queryTextSearch = ref('')
 const querylocationSearch = ref('')
 const queryJobType = ref('')
 const queryJobLevel = ref('')
+const IsDecsending = ref(true);
 
 // if(jobStore.listjobs.length === 0){
 //      loading.value = true;
@@ -66,8 +67,8 @@ const onShowSizeChange = async (current, pageSize) => {
 
     // await jobStore.getJob(pageSize, current);
     await Promise.all([
-            jobStore.searchJobs(queryTextSearch.value, querylocationSearch.value, queryJobType.value, queryJobLevel.value, pageSize, current),
-            jobStore.getTotalWithConditions(queryTextSearch.value, querylocationSearch.value, queryJobType.value, queryJobLevel.value)
+            jobStore.searchJobs(queryTextSearch.value, querylocationSearch.value, queryJobType.value, queryJobLevel.value, IsDecsending.value, pageSize, current),
+            jobStore.getTotalWithConditions(queryTextSearch.value, querylocationSearch.value, queryJobType.value, queryJobLevel.value, IsDecsending.value)
         ]);
     // await jobStore.searchJobs(queryTextSearch.value, querylocationSearch.value, queryJobType.value, queryJobLevel.value, pageSize.value, current.value);
 
@@ -80,8 +81,8 @@ watch([current, pageSize], async ([newCurrent, newPageSize]) => {
    console.log(newCurrent,newPageSize);
     // await jobStore.getJob(newPageSize, newCurrent);
     await Promise.all([
-            jobStore.searchJobs(queryTextSearch.value, querylocationSearch.value, queryJobType.value, queryJobLevel.value, newPageSize, newCurrent),
-            jobStore.getTotalWithConditions(queryTextSearch.value, querylocationSearch.value, queryJobType.value, queryJobLevel.value)
+            jobStore.searchJobs(queryTextSearch.value, querylocationSearch.value, queryJobType.value, queryJobLevel.value, IsDecsending.value, newPageSize, newCurrent),
+            jobStore.getTotalWithConditions(queryTextSearch.value, querylocationSearch.value, queryJobType.value, queryJobLevel.value, IsDecsending.value)
         ]);
    // await jobStore.searchJobs(queryTextSearch.value, querylocationSearch.value, queryJobType.value, queryJobLevel.value, pageSize.value, current.value);
 
@@ -96,8 +97,8 @@ watch([current, pageSize], async ([newCurrent, newPageSize]) => {
 // Hàm debounce để trì hoãn tìm kiếm
 const debounceSearch = debounce(async () => {
   await Promise.all([
-            jobStore.searchJobs(queryTextSearch.value, querylocationSearch.value, queryJobType.value, queryJobLevel.value, pageSize.value, current.value),
-            jobStore.getTotalWithConditions(queryTextSearch.value, querylocationSearch.value, queryJobType.value, queryJobLevel.value)
+            jobStore.searchJobs(queryTextSearch.value, querylocationSearch.value, queryJobType.value, queryJobLevel.value,  IsDecsending.value, pageSize.value, current.value),
+            jobStore.getTotalWithConditions(queryTextSearch.value, querylocationSearch.value, queryJobType.value, queryJobLevel.value,  IsDecsending.value,)
         ]);
   }, 300);
 
@@ -111,7 +112,7 @@ const hangleSearch = async () => {
 <template>
 
 
-    <div v-if="loading" class="text-center">
+    <!-- <div v-if="loading" class="text-center">
       <div class="example">
         <a-spin tip="Loading...">
           <a-alert
@@ -119,10 +120,13 @@ const hangleSearch = async () => {
             description="Fetching job listings. Please wait."
           ></a-alert>
         </a-spin>
+      </div> 
+      <div class="loading">
+        <a-spin />
       </div>
-    </div>
+    </div> -->
 
-    <section class="section-3 py-5 bg-2" v-else>
+    <section class="section-3 py-5 bg-2">
       <div class="container">
         <!-- Header -->
         <div class="row">
@@ -130,9 +134,9 @@ const hangleSearch = async () => {
             <h2>Find Jobs</h2>
           </div>
           <div class="col-6 col-md-2">
-            <select name="sort" id="sort" class="form-control">
-              <option value="latest">Latest</option>
-              <option value="oldest">Oldest</option>
+            <select v-model="IsDecsending" name="IsDecsending" id="IsDecsending" class="form-control" @change="hangleSearch">
+              <option value="true">Latest</option>
+              <option value="false">Oldest</option>
             </select>
           </div>
         </div>
@@ -231,11 +235,18 @@ const hangleSearch = async () => {
               <div class="job_lists">
                 <div class="row g-3">
 
-                  <div v-if="jobStore.listjobs.length === 0">
+                  <div v-if="loading" class="text-center">
+                    <div class="loading">
+                      <a-spin size="large" tip="Loading..."/>
+                    </div>
+                  </div>
+
+                  <div v-else-if="jobStore.listjobs.length === 0">
                     <h1 class="text-center text-primary">NOT FUND JOB </h1>
                   </div>
 
                   <CardProduct
+                  v-else-if="jobStore.listjobs.length !== 0"
                     v-for="(job, index) in jobStore.listjobs"
                     :key="index"
                     :card-data="{
@@ -285,5 +296,18 @@ const hangleSearch = async () => {
   padding: 30px 50px;
   margin: 20px 0;
   height: 60vh;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background: transparent;
+  border-radius: 4px;
+ 
+  padding: 30px 50px;
+  
+  height: 50vh;
 }
 </style>

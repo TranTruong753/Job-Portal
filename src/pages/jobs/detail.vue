@@ -2,7 +2,7 @@
 import { RouterLink, useRoute, useRouter } from 'vue-router';
 import { useJobtore } from '@/stores/jobs';
 import { useAuthStore } from '@/stores/auth';
-import { onMounted, ref } from 'vue';
+import { onMounted, reactive, ref, watch } from 'vue';
 import { formatDateV2, closeModal } from '@/assets/js/jsUtils.js'
 
 
@@ -16,7 +16,23 @@ const file = ref(null);
 
 const errorText = ref("");
 
+const checkStatusJob = reactive({
+    isSave: '',
+    isApply: 0
+})
+
+
+
 onMounted(async () => {
+    if(authStore.role === 'User'){
+
+        const dataSaveOrApply = await authStore.checkJobIsSaveOrApply(jobId);
+        if(dataSaveOrApply){
+        checkStatusJob.isSave = dataSaveOrApply.issave ;
+        checkStatusJob.isApply = dataSaveOrApply.status ;
+        console.log(checkStatusJob)
+    }
+    }
     await jobStore.getDetailJobs(jobId);
     if (jobStore.job) {
         console.log('get job thành công!')
@@ -27,12 +43,17 @@ onMounted(async () => {
     } else {
         console.log('get job thất bại!')
     }
+
+   
 })
 
 
 const handleApply = async() => {
     if (file.value) {
-        await authStore.applyJob(jobId, file.value);
+        const isSucces = await authStore.applyJob(jobId, file.value);
+        if(isSucces){
+            checkStatusJob.isApply = 1;
+        }
         file.value = null;
         const fileInput = document.getElementById("cv"); 
         if (fileInput) { 
@@ -53,7 +74,13 @@ const handleFileChange = (event) => {
 };
 
 const handleSaveJob = async() => {
-    authStore.SavedJobs(jobId);
+    if(checkStatusJob.isSave){
+        checkStatusJob.isSave = false;
+        authStore.SavedJobs(jobId, false);
+    }else{
+        checkStatusJob.isSave = true;
+        authStore.SavedJobs(jobId, true);
+    }
 }
 
 </script>
@@ -182,20 +209,28 @@ const handleSaveJob = async() => {
 
                             <div class="border-bottom"></div>
                             <div class="pt-3 text-end">
-                                <button type="button" class="btn btn-secondary" @click="handleSaveJob">Save</button>
-                                <button v-if="authStore.role === 'User'" type="button" class="ms-2 btn btn-primary" @click="handleApply" data-bs-toggle="modal" data-bs-target="#addCvJob">Apply</button>
+                                <button type="button" class="btn btn-secondary" @click="handleSaveJob">
+                                    {{ checkStatusJob.isSave ? 'saved' : 'save' }}
+                                </button>
+                                
+                                <button v-if="authStore.role === 'User' && checkStatusJob.isApply !== 1" type="button" class="ms-2 btn btn-primary" @click="handleApply" data-bs-toggle="modal" data-bs-target="#addCvJob">Apply</button>
+                                <button v-else-if="authStore.role === 'User' && checkStatusJob.isApply === 1" type="button" class="ms-2 btn btn-primary" disabled>Applied</button>
+                         
                             </div>
                         </div>
                     </div>
                 </div>
                 <!-- column right -->
                 <div class="col-lg-4 col-md-12 ">
-                    <div class="mb-4">
-                        <button v-if="authStore.role === 'User'" type="button" class="btn btn-primary w-100 p-lg-3" data-bs-toggle="modal" data-bs-target="#addCvJob">
+                    <div class="">
+                        <button v-if="authStore.role === 'User' && checkStatusJob.isApply !== 1" type="button" class="mb-4 btn btn-primary w-100 p-lg-3" data-bs-toggle="modal" data-bs-target="#addCvJob">
                             <span> Apply Now </span>
                         </button>
+                        <button v-else-if="authStore.role === 'User' && checkStatusJob.isApply == 1" type="button" class="mb-4 btn btn-primary w-100 p-lg-3" disabled>
+                            <span> Applied </span>
+                        </button>
                         <router-link v-else-if="authStore.role !== 'Employer'" to="/login"
-                            class="btn btn-primary w-100 p-lg-3">
+                            class="mb-4 btn btn-primary w-100 p-lg-3">
                             <span>Login Now</span>
                         </router-link>
                     </div>

@@ -2228,7 +2228,7 @@ textarea.form-control-lg {
   transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
 }
 .nav-link:hover, .nav-link:focus {
-  color: #0a58ca;
+  color: #d34127;
 }
 .nav-link.disabled {
   color: #6c757d;
@@ -9273,9 +9273,9 @@ button.btn-secondary, .btn.btn-secondary {
   border: 2px solid #242021;
 }
 button.btn-secondary:hover, button.btn-secondary:focus, .btn.btn-secondary:hover, .btn.btn-secondary:focus {
-  border: 2px solid #d34127;
+  /* border: 2px solid #d34127;
   background: #d34127;
-  color: #ffffff;
+  color: #ffffff; */
 }
 button.btn-outline-primary, .btn.btn-outline-primary {
   color: #d34127;

@@ -1,32 +1,169 @@
 <script setup>
-import NavAccount from "@/components/account/navAccount.vue";
-
 import { useAuthStore } from '@/stores/auth.js';
-
-import {onMounted, reactive} from 'vue'
-
+import { useLocationStore } from "@/stores/locationStore";
+import { onMounted, reactive } from 'vue'
+import { useForm, useField } from 'vee-validate';
+import * as yup from 'yup';
+import {formatDateForInput} from '@/assets/js/jsUtils'
 
 const authStore = useAuthStore();
+const locationStore = useLocationStore();
 
-onMounted(()=>{
-     authStore.getUserData();
-     userObj.birthday = authStore.userData.birthday;
-     userObj.sex = authStore.userData.sex;
-     userObj.phone = authStore.userData.phone;
-     userObj.img = authStore.userData.img;
-     if(authStore.userData.address){
+onMounted(async () => {
+    await authStore.getUserData();
+    // Lấy danh sách tỉnh/thành khi component được mount
+    await locationStore.fetchProvinces();
+    fullname.value = authStore.userData.fullname;
+    email.value = authStore.userData.email;
+   
+    if(authStore.userData.birthdate){
 
-     }
+        birthdate.value = formatDateForInput(authStore.userData.birthdate);
+    }
+
+    if(authStore.userData.sex){
+        sex.value = authStore.userData.sex;
+    }
+
+    if(authStore.userData.phone){
+        phone.value = authStore.userData.phone; 
+    }
+    
+ 
+    // if (authStore.userData.address) {
+    //     street.value = authStore.userData.address.street
+    //     province.value = authStore.userData.address.province
+    //     district.value = authStore.userData.address.district
+    //     ward.value = authStore.userData.address.ward
+    // }
+     // Gán địa chỉ nếu tồn tại
+     if (authStore.userData.address) {
+        street.value = authStore.userData.address.street || '';
+
+        // Tìm và gán province
+        const provinceVar = locationStore.provinces.find(
+            (item) => item.name === authStore.userData.address.province
+        );
+        if (provinceVar) {
+            locationStore.selectedProvince = provinceVar.code;
+            await locationStore.fetchDistricts(provinceVar.code);
+
+            // Tìm và gán district
+            const district = locationStore.districts.find(
+                (item) => item.name === authStore.userData.address.district
+            );
+            if (district) {
+                locationStore.selectedDistrict = district.code;
+                await locationStore.fetchWards(district.code);
+
+                // Tìm và gán ward
+                const ward = locationStore.wards.find(
+                    (item) => item.name === authStore.userData.address.ward
+                );
+                if (ward) {
+                    locationStore.selectedWard = ward.code;
+                }
+            }
+        }
+    }
 })
+
+
 
 const userObj = reactive({
-    fullname: authStore.fullname,
-    email: authStore.email,
-    birthday: '',
+    fullname: '',
+    email: '',
+    birthdate: null,
     sex: '',
     phone: '',
-    img: '',
+    street: '',
+    province: '',
+    district: '',
+    ward: ''
 })
+
+const schema = yup.object({
+  fullname: yup.string().required('Full name is required'),
+  email: yup.string().email('Email must be a valid email').required('Email is required'),
+  birthdate: yup.date().required('Date of birth is required'),
+  sex: yup.string().required('Sex is required'),
+  phone: yup
+    .string()
+    .matches(/^\d+$/, 'Phone must be a number')
+    .required('Phone is required'),
+    street: yup.string().required('Street is required'),
+    province: yup.string().required('Province is required'),
+    district: yup.string().required('District is required'),
+    ward: yup.string().required('Ward is required'),
+});
+
+
+const { handleSubmit, resetForm } = useForm({
+    validationSchema: schema, // Áp dụng schema
+    initialValues: userObj,   // Gán giá trị ban đầu từ userObj
+    validateOnBlur: true,
+});
+
+const { value: fullname, errorMessage: fullnameError } = useField('fullname');
+const { value: email, errorMessage: emailError } = useField('email');
+const { value: birthdate, errorMessage: birthdateError } = useField('birthdate');
+const { value: sex, errorMessage: sexError } = useField('sex');
+const { value: phone, errorMessage: phoneError } = useField('phone');
+const { value: street, errorMessage: streetError, setValue: setStreet } = useField('street');
+const { value: province, errorMessage: provinceError, setValue: setProvince } = useField('province');
+const { value: ward, errorMessage: wardError, setValue: setWard } = useField('ward');
+const { value: district, errorMessage: districtError, setValue: setDistrict } = useField('district');
+
+
+
+const onProvinceChange = (event) => {
+    locationStore.fetchDistricts(locationStore.selectedProvince);
+    locationStore.updateResult();
+
+    const selectedProvince = locationStore.provinces.find(province => province.code === locationStore.selectedProvince);
+
+
+    province.value = selectedProvince.name;
+    district.value = "";
+    ward.value = "";
+};
+
+const onDistrictChange = (event) => {
+    locationStore.fetchWards(locationStore.selectedDistrict);
+    locationStore.updateResult();
+
+    const selectedDistrict = locationStore.districts.find(districts => districts.code === locationStore.selectedDistrict);
+
+    // console.log(selectedDistrict.name);
+    district.value = selectedDistrict.name;
+    ward.value = "";
+
+};
+
+const onWardChange = (event) => {
+    locationStore.updateResult();
+
+    const selectedWard = locationStore.wards.find(wards => wards.code === locationStore.selectedWard);
+
+    // console.log(selectedWard.name);
+    ward.value = selectedWard.name;
+};
+
+const onSubmit = handleSubmit(
+        async values => {
+          await authStore.updateUser(values);
+           
+        },
+        ({ errors }) => {
+            const firstError = Object.keys(errors)[0];
+            const el = document.querySelector(`[name="${firstError}"]`);
+            el?.scrollIntoView({
+                behavior: 'smooth',
+            });
+            el.focus();
+        },
+        );
+
 
 </script>
 
@@ -36,586 +173,102 @@ const userObj = reactive({
     <div class="card border-0 shadow mb-4  ">
         <div class="card-body p-4">
             <h3 class="mt-3 fs-4 mb-1">Personal Information</h3>
-            <div class="pt-0 row g-3">
-                <div class="col-lg-6">
-                    <label for="fullname" class="mb-2">Full Name<span class="text-primary">*</span></label>
-                    <input type="text" placeholder="Enter Name" class="form-control" id="fullname" v-model="userObj.fullname">
-                </div>
-                <div class="col-lg-6">
-                    <label for="email" class="mb-2">Email<span class="text-primary">*</span></label>
-                    <input type="text" placeholder="Enter Email" id="email" v-model="userObj.email" class="form-control">
-                </div>
-                <div class="col-lg-6">
-                    <label for="birthday" class="mb-2">Date of Birth<span class="text-primary">*</span></label>
-                    <input id="birthday" type="date" placeholder="Designation" class="form-control" v-model="userObj.birthday" >
-                </div>
-                <div class="col-lg-6">
-                    <label for="" class="mb-2">Sex<span class="text-primary">*</span></label>
-                    <div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1"
-                                value="Men" v-model="userObj.sex">
-                            <label class="form-check-label" for="inlineRadio1">Men</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2"
-                                value="Women" v-model="userObj.sex">
-                            <label class="form-check-label" for="inlineRadio2">Women</label>
-                        </div>
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio3"
-                                value="Other" v-model="userObj.sex">
-                            <label class="form-check-label" for="inlineRadio3">Other</label>
+            <form @submit.prevent="onSubmit" id="formProfile" >
+                <div class="pt-0 row g-3">
+                    <div class="col-lg-6">
+                        <label for="fullname" class="mb-2">Full Name<span class="text-primary">*</span></label>
+                        <input type="text" placeholder="Enter Name" class="form-control" id="fullname" v-model="fullname" name="fullname" />
+                        <span class="text-danger">{{ fullnameError }}</span>
+                    </div>
+    
+                    <div class="col-lg-6">
+                        <label for="email" class="mb-2">Email<span class="text-primary">*</span></label>
+                        <input readonly type="text" placeholder="Enter Email" id="email" v-model="email" class="form-control" name="email" />
+                        <span class="text-danger">{{ emailError }}</span>
+                    </div>
+    
+                    <div class="col-lg-6">
+                        <label for="birthdate" class="mb-2">Date of Birth<span class="text-primary">*</span></label>
+                        <input id="birthdate" type="date" class="form-control" v-model="birthdate"  name="birthdate" />
+                        <span class="text-danger">{{ birthdateError }}</span>
+                    </div>
+    
+                    <div class="col-lg-6">
+                        <label for="" class="mb-2">Sex<span class="text-primary">*</span></label>
+                        <div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" id="inlineRadio1" value="Men" v-model="sex" />
+                                <label class="form-check-label" for="inlineRadio1">Men</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" id="inlineRadio2" value="Women"
+                                    v-model="sex" />
+                                <label class="form-check-label" for="inlineRadio2">Women</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" id="inlineRadio3" value="Other"
+                                    v-model="sex" />
+                                <label class="form-check-label" for="inlineRadio3">Other</label>
+                            </div>
+                            <span class="text-danger">{{ sexError }}</span>
                         </div>
                     </div>
+    
+                    <div class="col-lg-6">
+                        <label for="" class="mb-2">Phone<span class="text-primary">*</span></label>
+                        <input v-model="phone" type="text" placeholder="not update" class="form-control" name="phone"/>
+                        <span class="text-danger">{{ phoneError }}</span>
+                    </div>
+
+                    <div class="row">
+                
+                        <div class="mb-4 col-md-4">
+                            <label for="province">Province<span class="text-primary">*</span></label>
+                            <select name="province" class="form-select" id="province" v-model="locationStore.selectedProvince" @change="onProvinceChange">
+                                <option disabled value="">Chọn tỉnh/thành</option>
+                                <option v-for="province in locationStore.provinces" :key="province.code" :value="province.code"  :data-name="province.name">
+                                {{ province.name }}
+                                </option>
+                            </select>
+                            <span class="text-danger ">{{ provinceError }}</span>
+                        </div>
+                        <div class="mb-4 col-md-4">
+                            <label for="district">district<span class="text-primary">*</span></label>
+                            <select name="district"  class="form-select" id="district" v-model="locationStore.selectedDistrict" @change="onDistrictChange">
+                                <option disabled value="">Chọn quận/huyện</option>
+                                <option v-for="district in locationStore.districts" :key="district.code" :value="district.code"  :data-name="district.name">
+                                {{ district.name }}
+                                </option>
+                            </select>
+                            <span class="text-danger ">{{ districtError }}</span>
+                        </div>
+                        <div class="mb-4 col-md-4">
+                            <label for="ward">ward<span class="text-primary">*</span></label>
+                            <select name="ward"  class="form-select" id="ward" v-model="locationStore.selectedWard" @change="onWardChange">
+                                <option disabled value="">Chọn phường/xã</option>
+                                <option v-for="ward in locationStore.wards" :key="ward.code" :value="ward.code" :data-name="ward.name">
+                                {{ ward.name }}
+                                </option>
+                            </select>
+                            <span class="text-danger ">{{ wardError }}</span>
+                        </div>
+                        
+                    </div>
+
+                    <div class="">
+                        <label for="street" class="mb-2">Street<span class="req">*</span></label>
+                        <textarea :id="street" v-model="street" class="form-control" name="street" id="Street" cols="5" rows="5"
+                            placeholder="Street"></textarea>
+                        <span class="text-danger ">{{ streetError }}</span>
+                    </div>
+    
                 </div>
-                <div class="col-lg-6">
-                    <label for="" class="mb-2">Phone<span class="text-primary">*</span></label>
-                    <input v-model="userObj.phone" type="text" placeholder="not update" class="form-control">
-                </div>
-            </div>
+            </form>
 
         </div>
         <div class="card-footer p-4">
-            <button type="button" class="btn btn-primary">Update</button>
+            <button type="submit" form="formProfile" class="btn btn-primary" >Update</button>
         </div>
     </div>
-
-    <!-- General information-->
-    <!-- <div class="card border-0 shadow mb-4">
-        <div class="card-body p-4">
-            <h3 class="mt-3 fs-4 mb-1">General Information</h3>
-            <div class="row g-3 pt-0">
-                <div class=" col-lg-12">
-                    <label for="" class="mb-2">Career Objective<span class="text-primary">*</span></label>
-                    <input type="text" placeholder="not updated" class="form-control">
-                </div>
-
-                <div class=" col-lg-6">
-                    <label for="" class="mb-2">Desired Position<span class="text-primary">*</span></label>
-                    <input type="text" placeholder="not updated" class="form-control">
-                </div>
-
-                <div class=" col-lg-6">
-                    <label for="" class="mb-2">Desired Job Level<span class="text-primary">*</span></label>
-                    <input type="text" placeholder="not updated" class="form-control">
-                </div>
-
-                <div class=" col-lg-6">
-                    <label for="" class="mb-2">Education<span class="text-primary">*</span></label>
-                    <input type="text" placeholder="not updated" class="form-control">
-                </div>
-
-                <div class=" col-lg-6">
-                    <label for="" class="mb-2">Experience<span class="text-primary">*</span></label>
-                    <input type="text" placeholder="not updated" class="form-control">
-                </div>
-
-                <div class=" col-lg-6">
-                    <label for="" class="mb-2">Desired Location<span class="text-primary">*</span></label>
-                    <input type="text" placeholder="not updated" class="form-control">
-                </div>
-
-                <div class=" col-lg-6">
-                    <label for="" class="mb-2">Expected Salary<span class="text-primary">*</span></label>
-                    <input type="text" placeholder="---" class="form-control">
-                </div>
-
-                <div class=" col-lg-6">
-                    <label for="" class="mb-2">Work Location<span class="text-primary">*</span></label>
-                    <input type="text" placeholder="not updated" class="form-control">
-                </div>
-
-                <div class=" col-lg-6">
-                    <label for="" class="mb-2">Work Type<span class="text-primary">*</span></label>
-                    <input type="text" placeholder="not updated" class="form-control">
-                </div>
-
-                <div class=" col-lg-6">
-                    <label for="" class="mb-2">Job<span class="text-primary">*</span></label>
-                    <input type="text" placeholder="not updated" class="form-control">
-                </div>
-            </div>
-        </div>
-        <div class="card-footer  p-4">
-            <button type="button" class="btn btn-primary">Update</button>
-        </div>
-    </div> -->
-
-    <!-- item demo -->
-    <!-- <div class="card border-0 shadow mb-4  ">
-        <div class="card-body p-0">
-            <div class="d-flex align-items-sm-start justify-content-between ps-4 pe-2 pt-2 ">
-                <h3 class="mt-3 fs-4 mb-1 pb-0">Demo</h3>
-                <button class="btn btn-primary rounded-circle btn " type="button" data-bs-toggle="modal"
-                    data-bs-target="#demoModal">
-                    <i class="fa-solid fa-pen d-none"></i>
-                    <i class="fa-solid fa-plus"></i>
-                </button>
-            </div>
-            <div class="m-3 border border-2">
-                <div class="p-3 ">
-
-                    <div class="mb-3 ">
-                        <div class="d-flex gap-3 align-items-center">
-                            <span class="rounded-circle bg-1" style="height: 13px; width: 13px;"></span>
-                            <p class="m-0 small text-black-50 fst-italic">31/08/2023 - 09/09/2024 </p>
-                        </div>
-                        <div class="mx-1 mt-3 border-2 border-start pb-3 ps-3">
-                            <h5 class="p-0 lh-base">Titile</h5>
-                            <p class="fs-6 p-0 m-0 lh-base">
-                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Fugit, quidem?
-                            </p>
-                            <p class="fs-6 fst-italic p-0 m-0 lh-base">Lorem ipsum dolor sit amet.</p>
-                            <div class="mt-2 d-flex align-items-center gap-3">
-                                <a href="#!" class="p-1"> <i class="fs-5 fa-solid fa-pen text-warning"></i></a>
-                                <a href="#!" class="p-1"><i class="fs-5 fa-solid fa-trash text-danger"></i></a>
-                            </div>
-                            <span class="mt-3 d-block border-bottom border-1"></span>
-
-                        </div>
-                    </div>
-
-                    <div class="mb-3 ">
-                        <div class="d-flex gap-3 align-items-center">
-                            <span class="rounded-circle bg-1" style="height: 13px; width: 13px;"></span>
-
-                            <p class="m-0 small text-black-50 fst-italic">31/08/2023 - 09/09/2024 </p>
-                        </div>
-                        <div class="mx-1 mt-3 border-2 border-start pb-3 ps-3">
-                            <h5 class="p-0 lh-base">Titile</h5>
-                            <p class="fs-6 p-0 m-0 lh-base">
-                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Fugit, quidem?
-                            </p>
-                            <p class="fs-6 fst-italic p-0 m-0 lh-base">Lorem ipsum dolor sit amet.</p>
-                            <div class="mt-2 d-flex align-items-center gap-3">
-                                <a href="#!" class="p-1"> <i class="fs-5 fa-solid fa-pen text-warning"></i></a>
-                                <a href="#!" class="p-1"><i class="fs-5 fa-solid fa-trash text-danger"></i></a>
-                            </div>
-                            <span class="mt-3 d-block border-bottom border-1"></span>
-
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-    </div> -->
-
-    <!-- work experience -->
-    <!-- <div class="card border-0 shadow mb-4  ">
-        <div class="card-body p-0">
-            <div class="d-flex align-items-sm-start justify-content-between ps-4 pe-2 pt-2 ">
-                <h3 class="mt-3 fs-4 mb-1 pb-0">Work experience</h3>
-                <button class="btn btn-primary rounded-circle btn " type="button" data-bs-toggle="modal"
-                    data-bs-target="#workExperienceModal">
-                    <i class="fa-solid fa-pen d-none"></i>
-                    <i class="fa-solid fa-plus"></i>
-                </button>
-            </div>
-            <div class="m-3 border border-2">
-                <div class="p-3 ">
-                    <p class="card-text">you often add work experience</p>
-                </div>
-            </div>
-        </div>
-    </div> -->
-
-    <!-- educational information -->
-    <!-- <div class="card border-0 shadow mb-4  ">
-        <div class="card-body p-0">
-            <div class="d-flex align-items-sm-start justify-content-between ps-4 pe-2 pt-2 ">
-                <h3 class="mt-3 fs-4 mb-1 pb-0">Educational Information</h3>
-                <button class="btn btn-primary rounded-circle btn " type="button" data-bs-toggle="modal"
-                    data-bs-target="#educationalInformationModal">
-                    <i class="fa-solid fa-pen d-none"></i>
-                    <i class="fa-solid fa-plus"></i>
-                </button>
-            </div>
-            <div class="m-3 border border-2">
-                <div class="p-3 ">
-                    <p class="card-text">you often add work experience</p>
-                </div>
-            </div>
-        </div>
-    </div> -->
-
-    <!-- certificate -->
-    <!-- <div class="card border-0 shadow mb-4  ">
-        <div class="card-body p-0">
-            <div class="d-flex align-items-sm-start justify-content-between ps-4 pe-2 pt-2 ">
-                <h3 class="mt-3 fs-4 mb-1 pb-0">Certificate</h3>
-                <button class="btn btn-primary rounded-circle btn " type="button" data-bs-toggle="modal"
-                    data-bs-target="#certificateModal">
-                    <i class="fa-solid fa-pen d-none"></i>
-                    <i class="fa-solid fa-plus"></i>
-                </button>
-            </div>
-            <div class="m-3 border border-2">
-                <div class="p-3 ">
-                    <p class="card-text">you often add work experience</p>
-                </div>
-            </div>
-        </div>
-    </div> -->
-
-    <!-- Specialized skills -->
-    <!-- <div class="card border-0 shadow mb-4  ">
-        <div class="card-body p-0">
-            <div class="d-flex align-items-sm-start justify-content-between ps-4 pe-2 pt-2 ">
-                <h3 class="mt-3 fs-4 mb-1 pb-0">Specialized skills</h3>
-                <button class="btn btn-primary rounded-circle btn " type="button" data-bs-toggle="modal"
-                    data-bs-target="#specializedSkillsModal">
-                    <i class="fa-solid fa-pen d-none"></i>
-                    <i class="fa-solid fa-plus"></i>
-                </button>
-            </div>
-            <div class="m-3 border border-2">
-                <div class="p-3 ">
-                    <p class="card-text">you often add work experience</p>
-                </div>
-            </div>
-        </div>
-    </div> -->
-
-    <!-- Other skills -->
-    <!-- <div class="card border-0 shadow mb-4  ">
-        <div class="card-body p-0">
-            <div class="d-flex align-items-sm-start justify-content-between ps-4 pe-2 pt-2 ">
-                <h3 class="mt-3 fs-4 mb-1 pb-0">Other skills</h3>
-                <button class="btn btn-primary rounded-circle btn " type="button" data-bs-toggle="modal"
-                    data-bs-target="#otherSkillsModal">
-                    <i class="fa-solid fa-pen d-none"></i>
-                    <i class="fa-solid fa-plus"></i>
-                </button>
-            </div>
-            <div class="m-3 border border-2">
-                <div class="p-3 ">
-                    <p class="card-text">you often add work experience</p>
-                </div>
-            </div>
-        </div>
-    </div> -->
-
-    <!-- modal -->
-    <!-- modal demo -->
-    <!-- <div class="modal fade" id="demoModal" tabindex="-1" aria-labelledby="demoModalLabel" aria-hidden="true">
-        <div class="modal-dialog  modal-dialog-centered  modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-4 p-0" id="demoModalLabel">Demo</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form action="">
-                        <div class="row g-3 ">
-                            <div class=" col-lg-12">
-                                <label for="" class="mb-2">input 1<span class="text-primary">*</span></label>
-                                <input type="text" placeholder="not updated" class="form-control">
-                            </div>
-
-                            <div class=" col-lg-6">
-                                <label for="" class="mb-2">input 2<span class="text-primary">*</span></label>
-                                <input type="text" placeholder="not updated" class="form-control">
-                            </div>
-
-                            <div class=" col-lg-6">
-                                <label for="" class="mb-2">input 3<span class="text-primary">*</span></label>
-                                <input type="text" placeholder="not updated" class="form-control">
-                            </div>
-
-                            <div class=" col-lg-6">
-                                <label for="" class="mb-2">Start Date<span class="text-primary">*</span></label>
-                                <input type="date" placeholder="not updated" class="form-control">
-                            </div>
-
-                            <div class=" col-lg-6">
-                                <label for="" class="mb-2">End date<span class="text-primary">*</span></label>
-                                <input type="date" placeholder="not updated" class="form-control">
-                            </div>
-
-
-                            <div class=" col-lg-12">
-                                <label for="" class="mb-2"> More Description <span class="text-primary">*</span></label>
-                                <textarea class="form-control" placeholder="Leave a Description here" id=""
-                                    style="height: 200px; resize: none;"></textarea>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
-                </div>
-            </div>
-        </div>
-    </div> -->
-
-    <!-- modal Work experience  -->
-    <!-- <div class="modal fade" id="workExperienceModal" tabindex="-1" aria-labelledby="workExperienceModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog  modal-dialog-centered  modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-4 p-0" id="workExperienceModalLabel">Work experience</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form action="">
-                        <div class="row g-3 ">
-                            <div class=" col-lg-12">
-                                <label for="" class="mb-2">Job Title/Position<span class="text-primary">*</span></label>
-                                <input type="text" placeholder="not updated" class="form-control">
-                            </div>
-
-                            <div class=" col-lg-12">
-                                <label for="" class="mb-2">Company Name<span class="text-primary">*</span></label>
-                                <input type="text" placeholder="not updated" class="form-control">
-                            </div>
-
-                            <div class=" col-lg-6">
-                                <label for="" class="mb-2">Start Date<span class="text-primary">*</span></label>
-                                <input type="date" placeholder="not updated" class="form-control">
-                            </div>
-
-                            <div class=" col-lg-6">
-                                <label for="" class="mb-2">End date<span class="text-primary">*</span></label>
-                                <input type="date" placeholder="not updated" class="form-control">
-                            </div>
-
-
-                            <div class=" col-lg-12">
-                                <label for="" class="mb-2"> More Description <span class="text-primary">*</span></label>
-                                <textarea class="form-control" placeholder="Leave a Description here" id=""
-                                    style="height: 200px; resize: none;"></textarea>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
-                </div>
-            </div>
-        </div>
-    </div> -->
-
-    <!-- modal Educational Information -->
-    <!-- <div class="modal fade" id="educationalInformationModal" tabindex="-1"
-        aria-labelledby="educationalInformationModalLabel" aria-hidden="true">
-        <div class="modal-dialog  modal-dialog-centered  modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-4 p-0" id="educationalInformationModalLabel">Educational Information</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form action="">
-                        <div class="row g-3 ">
-                            <div class=" col-lg-12">
-                                <label for="" class="mb-2">Name of Degree/Certificate<span
-                                        class="text-primary">*</span></label>
-                                <input type="text" placeholder="not updated" class="form-control">
-                            </div>
-
-                            <div class=" col-lg-6">
-                                <label for="" class="mb-2">Training major<span class="text-primary">*</span></label>
-                                <input type="text" placeholder="not updated" class="form-control">
-                            </div>
-
-                            <div class=" col-lg-6">
-                                <label for="" class="mb-2">School/Training Center<span
-                                        class="text-primary">*</span></label>
-                                <input type="text" placeholder="not updated" class="form-control">
-                            </div>
-
-                            <div class=" col-lg-6">
-                                <label for="" class="mb-2">Start Date<span class="text-primary">*</span></label>
-                                <input type="date" placeholder="not updated" class="form-control">
-                            </div>
-
-                            <div class=" col-lg-6">
-                                <label for="" class="mb-2">End date<span class="text-primary">*</span></label>
-                                <input type="date" placeholder="not updated" class="form-control">
-                            </div>
-
-
-                            <div class=" col-lg-12">
-                                <label for="" class="mb-2"> More Description <span class="text-primary">*</span></label>
-                                <textarea class="form-control" placeholder="Leave a Description here" id=""
-                                    style="height: 200px; resize: none;"></textarea>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
-                </div>
-            </div>
-        </div>
-    </div> -->
-
-    <!-- modal certificate -->
-    <!-- <div class="modal fade" id="certificateModal" tabindex="-1" aria-labelledby="certificateModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog  modal-dialog-centered  modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-4 p-0" id="certificateModalLabel">Certificate</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form action="">
-                        <div class="row g-3 ">
-                            <div class=" col-lg-12">
-                                <label for="" class="mb-2">input 1<span class="text-primary">*</span></label>
-                                <input type="text" placeholder="not updated" class="form-control">
-                            </div>
-
-                            <div class=" col-lg-6">
-                                <label for="" class="mb-2">input 2<span class="text-primary">*</span></label>
-                                <input type="text" placeholder="not updated" class="form-control">
-                            </div>
-
-                            <div class=" col-lg-6">
-                                <label for="" class="mb-2">input 3<span class="text-primary">*</span></label>
-                                <input type="text" placeholder="not updated" class="form-control">
-                            </div>
-
-                            <div class=" col-lg-6">
-                                <label for="" class="mb-2">Start Date<span class="text-primary">*</span></label>
-                                <input type="date" placeholder="not updated" class="form-control">
-                            </div>
-
-                            <div class=" col-lg-6">
-                                <label for="" class="mb-2">End date<span class="text-primary">*</span></label>
-                                <input type="date" placeholder="not updated" class="form-control">
-                            </div>
-
-
-                            <div class=" col-lg-12">
-                                <label for="" class="mb-2"> More Description <span class="text-primary">*</span></label>
-                                <textarea class="form-control" placeholder="Leave a Description here" id=""
-                                    style="height: 200px; resize: none;"></textarea>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
-                </div>
-            </div>
-        </div>
-    </div> -->
-
-    <!-- Specialized skills -->
-    <!-- <div class="modal fade" id="specializedSkillsModal" tabindex="-1" aria-labelledby="specializedSkillsModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog  modal-dialog-centered  modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-4 p-0" id="specializedSkillsModalLabel">Specialized skills</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form action="">
-                        <div class="row g-3 ">
-                            <div class=" col-lg-12">
-                                <label for="" class="mb-2">input 1<span class="text-primary">*</span></label>
-                                <input type="text" placeholder="not updated" class="form-control">
-                            </div>
-
-                            <div class=" col-lg-6">
-                                <label for="" class="mb-2">input 2<span class="text-primary">*</span></label>
-                                <input type="text" placeholder="not updated" class="form-control">
-                            </div>
-
-                            <div class=" col-lg-6">
-                                <label for="" class="mb-2">input 3<span class="text-primary">*</span></label>
-                                <input type="text" placeholder="not updated" class="form-control">
-                            </div>
-
-                            <div class=" col-lg-6">
-                                <label for="" class="mb-2">Start Date<span class="text-primary">*</span></label>
-                                <input type="date" placeholder="not updated" class="form-control">
-                            </div>
-
-                            <div class=" col-lg-6">
-                                <label for="" class="mb-2">End date<span class="text-primary">*</span></label>
-                                <input type="date" placeholder="not updated" class="form-control">
-                            </div>
-
-
-                            <div class=" col-lg-12">
-                                <label for="" class="mb-2"> More Description <span class="text-primary">*</span></label>
-                                <textarea class="form-control" placeholder="Leave a Description here" id=""
-                                    style="height: 200px; resize: none;"></textarea>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
-                </div>
-            </div>
-        </div>
-    </div> -->
-
-    <!-- Other skills -->
-    <!-- <div class="modal fade" id="otherSkillsModal" tabindex="-1" aria-labelledby="otherSkillsModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog  modal-dialog-centered  modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-4 p-0" id="otherSkillsModalLabel">Other skills</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form action="">
-                        <div class="row g-3 ">
-                            <div class=" col-lg-12">
-                                <label for="" class="mb-2">input 1<span class="text-primary">*</span></label>
-                                <input type="text" placeholder="not updated" class="form-control">
-                            </div>
-
-                            <div class=" col-lg-6">
-                                <label for="" class="mb-2">input 2<span class="text-primary">*</span></label>
-                                <input type="text" placeholder="not updated" class="form-control">
-                            </div>
-
-                            <div class=" col-lg-6">
-                                <label for="" class="mb-2">input 3<span class="text-primary">*</span></label>
-                                <input type="text" placeholder="not updated" class="form-control">
-                            </div>
-
-                            <div class=" col-lg-6">
-                                <label for="" class="mb-2">Start Date<span class="text-primary">*</span></label>
-                                <input type="date" placeholder="not updated" class="form-control">
-                            </div>
-
-                            <div class=" col-lg-6">
-                                <label for="" class="mb-2">End date<span class="text-primary">*</span></label>
-                                <input type="date" placeholder="not updated" class="form-control">
-                            </div>
-
-
-                            <div class=" col-lg-12">
-                                <label for="" class="mb-2"> More Description <span class="text-primary">*</span></label>
-                                <textarea class="form-control" placeholder="Leave a Description here" id=""
-                                    style="height: 200px; resize: none;"></textarea>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
-                </div>
-            </div>
-        </div>
-    </div> -->
 
 </template>

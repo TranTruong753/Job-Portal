@@ -19,6 +19,10 @@ export const useAuthStore = defineStore('auth', {
     addressCompany: null,
     userCompany: [],
     userData: [],
+    listJobApply: [],
+    listJobSaved: [],
+    listJobPost: [],
+    listApplicantsByJob: [],
   }),
 
   actions: {
@@ -190,6 +194,7 @@ export const useAuthStore = defineStore('auth', {
 
     checklogin(cookie) {
       const token = jwtDecode(cookie);
+      
       if (token) {
         this.token = cookie;
         this.isAuthenticated = true;
@@ -273,13 +278,13 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
-    async SavedJobs(idJob) {
+    async SavedJobs(idJob, isSave) {
       const url = "/api/appuserjob/issave";
       
       // Tạo dữ liệu dưới dạng JSON
       const data = {
         jobId: idJob,
-        issave: true
+        issave: isSave
       };
     
       try {
@@ -291,12 +296,12 @@ export const useAuthStore = defineStore('auth', {
         });
     
         if (response.status === 200 || response.status === 201 || response.status === 204) {
-          Swal.fire({
-            title: 'Save Job!',
-            text: response.data,
-            icon: 'success',
-            confirmButtonText: 'OK',
-          });
+          // Swal.fire({
+          //   title: 'Save Job!',
+          //   text: response.data,
+          //   icon: 'success',
+          //   confirmButtonText: 'OK',
+          // });
           return true;
         } else {
           Swal.fire({
@@ -310,8 +315,252 @@ export const useAuthStore = defineStore('auth', {
       } catch (error) {
         console.error(error);
       }
-    }
+    },
     
+    async updateUser(values){
+        const url = '/api/appuserjob/Update-User';
+        try{
+          const response = await axios.post(url,values,{
+            headers: {
+              Authorization: `Bearer ${this.token}`,
+            }
+          });
+          if(response.status === 200 || response.status === 201 || response.status === 204){
+            Swal.fire({
+              title: 'Update Profile Success!',
+              text: response.data,
+              icon: 'success',
+              confirmButtonText: 'OK',
+            });
+            return true;
+          }else{
+            Swal.fire({
+              title: 'Update Profile False!',
+              text: response.data,
+              icon: 'error',
+              confirmButtonText: 'OK',
+            });
+            return false;
+          }
+        }catch(error){
+          console.error(error);
+          Swal.fire({
+            title: 'Update Profile False!',
+            text: error,
+            icon: 'error',
+            confirmButtonText: 'OK',
+          });
+          return true
+        }
+    },
+
+    async checkJobIsSaveOrApply(jobId){
+      const url = '/api/appuserjob/GetIssaveAndStatus';
+      try {
+        const response = await axios.get(url,{
+          headers: {
+            Authorization: `Bearer ${this.token}`,
+          },
+          params: { JobId: jobId }
+        })
+        if(response.data || response.status === 200){
+            return response.data
+        }
+      } catch (error) {
+        console.error(error)
+      }
+    },
+
+    async getListApplyUser(query){
+      const url = '/api/appuserjob/user-job';
+      try {
+        const response = await axios.get(url,{
+          headers:{
+            Authorization: `Bearer ${this.token}`,
+          },
+          params: {
+            Title: query,
+          }
+        })
+        if(response.data || response.status === 200){
+          const modifiedData = response.data.map(item => ({
+            ...item,
+            isShowUser: true // Giá trị mặc định
+          }));
+          
+          // Thêm dữ liệu đã sửa đổi vào listJobApply
+          this.listJobApply = modifiedData;
+          console.log("this.listJobApply",this.listJobApply)
+
+            
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    },
+
+    updateIsShowUser(jobId) {
+      const jobIndex = this.listJobApply.findIndex(item => item.id === jobId);
+        if (jobIndex !== -1) {
+            this.listJobApply[jobIndex].isShowUser = false;
+        }
+    },
+    updateIsShowUserForJobSave(jobId) {
+      const jobIndex = this.listJobSaved.findIndex(item => item.id === jobId);
+        if (jobIndex !== -1) {
+            this.listJobSaved[jobIndex].isShowUser = false;
+        }
+    },
+    updateIsShowUserForJobPost(jobId) {
+      const jobIndex = this.listJobPost.findIndex(item => item.id === jobId);
+        if (jobIndex !== -1) {
+            this.listJobPost[jobIndex].isShowEmployer = false;
+        }
+    },
+    async getListSaveUser(query){
+      const url = '/api/appuserjob/user-issave-job';
+      try {
+        const response = await axios.get(url,{
+          headers:{
+            Authorization: `Bearer ${this.token}`,
+          },
+          params: {
+            Title: query,
+          }
+        })
+        if(response.data || response.status === 200){
+          const modifiedData = response.data.map(item => ({
+            ...item,
+            isShowUser: true // Giá trị mặc định
+          }));
+          
+          // Thêm dữ liệu đã sửa đổi vào listJobApply
+          this.listJobSaved = modifiedData;
+          console.log("this.listJobSaved",this.listJobSaved)
+
+            
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    },
+
+    async getListJobPost(query,currentPage,pageSize){
+      const url = '/api/appuserjob/employer-job';
+      try {
+        const response = await axios.get(url,{
+          headers:{
+            Authorization: `Bearer ${this.token}`,
+          },
+          params: {
+            Title: query,
+            PageNumber: currentPage,
+            PageSize: pageSize,
+          }
+        })
+        if(response.data || response.status === 200){
+          const modifiedData = response.data.map(item => ({
+            ...item,
+            isShowEmployer: true // Giá trị mặc định
+          }));
+          
+          // Thêm dữ liệu đã sửa đổi vào listJobApply
+          this.listJobPost = modifiedData;
+          console.log("this.listJobApply",this.listJobPost)
+          return true;
+            
+        }else{
+          return false;
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    },
+
+    async getTotalListJobPost(query,currentPage,pageSize){
+      const url = '/api/appuserjob//GetTotalForEmployer';
+      try {
+        const response = await axios.get(url,{
+          headers:{
+            Authorization: `Bearer ${this.token}`,
+          },
+          params: {
+            Title: query,
+            PageNumber: currentPage,
+            PageSize: pageSize,
+          }
+        })
+        if(response.data || response.status === 200){
+         
+          return response.data;
+            
+        }else{
+          return 0;
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    },
+
+    async getApplycationByJob(jobId){
+      const url = '/api/appuserjob/employer-jobById';
+      try {
+        const response = await axios.get(url,{
+          headers:{
+            Authorization: `Bearer ${this.token}`,
+          },
+          params: {
+            JobId: jobId
+          }
+        });
+        if(response.data || response.status === 200){
+          this.listApplicantsByJob = response.data ;
+          console.log(response)
+          console.log('this.listApplicantsByJob',this.listApplicantsByJob);
+          return true;
+        }else{
+          return false;
+        }
+      } catch (error) {
+        console.error(error)
+      }
+    },
+
+    async ConfirmApplication(jobId, userId, status) { 
+      const url = '/api/appuserjob/Confirm-application';
+      try {
+          const response = await axios.post(
+              url,
+              {
+                  jobId: jobId,
+                  userId: userId,
+                  status: status
+              },
+              {
+                  headers: {
+                      Authorization: `Bearer ${this.token}`,
+                      'Content-Type': 'application/json'
+                  }
+              }
+          );
+  
+          if ( response.status === 200 || response.status === 201 || response.status === 204) {
+            Swal.fire({
+              title: 'Change Status Success!',
+              text: response.data,
+              icon: 'success',
+              confirmButtonText: 'OK',
+            });
+              return true;
+          } else {
+              return false;
+          }
+      } catch(error) {
+          console.log(error);
+          return false;
+      }
+  }
+  
 
 
   },

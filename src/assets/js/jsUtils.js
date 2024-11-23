@@ -25,15 +25,6 @@ function checkAuth(next) {
     if (token) {
         userAuth.checklogin(token);  // Gọi hàm checklogin mà không dùng then (vì là đồng bộ)
        
-        // if (userAuth && userAuth.role) {
-        //   if (userAuth.role === 'User' || userAuth.role === "Employer") {
-        //     next();  // Cho phép truy cập
-        //   } else {
-        //     next({ name: 'user-login' });  // Chuyển hướng nếu không phải user
-        //   }
-        // } else {
-        //   next({ name: 'user-login' });  // Nếu không có role, chuyển hướng đến trang đăng nhập
-        // }
         if (userAuth && userAuth.role) {
             return userAuth.role;
 
@@ -101,4 +92,22 @@ function formatDateV2(dateString) {
     return `${day} ${month}, ${year}`;
 }
 
-export { formatDate, closeModal, checkAuth, checkUserInDb, calculateDaysAgo, formatDateV2 }
+
+function formatDateForInput(dateString) {
+    const date = new Date(dateString);
+    if (isNaN(date)) return ''; // Trả về chuỗi rỗng nếu ngày không hợp lệ
+  
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Thêm số 0 nếu cần
+    const day = String(date.getDate()).padStart(2, '0'); // Thêm số 0 nếu cần
+  
+    return `${year}-${month}-${day}`;
+  }
+
+  function convertToUrl(path) {
+    // Thay thế dấu \ thành dấu / và thêm tiền tố base URL
+    const baseUrl = 'https://localhost:7283/';
+    const formattedPath = path.replace(/\\/g, '/'); // Thay thế \ thành /
+    return baseUrl + formattedPath.split('wwwroot')[1]; // Thêm phần sau 'wwwroot' vào URL
+}
+export { formatDate, closeModal, checkAuth, checkUserInDb, calculateDaysAgo, formatDateV2, formatDateForInput, convertToUrl }

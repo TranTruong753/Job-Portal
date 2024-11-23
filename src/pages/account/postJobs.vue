@@ -18,6 +18,10 @@
     onMounted( async ()=>{
         await companyStore.getUserCompany();
         await skillStore.getSkill();
+
+        //mới sửa
+        // Lấy danh sách tỉnh/thành khi component được mount
+        await locationStore.fetchProvinces();
             
         options.value = skillStore.list.map(skill => ({
             value: skill.name, // Gán trực tiếp tên kỹ năng vào giá trị option
@@ -37,8 +41,7 @@
         // skillStore.$reset();
     })
 
-    // Lấy danh sách tỉnh/thành khi component được mount
-    locationStore.fetchProvinces();
+
 
     // Hàm xử lý thay đổi
     const onProvinceChange = (event) => {

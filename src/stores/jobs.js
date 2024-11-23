@@ -66,7 +66,7 @@ export const useJobtore = defineStore('job', {
             }
         },
 
-        async getTotalWithConditions(txtTitle, txtLocation, txtJobType, txtJoblevel) {
+        async getTotalWithConditions(txtTitle, txtLocation, txtJobType, txtJoblevel, isDecsending) {
             const url = '/api/job/GetTotalWithConditions';
             try {
                 const response = await axios.get(url, {
@@ -74,6 +74,7 @@ export const useJobtore = defineStore('job', {
                         Title: txtTitle,
                         Location: txtLocation,
                         JobLevel: txtJoblevel,
+                        IsDecsending: isDecsending,
                         JobType: txtJobType,
 
                     },
@@ -116,7 +117,7 @@ export const useJobtore = defineStore('job', {
             }
         },
 
-        async searchJobs(txtTitle, txtLocation, txtJobType, txtJoblevel, pageSize, currentPage) {
+        async searchJobs(txtTitle, txtLocation, txtJobType, txtJoblevel, isDecsending, pageSize, currentPage) {
             this.currentPage = currentPage;
             this.pageSize = pageSize;
             const url = '/api/job';
@@ -129,6 +130,7 @@ export const useJobtore = defineStore('job', {
                         Location: txtLocation,
                         JobLevel: txtJoblevel,
                         JobType: txtJobType,
+                        IsDecsending: isDecsending,
                         PageNumber: this.currentPage, // Số trang
                         PageSize: this.pageSize,     // Kích thước trang
 

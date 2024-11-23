@@ -2,18 +2,28 @@
 import { onBeforeMount,onMounted, ref } from 'vue';
 import {getCookie } from '@/assets/js/cookieUtils.js'
 import { useCompanyStore } from '@/stores/company';
+
 import {useLocationStore} from '@/stores/locationStore';
 import { useAuthStore } from '@/stores/auth.js';
 import { useRouter } from 'vue-router';
+import { useJobtore } from '@/stores/jobs';
+import { useSkillStore } from '@/stores/skill';
    
 
 const router = useRouter(); // Sử dụng router
 
 const authStore = useAuthStore();
-
+const locationStore = useLocationStore();
+const companyStore = useCompanyStore();
+const jobStore = useJobtore();
+const skills = useSkillStore();
 const handleLogout = () => {
   try {
     authStore.logout();
+    locationStore.$reset();
+    companyStore.$reset();
+    jobStore.$reset();
+    skills.$reset();
     // authStore.
     // router.push('/home');
   } catch (error) {
@@ -111,9 +121,9 @@ const handleLogout = () => {
                   <li>
                     <router-link class="dropdown-item" to="/account">Account Setting</router-link>
                   </li>
-                  <li>
+                  <!-- <li>
                     <router-link class="dropdown-item" to="/account/post-blog">Post a Blog</router-link>
-                  </li>
+                  </li> -->
                   <li>
                     <router-link class="dropdown-item" to="/account/create-cv">Create CV</router-link>
                   </li>

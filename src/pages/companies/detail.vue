@@ -173,8 +173,8 @@ import { calculateDaysAgo } from '@/assets/js/jsUtils.js'
                 </div>
                 <!-- column right -->
                 <div class="col-lg-4 col-md-12">
-                    <h2>job openings</h2>
-                    <div class="list-jobs my-4 p-2" style="height: 100vh; overflow: auto ;">
+                    <h2 >job openings</h2>
+                    <div v-if="listJob.length !== 0" class="list-jobs my-4 p-2" style="height: 100vh; overflow: auto ;">
                         <div class="row g-3">
                             <CardProduct
                                 v-for="(job, index) in listJob"
@@ -350,7 +350,12 @@ import { calculateDaysAgo } from '@/assets/js/jsUtils.js'
 
                         </div>
                     </div>
-
+                    <div v-else class="card shadow border-0 my-4">
+                        <div class="p-3">
+                            <h5 class="text-center p-0">Not update Job</h5>
+                        </div>
+                    </div>
+                    <h2 >Contact</h2>
                     <div class="card shadow border-0 my-4">
                         <div class="job_sumary">
                             <div class="summery_header pb-1 pt-4">
