@@ -86,12 +86,12 @@ const onSubmit = handleSubmit(async (values) => {
 </script>
 
 <template>
-    <section class="section-5">
+    <!-- <section class="section-5">
         <div class="container my-5">
             <div class="py-lg-2">&nbsp;</div>
-            <div class="row d-flex justify-content-center">
+            <div class="row d-flex justify-content-center g-0 border-1 border ">
                 <div class="col-md-5">
-                    <div class="card shadow border-0 p-5">
+                    <div class="card border-0 p-5">
                         <h1 class="h3">Login</h1>
                         <form @submit.prevent="onSubmit" autocomplete="off">
 
@@ -129,7 +129,73 @@ const onSubmit = handleSubmit(async (values) => {
             </div>
             <div class="py-lg-5">&nbsp;</div>
         </div>
+    </section> -->
+    <section class="vh-100" style="">
+        <div class="container h-100">
+            <div class="row d-flex justify-content-center align-items-center h-100 ">
+                <div class="col col-xl-10">
+                    <div class="card" style="border-radius: 1rem;">
+                        <div class="row g-0">
+                            <div class="col-md-6 col-lg-6 d-none d-md-block ">
+                                <img src="../../assets/img/banner5.jpg" alt="login form" class="img-fluid"
+                                    style="border-radius: 1rem 0 0 1rem;" />
+                            </div>
+                            <div class="col-md-6 col-lg-6 d-flex align-items-center my-3">
+                                <div class="card-body p-4 p-lg-5 text-black">
+
+
+                                    <form @submit.prevent="onSubmit" autocomplete="off" class="">
+                                        <div class="d-flex align-items-center mb-3 pb-1">
+
+                                            <span class="h1 fw-bolder mb-0 ">CareerVibe</span>
+                                        </div>
+
+                                        <h5 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Sign into your
+                                            account</h5>
+
+                                        <div class="">
+                                            <label for="username" class="mb-2">User Name <span
+                                                    class="text-danger d-inline fs-5">*</span></label>
+                                            <input type="text" v-model="username" class="form-control"
+                                                placeholder="Enter User Name">
+                                            <span class="text-danger ">{{ usernameError }}</span>
+                                        </div>
+
+
+                                        <div class="">
+                                            <label for="password" class="mb-2">Password <span
+                                                    class="text-danger d-inline fs-5">*</span></label>
+                                            <div class="input__password">
+                                                <input :type="isPasswordVisible ? 'text' : 'password'"
+                                                    v-model="password" class="form-control "
+                                                    placeholder="Enter Password" autocomplete="new-password">
+                                                <div class="password-toggle"
+                                                    @click="isPasswordVisible = !isPasswordVisible">
+                                                    <i
+                                                        :class="isPasswordVisible ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'"></i>
+                                                </div>
+                                            </div>
+                                            <span class="text-danger ">{{ passwordError }}</span>
+
+                                        </div>
+
+
+                                        <button class="btn btn-primary mt-2" type="submit">Login</button>
+                                    </form>
+                                    <div class="mt-4 text-start">
+                                        <router-link class="small text-muted" to="/forgotPass">Forgot password?</router-link>
+                                        <p>Do not have an account? <router-link class="" to="/register">Register</router-link></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </section>
+
+
 </template>
 
 <style>
@@ -153,5 +219,13 @@ const onSubmit = handleSubmit(async (values) => {
 
 .input__password {
     position: relative;
+}
+
+.col-md-6 img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 0 10px 10px 0;
+    /* Bo góc phải phù hợp */
 }
 </style>

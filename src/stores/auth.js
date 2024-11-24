@@ -74,7 +74,7 @@ export const useAuthStore = defineStore('auth', {
         if (response.status === 200 || response.data.success) {  // Kiểm tra nếu thành công
           Swal.fire({
             title: 'Post Job!',
-            text: response.data.message || 'Job posted successfully!',
+            text: response.data.message || 'Change Password successfully!',
             icon: 'success',
             confirmButtonText: 'OK',
           });
@@ -82,7 +82,7 @@ export const useAuthStore = defineStore('auth', {
         } else {
           Swal.fire({
             title: 'Post Job Failed!',
-            text: response.data.message || 'There was an issue posting the job.',
+            text: response.data.message || 'There was an issue Change Password!.',
             icon: 'error',
             confirmButtonText: 'OK',
           });
@@ -90,7 +90,7 @@ export const useAuthStore = defineStore('auth', {
         }
       }
       catch (error) {
-        const errorMessage = error.response?.data | "Can't change passwork!";
+        const errorMessage = error.response?.data | "Can't change password!";
         Swal.fire({
           title: 'Change Pass failed!',
           text: errorMessage,
@@ -98,6 +98,39 @@ export const useAuthStore = defineStore('auth', {
           confirmButtonText: 'OK',
         });
         throw error;
+      }
+    },
+    async fogotPass(values){
+      const url = '/api/account/Forget-pass';
+      try {
+        const response = await axios.post(url,values,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        console.log('response',response);
+        if(response.data || response.status === 200){
+            
+            return true;  // Trả về false nếu không thành công
+        }else{
+          Swal.fire({
+            title: 'Send Email failed!',
+            text: response.data,
+            icon: 'error',
+            confirmButtonText: 'OK',
+          });
+        }
+      } catch (error) {
+        console.error(error.response.data)
+        const errorMessage = error.response.data??"can't send email!" ;
+        Swal.fire({
+          title: 'Send Email failed!',
+          text: errorMessage,
+          icon: 'error',
+          confirmButtonText: 'OK',
+        });
       }
     },
 
@@ -559,6 +592,35 @@ export const useAuthStore = defineStore('auth', {
           console.log(error);
           return false;
       }
+  },
+
+  async removeApplication(jobId, userId, status) {
+    const data = {
+      jobId: jobId,
+      userId: userId,
+      status: status
+    };
+
+    const url = '/api/appuserjob/Remove-application'
+  
+    try {
+      const response = await axios.post(url, data,{
+        headers:{
+          Authorization: `Bearer ${this.token}`,
+        }
+      });
+      console.log('Response:', response.data);
+      if(response.data || response.status === 200){
+        return true
+      }else{
+        return false;
+      }
+      return response.data; // Trả về dữ liệu phản hồi nếu thành công
+    } catch (error) {
+      console.error('Error:', error.response ? error.response.data : error.message);
+      return false;
+      // throw error; // Ném lỗi nếu có
+    }
   }
   
 

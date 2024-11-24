@@ -231,6 +231,11 @@ const user = [
                 component: () => import("../pages/login/index.vue")
             },
             {
+                path: "/forgotPass",
+                name: "user-forget-pass",
+                component: () => import("../pages/forgot/index.vue")
+            },
+            {
                 path: "/register",
                 name: "user-register",
                 component: () => import("../pages/register/index.vue")

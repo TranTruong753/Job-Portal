@@ -16,10 +16,15 @@ onMounted(async () => {
         await authStore.getListJobPost(query.value, current.value, pageSize.value);
         const totalResult = await authStore.getTotalListJobPost(query.value, current.value, pageSize.value);
         total.value = totalResult; // Gán kết quả thực tế
+          // Kiểm tra trạng thái dữ liệu
+        loading.value = !(total.value && authStore.listJobPost.length !== 0);
+        if (!loading.value) {
+            console.log("authStore.listJobPost", authStore.listJobPost);
+        }
     } catch (error) {
         console.error("Error loading data:", error);
     } finally {
-        loading.value = false;
+        // loading.value = false;
     }
 })
 
@@ -40,7 +45,7 @@ watch([current, pageSize], async ([newCurrent, newPageSize]) => {
     console.log(newCurrent, newPageSize);
     // await jobStore.getJob(newPageSize, newCurrent);
     await Promise.all([
-        authStore.getListJobPost(query.value, current.value, pageSize.value),
+        authStore.getListJobPost(query.value, newCurrent, newPageSize),
         authStore.getTotalListJobPost(query.value, newCurrent, newPageSize).then(result => {
             total.value = result; // Đảm bảo gán kết quả sau khi hoàn tất
         }),
@@ -85,7 +90,12 @@ watch([current, pageSize], async ([newCurrent, newPageSize]) => {
                         </tr>
                     </thead>
                     <tbody class="border-0">
-                        <tr v-for="(item, index) in authStore.listJobPost">
+                        <div v-if="loading" class="text-center">
+                            <div class="loading">
+                                <a-spin size="large" tip="Loading..."/>
+                            </div>
+                        </div>
+                        <tr v-else v-for="(item, index) in authStore.listJobPost">
                             <td v-if="item.isShowEmployer">
                                 <div class="job-name fw-500">{{ item.title }}</div>
                                 <div class="info1">{{ item.jobLevel }}</div>
@@ -254,7 +264,7 @@ watch([current, pageSize], async ([newCurrent, newPageSize]) => {
 
                 </table>
                 <div class="d-flex justify-content-center">
-                    <a-pagination v-model:current="current" :total="total" show-less-items />
+                    <a-pagination v-model:current="current" :total="total"  :pageSize="pageSize"  show-less-items />
                 </div>
             </div>
         </div>

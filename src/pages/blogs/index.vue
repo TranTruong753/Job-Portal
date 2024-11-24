@@ -1,6 +1,66 @@
 <script setup>
 import Cardblog from '@/components/blogs/cardBlog.vue';
-import Cardblog02 from '@/components/blogs/cardBlog-02.vue';
+import { useBlogStore } from '@/stores/blog';
+import { ref, onMounted, watch } from 'vue';
+import { debounce } from 'lodash';
+import {convertToUrl, calculateDaysAgo} from '@/assets/js/jsUtils'
+
+const current = ref(1);
+const total = ref(0);
+const loading = ref(true);
+const pageSize = ref(6)
+const blogStore = useBlogStore();
+const query = ref('');
+
+onMounted(async () => {
+    loading.value = true;
+    try {
+        await blogStore.getBlog(query.value, current.value, pageSize.value);
+        const totalResult = await blogStore.getTotalBlog(query.value, current.value, pageSize.value);
+        total.value = totalResult; // Gán kết quả thực tế
+        console.log('total', total.value);
+         // Kiểm tra trạng thái dữ liệu
+        loading.value = !(total.value && blogStore.listBlog.length !== 0);
+        if (!loading.value) {
+            console.log("blogStore.listBlog", blogStore.listBlog);
+        }
+
+    } catch (error) {
+        console.error("Error loading data:", error);
+    } finally {
+        // loading.value = false;
+    }
+})
+
+
+const handleQuery = debounce(async () => {
+    await Promise.all([
+        blogStore.getBlog(query.value, current.value, pageSize.value),
+        blogStore.getTotalBlog(query.value, current.value, pageSize.value).then(result => {
+            total.value = result; // Đảm bảo gán kết quả sau khi hoàn tất
+        }),
+    ]);
+}, 300)
+
+
+watch([current, pageSize], async ([newCurrent, newPageSize]) => {
+
+    console.log(newCurrent, newPageSize);
+    // await jobStore.getJob(newPageSize, newCurrent);
+    await Promise.all([
+        blogStore.getBlog(query.value, newCurrent, newPageSize),
+        blogStore.getTotalBlog(query.value, newCurrent, newPageSize).then(result => {
+            total.value = result; // Đảm bảo gán kết quả sau khi hoàn tất
+        }),
+    ]);
+  
+
+
+});
+
+
+
+
 </script>
 <template>
     <!-- search -->
@@ -9,12 +69,12 @@ import Cardblog02 from '@/components/blogs/cardBlog-02.vue';
             <div class="card border-0 shadow p-5">
                 <div class="row">
                     <div class="col-md-8 mb-3 mb-sm-3 mb-lg-0">
-                        <input type="text" class="form-control" name="search" id="search" placeholder="Keywords">
+                        <input type="text" class="form-control" name="search" id="search" placeholder="Keywords" v-model="query">
                     </div>
 
                     <div class=" col-md-3 mb-xs-3 mb-sm-3 mb-lg-0">
                         <div class="d-grid gap-2">
-                            <a href="jobs.html" class="btn btn-primary btn-block">Search</a>
+                            <button class="btn btn-primary btn-block" @click="handleQuery" >Search</button>
                         </div>
 
                     </div>
@@ -33,7 +93,6 @@ import Cardblog02 from '@/components/blogs/cardBlog-02.vue';
                 <div class="carousel-inner w-80 m-auto">
                     <div class="carousel-item active" data-bs-interval="5000">
                         <div class="row g-3">
-                            <!-- card 01 -->
                             <Cardblog :cardData="{
                                 imgSrc: '/src/assets/img/banner-1.jpg',
                                 imgAlt: 'blog 01',
@@ -41,8 +100,10 @@ import Cardblog02 from '@/components/blogs/cardBlog-02.vue';
                                 description: 'Để css html hiểu quả bạn cần thông qua lí thuyết kết hợp thực hành',
                                 timePost: '24/10/2024',
                                 isShow: true,
-                                styleCss: 'col-12 col-lg-4 col-md-6'
+                                styleCss: 'col-12 col-lg-4 col-md-6',
+                                 isShowStyle: 'card-h-100 card border-0 '
                             }" />
+
                             <!-- card 02 -->
                             <Cardblog :cardData="{
                                 imgSrc: '/src/assets/img/banner-1.jpg',
@@ -51,18 +112,10 @@ import Cardblog02 from '@/components/blogs/cardBlog-02.vue';
                                 description: 'Để css html hiểu quả bạn cần thông qua lí thuyết kết hợp thực hành',
                                 timePost: '24/10/2024',
                                 isShow: true,
-                                styleCss: 'col-12 col-lg-4 col-md-6'
+                                styleCss: 'col-12 col-lg-4 col-md-6',
+                                 isShowStyle: 'card-h-100 card border-0 '
                             }" />
-                            <!-- card 03 -->
-                            <Cardblog :cardData="{
-                                imgSrc: '/src/assets/img/banner-1.jpg',
-                                imgAlt: 'blog 01',
-                                name: 'HTML CSS làm sao cho hiểu quả',
-                                description: 'Để css html hiểu quả bạn cần thông qua lí thuyết kết hợp thực hành',
-                                timePost: '24/10/2024',
-                                isShow: true,
-                                styleCss: 'col-12 col-lg-4 col-md-6'
-                            }" />
+                         
                         </div>
                     </div>
                     <div class="carousel-item" data-bs-interval="5000">
@@ -75,7 +128,8 @@ import Cardblog02 from '@/components/blogs/cardBlog-02.vue';
                                 description: 'Để css html hiểu quả bạn cần thông qua lí thuyết kết hợp thực hành',
                                 timePost: '24/10/2024',
                                 isShow: true,
-                                styleCss: 'col-12 col-lg-4 col-md-6'
+                                styleCss: 'col-12 col-lg-4 col-md-6',
+                                 isShowStyle: 'card-h-100 card border-0 '
                             }" />
 
                             <!-- card 02 -->
@@ -86,7 +140,8 @@ import Cardblog02 from '@/components/blogs/cardBlog-02.vue';
                                 description: 'Để css html hiểu quả bạn cần thông qua lí thuyết kết hợp thực hành',
                                 timePost: '24/10/2024',
                                 isShow: true,
-                                styleCss: 'col-12 col-lg-4 col-md-6'
+                                styleCss: 'col-12 col-lg-4 col-md-6',
+                                 isShowStyle: 'card-h-100 card border-0 '
                             }" />
                         </div>
                     </div>
@@ -113,39 +168,38 @@ import Cardblog02 from '@/components/blogs/cardBlog-02.vue';
                 <div class="blog_listing_area">
                     <div class="blog_lists">
                         <div class="row g-3">
+                            <div v-if="loading" class="text-center">
+                                <div class="loading">
+                                    <a-spin size="large" tip="Loading..."/>
+                                </div>
+                            </div>
+                            <div v-else-if="blogStore.listBlog.length === 0">
+                                <h1 class="text-center text-primary">NOT FUND BLOG </h1>
+                            </div>
                             <!-- card 01 -->
-                            <Cardblog02 :cardData="{
-                                imgSrc: '/src/assets/img/banner-1.jpg',
-                                imgAlt: 'blog 01',
-                                name: 'HTML CSS làm sao cho hiểu quả',
-                                description: 'Để css html hiểu quả bạn cần thông qua lí thuyết kết hợp thực hành',
-                                timePost: '24/10/2024',
+                            <Cardblog v-else v-for="(item,index) in blogStore.listBlog" :key="index"
+                            
+                            :cardData="{
+                                id: item.id,
+                                imgSrc: convertToUrl(item.img),
+                                imgAlt: item.title,
+                                name: item.title,
+                                description: 'Poster: ' + item.username,
+                                timePost: calculateDaysAgo(item.createOn),
                                 isShow: true,
-                                styleCss: 'col-12 col-lg-4 col-md-6'
+                                styleCss: 'col-12 col-lg-4 col-md-6 ',
+                                isShowStyle: 'card-h-100 card border-0 shadow'
                             }" />
-
-                            <Cardblog02 :cardData="{
-                                imgSrc: '/src/assets/img/banner-1.jpg',
-                                imgAlt: 'blog 01',
-                                name: 'HTML CSS làm sao cho hiểu quả',
-                                description: 'Để css html hiểu quả bạn cần thông qua lí thuyết kết hợp thực hành',
-                                timePost: '24/10/2024',
-                                isShow: true,
-                                styleCss: 'col-12 col-lg-4 col-md-6'
-                            }" />
-
-                            <Cardblog02 :cardData="{
-                                imgSrc: '/src/assets/img/banner-1.jpg',
-                                imgAlt: 'blog 01',
-                                name: 'HTML CSS làm sao cho hiểu quả',
-                                description: 'Để css html hiểu quả bạn cần thông qua lí thuyết kết hợp thực hành',
-                                timePost: '24/10/2024',
-                                isShow: true,
-                                styleCss: 'col-12 col-lg-4 col-md-6'
-                            }" />
+                       
+                            
                         </div>
                     </div>
                 </div>
+            </div>
+              <!-- pagination -->
+          
+              <div class="mt-3 d-flex justify-content-center">
+                <a-pagination v-model:current="current" :total="total" :pageSize="pageSize" show-less-items />
             </div>
         </div>
     </section>
@@ -159,7 +213,7 @@ import Cardblog02 from '@/components/blogs/cardBlog-02.vue';
                     <div class="blog_lists">
                         <div class="row g-3">
                             <!-- card 01 -->
-                            <Cardblog02 :cardData="{
+                            <!-- <Cardblog02 :cardData="{
                                 imgSrc: '/src/assets/img/banner-1.jpg',
                                 imgAlt: 'blog 01',
                                 name: 'HTML CSS làm sao cho hiểu quả',
@@ -167,10 +221,10 @@ import Cardblog02 from '@/components/blogs/cardBlog-02.vue';
                                 timePost: '24/10/2024',
                                 isShow: true,
                                 styleCss: 'col-12 col-lg-4 col-md-6'
-                            }" />
+                            }" /> -->
 
                             <!-- card 02 -->
-                            <Cardblog02 :cardData="{
+                            <!-- <Cardblog02 :cardData="{
                                 imgSrc: '/src/assets/img/banner-1.jpg',
                                 imgAlt: 'blog 01',
                                 name: 'HTML CSS làm sao cho hiểu quả',
@@ -178,10 +232,10 @@ import Cardblog02 from '@/components/blogs/cardBlog-02.vue';
                                 timePost: '24/10/2024',
                                 isShow: true,
                                 styleCss: 'col-12 col-lg-4 col-md-6'
-                            }" />
+                            }" /> -->
 
                             <!-- card 03 -->
-                            <Cardblog02 :cardData="{
+                            <!-- <Cardblog02 :cardData="{
                                 imgSrc: '/src/assets/img/banner-1.jpg',
                                 imgAlt: 'blog 01',
                                 name: 'HTML CSS làm sao cho hiểu quả',
@@ -189,7 +243,7 @@ import Cardblog02 from '@/components/blogs/cardBlog-02.vue';
                                 timePost: '24/10/2024',
                                 isShow: true,
                                 styleCss: 'col-12 col-lg-4 col-md-6'
-                            }" />
+                            }" /> -->
                         </div>
                     </div>
                 </div>
@@ -197,3 +251,19 @@ import Cardblog02 from '@/components/blogs/cardBlog-02.vue';
         </div>
     </section>
 </template>
+
+<style scoped>
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background: transparent;
+  border-radius: 4px;
+ 
+  padding: 30px 50px;
+  
+  height: 50vh;
+}
+</style>

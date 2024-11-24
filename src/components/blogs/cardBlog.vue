@@ -1,22 +1,22 @@
 <template>
     <!-- col-12 col-lg-4 col-md-6 -->
     <div v-show="cardData.isShow" :class="cardData.styleCss">
-        <div class="card-h-100 card border-0">
-            <a href="#!"> 
+        <div :class="cardData.isShowStyle">
+            <router-link :to="`/blog/detail/${cardData.id}`" > 
                 <img :src="cardData.imgSrc" class="card-img-top img-fluid card-img-height"
                     :alt="cardData.imgAlt">
-            </a>
+            </router-link>
             <div class="card-body">
-                <a href="#!" class="text-black">
+                <router-link  :to="`/blog/detail/${cardData.id}`" class="text-black">
                     <h5 class="pb-1 card-title truncate-2">
                         {{cardData.name}}
                     </h5>
-                </a>
+                </router-link>
                 <p class="card-text truncate-3">
                     {{cardData.description}}
                 </p>
                 <div class="d-flex align-items-end justify-content-between">
-                    <a href="#" class="btn btn-primary">Read more</a>
+                    <router-link :to="`/blog/detail/${cardData.id}`" class="btn btn-primary">Read more</router-link>
                     <span class="text-black-50 small">{{cardData.timePost}}</span>
                 </div>
             </div>
@@ -32,6 +32,7 @@ export default {
             type: Object,
             required: true,
             default: () => ({
+                id: 1,
                 imgSrc: '',
                 imgAlt: 'Default Image',
                 name: 'default name',
@@ -39,7 +40,8 @@ export default {
                 timePost: 'Default time post',    
                 isSave: false,
                 isShow: true,
-                styleCss: ''
+                styleCss: '',
+                isShowStyle: 'card-h-100 card border-0'
 
             })
         }
