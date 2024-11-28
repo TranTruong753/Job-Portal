@@ -2,6 +2,7 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
 import { getCookie, setCookie, deleteCookie } from '../assets/js/cookieUtils.js'
+import { convertToUrl } from '@/assets/js/jsUtils.js';
 import Swal from 'sweetalert2';
 import { jwtDecode } from 'jwt-decode';
 
@@ -10,6 +11,7 @@ import { jwtDecode } from 'jwt-decode';
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     fullname: null,
+    urlImg: null,
     user: null,
     email: null,
     isAuthenticated: false,
@@ -22,6 +24,7 @@ export const useAuthStore = defineStore('auth', {
     listJobApply: [],
     listJobSaved: [],
     listJobPost: [],
+    listBlogPost:[],
     listApplicantsByJob: [],
   }),
 
@@ -67,11 +70,12 @@ export const useAuthStore = defineStore('auth', {
             Authorization: `Bearer ${this.token}`, // Thêm token vào header
           },
         });
-        this.password = values.newPass;
+     
 
         console.log(response);
         // Kiểm tra nếu phản hồi trả về status thành công
         if (response.status === 200 || response.data.success) {  // Kiểm tra nếu thành công
+          this.password = values.newPass;
           Swal.fire({
             title: 'Post Job!',
             text: response.data.message || 'Change Password successfully!',
@@ -188,6 +192,9 @@ export const useAuthStore = defineStore('auth', {
         if (response.status === 200 || response.data) {  // Kiểm tra nếu thành công
           this.userData = response.data;
           // console.log("userData: ",  this.userData);
+          if(this.userData.img){
+            this.urlImg = convertToUrl(this.userData.img);
+          }
           this.addressCompany = response.data.address;
           this.userCompany = response.data.company;
           // console.log("userCompany: ",  this.userCompany);
@@ -214,6 +221,9 @@ export const useAuthStore = defineStore('auth', {
         if (response.status === 200 || response.data) {  // Kiểm tra nếu thành công
           console.log("response: ", response.data);
           this.userData = response.data;
+          if(this.userData.img){
+            this.urlImg = convertToUrl(this.userData.img);
+          }
           return true;  // Trả về true nếu thành công
         } else {
           return false;  // Trả về false nếu không thành công
@@ -359,6 +369,7 @@ export const useAuthStore = defineStore('auth', {
             }
           });
           if(response.status === 200 || response.status === 201 || response.status === 204){
+            this.fullname = values.fullname;
             Swal.fire({
               title: 'Update Profile Success!',
               text: response.data,
@@ -621,7 +632,201 @@ export const useAuthStore = defineStore('auth', {
       return false;
       // throw error; // Ném lỗi nếu có
     }
-  }
+  },
+
+  async GetStatisticalJobStatus(){
+    const url = '/api/statistical/Get-Statistical-JobStatus'
+    try {
+      const response = await axios.get(url,{
+        headers:{
+          Authorization: `Bearer ${this.token}`,
+        }
+      })
+      if(response.data || response.status === 200){
+        console.log(response.data)
+        return response.data;
+      }else{
+        return false;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  },
+
+  async GetApplyAndDateRange(startDate,endDate){
+    const url = '/api/statistical/GetApplyAndDateRange';
+    try {
+      const response = await axios.get(url,{
+        headers:{
+          Authorization: `Bearer ${this.token}`,
+        },
+        params: {
+          'startDate' : startDate,
+          'endDate' : endDate
+        }
+      })
+      if(response.data || response.status === 200){
+        console.log(response.data)
+        return response.data;
+      }else{
+        return false;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  },
+
+  async isShowJobPost(jobId,isShow){
+    const data = {
+      jobId: jobId,
+      isShow: isShow,
+    };
+    const url = '/api/appuserjob/Update-IsShow-Job';
+    try {
+      const response = await axios.post(url,data, {
+        headers:{
+          Authorization: `Bearer ${this.token}`,
+        }
+      })
+
+      if(response.data || response.status === 200){
+        return true;
+      }else{
+        return false;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  },
+
+  async getListBlogPost(query,currentPage,pageSize){
+    const url = '/api/blog/GetForEmployer';
+    try {
+      const response = await axios.get(url,{
+        headers:{
+          Authorization: `Bearer ${this.token}`,
+        },
+        params: {
+          Title: query,
+          PageNumber: currentPage,
+          PageSize: pageSize,
+        }
+      })
+      if(response.data || response.status === 200){
+        // const modifiedData = response.data.map(item => ({
+        //   ...item,
+        //   isShowEmployer: true // Giá trị mặc định
+        // }));
+        
+        // Thêm dữ liệu đã sửa đổi vào listBlogPost
+        this.listBlogPost = response.data;
+        console.log("this.listBlogPost",this.listBlogPost)
+        return true;
+          
+      }else{
+        return false;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  },
+
+  async getTotalListBlogPost(query,currentPage,pageSize){
+    const url = '/api/blog/GetTotal';
+    try {
+      const response = await axios.get(url,{
+        headers:{
+          Authorization: `Bearer ${this.token}`,
+        },
+        params: {
+          Title: query,
+          PageNumber: currentPage,
+          PageSize: pageSize,
+        }
+      })
+      if(response.data || response.status === 200){
+       
+        return response.data;
+          
+      }else{
+        return 0;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  },
+
+  async isShowBlogPost(blogId,isShow){
+    const data = {
+      blogId: blogId,
+      isShow: isShow,
+    };
+    const url = '/api/blog/Update-IsShow-Blog';
+    try {
+      const response = await axios.post(url,data, {
+        headers:{
+          Authorization: `Bearer ${this.token}`,
+        }
+      })
+
+      if(response.data || response.status === 200){
+        return true;
+      }else{
+        return false;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  },
+  async postAvatar(file) {
+    const url = '/api/appuserjob/Update-Img-User';
+  
+    // Tạo FormData và đính kèm file
+    const formData = new FormData();
+    formData.append('img', file); // Key phải khớp với tên tham số backend nhận
+  
+    try {
+      // Gửi request POST
+      const response = await axios.post(url, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${this.token}`, // Token xác thực
+        },
+      });
+  
+      // Xử lý kết quả
+      if (response.status === 200 || response.status === 201 || response.status === 204) {
+        console.log('Update Avatar successfully', response);
+        Swal.fire({
+          title: 'Update Avatar Job!',
+          text: response.data.message || 'Avatar updated successfully!',
+          icon: 'success',
+          confirmButtonText: 'OK',
+        });
+        return true;
+      } else {
+        Swal.fire({
+          title: 'Update Avatar Fail!',
+          text: response.data.message || 'Something went wrong!',
+          icon: 'error',
+          confirmButtonText: 'OK',
+        });
+        return false;
+      }
+    } catch (error) {
+      console.error('Error submitting application:', error);
+  
+      // Hiển thị thông báo lỗi
+      Swal.fire({
+        title: 'Error!',
+        text: error.response?.data?.message || 'Failed to update avatar.',
+        icon: 'error',
+        confirmButtonText: 'OK',
+      });
+      return false;
+    }
+  },
+  
   
 
 

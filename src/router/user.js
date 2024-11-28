@@ -8,7 +8,7 @@ const user = [
     {
         path: "/",
         component: () => import("../layouts/user.vue"),
-        beforeEnter:(to, from, next) => {
+        beforeEnter: (to, from, next) => {
             const authStore = useAuthStore();
             // Kiểm tra xác thực
             const token = getCookie('token');
@@ -42,6 +42,11 @@ const user = [
                 path: "/job/detail/:id",
                 name: "job-detail",
                 component: () => import("../pages/jobs/detail.vue"),
+            },
+            {
+                path: "/job/detailEmployer/:id",
+                name: "job-detail-employer",
+                component: () => import("../pages/jobs/detailEmployer.vue"),
             },
             {
                 path: "/account",
@@ -113,6 +118,20 @@ const user = [
                         path: "my-jobs",
                         name: "account-my-jobs",
                         component: () => import("../pages/account/myJobs.vue"),
+                        beforeEnter: (to, from, next) => {
+                            const role = checkAuth(next);         
+                           
+                            if (role === 'Employer') {
+                                next();
+                            } else {
+                                next({name:'account-settings'})
+                            }
+                        },
+                    },
+                    {
+                        path: "my-blogs",
+                        name: "account-my-blogs",
+                        component: () => import("../pages/account/myBlog.vue"),
                         beforeEnter: (to, from, next) => {
                             const role = checkAuth(next);         
                            

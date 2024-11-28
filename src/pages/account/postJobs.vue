@@ -16,6 +16,7 @@
     const authStore = useAuthStore();
 
     onMounted( async ()=>{
+        locationStore.$reset();
         await companyStore.getUserCompany();
         await skillStore.getSkill();
 
@@ -86,7 +87,7 @@
         title: yup.string().required('Job title is required'),
         description: yup.string().required('Description is required'),
         requirements: yup.string().required('Requirements are required'),
-        benefits: yup.string(),
+        benefits: yup.string().required('Benefits are required'),
         salary: yup.number().positive('Salary must be a positive number').required('Salary is required'),
         jobLevel: yup.string().required('Job level is required'),
         jobType: yup.string().required('Job type is required'),
@@ -95,6 +96,14 @@
         district: yup.string().required('District is required'),
         ward: yup.string().required('Ward is required'),
         jobskill: yup.array().required('Jobskill is required'),
+        expiredDate: yup
+        .date()
+        .required('Expired date is required')
+        .test(
+            'is-future-date',
+            'Expired date must be later than today',
+            (value) => value && value > new Date()
+        ),
     });
 
     const { handleSubmit, errors, validateField, resetForm } = useForm({
@@ -102,38 +111,6 @@
         validateOnBlur: true,
     });
 
-
-
-    // const onSubmit = handleSubmit(async (values, { errors }) => {
-    //     if (Object.keys(errors).length > 0) {
-    //     // Lấy trường đầu tiên có lỗi
-    //         const firstErrorField = document.querySelector(`[name="${Object.keys(errors)[0]}"]`);
-    //         if (firstErrorField) {
-    //             firstErrorField.focus(); // Đặt focus vào trường lỗi đầu tiên
-    //             firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' }); // Cuộn đến trường lỗi
-    //         }
-    //         return; // Dừng việc submit
-    //         }
-    //     console.log('Form submitted:', values);
-    //     const selectedIds = value.value.map(value => {
-    //         const selectedOption = options.value.find(option => option.value === value);
-    //         return selectedOption ? selectedOption.id : null;
-    //     });
-    //     const dataToSubmit = {
-    //     ...values,  // Spread all the form values
-    //         expiredDate: new Date().toISOString(),  // Example date, replace with actual logic
-    //         createOn: new Date().toISOString(),
-    //         updatedOn: new Date().toISOString(),
-    //         skillIds: selectedIds,  // Include the selected skill IDs
-    //     };
-
-    //     await authStore.postJob(dataToSubmit);
-
-    //     console.log('Form submitted with data:', dataToSubmit);
-    //     resetForm();
-    //     locationStore.$reset();
-    //     value.value = [];
-    // });
 
 
     const onSubmit = handleSubmit(
@@ -145,7 +122,6 @@
             });
             const dataToSubmit = {
             ...values,  // Spread all the form values
-                expiredDate: new Date().toISOString(),  // Example date, replace with actual logic
                 createOn: new Date().toISOString(),
                 updatedOn: new Date().toISOString(),
                 skillIds: selectedIds,  // Include the selected skill IDs
@@ -192,6 +168,7 @@
     const { value: salary, errorMessage: salaryError, setValue: setSalary } = useField('salary');
     const { value: jobLevel, errorMessage: jobLevelError, setValue: setJobLevel } = useField('jobLevel');
     const { value: jobType, errorMessage: jobTypeError, setValue: setJobType } = useField('jobType');
+    const { value: expiredDate, errorMessage: expiredDateError, setValue: setexpiredDate } = useField('expiredDate');
 
     const { value: jobStatus, errorMessage: jobStatusError, setValue: setJobStatus } = useField('jobStatus');
     jobStatus.value = 0;
@@ -238,7 +215,7 @@
     <div class="card border-0 shadow mb-4 ">
         <div class="card-body card-form p-4">
             <h3 class="fs-4 mb-1">Job Details</h3>
-            <form @submit.prevent="onSubmit" id="formPostJob" >
+            <form @submit.prevent="onSubmit" id="formPostJob" autocomplete="off">
                 <div class="row">
                     <div class="col-md-6">
                         <label for="title" class="mb-2">Title<span class="req">*</span></label>
@@ -271,7 +248,7 @@
     
                 <div class="row">
                     
-                    <div class="col-md-6 ">
+                    <div class="col-md-3 ">
                         <label for="jobLevel" class="mb-2">Job level<span class="req">*</span></label>
                     
                         <select :value="jobLevel" name="jobLevel" class="form-control" @change="onJoblevelChange">
@@ -285,10 +262,15 @@
                         <span class="text-danger ">{{ jobLevelError }}</span>
                     </div>
     
-                    <div class="mb-4 col-md-6">
-                        <label for="salary" class="mb-2">Salary</label>
+                    <div class="mb-4 col-md-4">
+                        <label for="salary" class="mb-2">Salary<span class="req">*</span></label>
                         <input :id="salary" v-model="salary" type="number" placeholder="Salary" id="salary" name="salary" class="form-control">
                         <span class="text-danger ">{{ salaryError }}</span>
+                    </div>
+                    <div class="mb-4 col-md-5">
+                        <label for="expiredDate" class="mb-2">Expired Date<span class="req">*</span></label>
+                        <input :id="expiredDate" v-model="expiredDate" type="date" placeholder="expiredDate" id="expiredDate" name="expiredDate" class="form-control">
+                        <span class="text-danger ">{{ expiredDateError }}</span>
                     </div>
             
                 </div>
@@ -296,7 +278,7 @@
                 <div class="row">
                 
                     <div class="mb-4 col-md-4">
-                        <label for="province">Tỉnh/Thành:</label>
+                        <label for="province">Province<span class="req">*</span></label>
                         <select class="form-select" id="province" v-model="locationStore.selectedProvince" @change="onProvinceChange">
                             <option disabled value="">Chọn tỉnh/thành</option>
                             <option v-for="province in locationStore.provinces" :key="province.code" :value="province.code"  :data-name="province.name">
@@ -306,7 +288,7 @@
                         <span class="text-danger ">{{ provinceError }}</span>
                     </div>
                     <div class="mb-4 col-md-4">
-                        <label for="district">Quận/Huyện:</label>
+                        <label for="district">District<span class="req">*</span></label>
                         <select class="form-select" id="district" v-model="locationStore.selectedDistrict" @change="onDistrictChange">
                             <option disabled value="">Chọn quận/huyện</option>
                             <option v-for="district in locationStore.districts" :key="district.code" :value="district.code"  :data-name="district.name">
@@ -316,7 +298,7 @@
                         <span class="text-danger ">{{ districtError }}</span>
                     </div>
                     <div class="mb-4 col-md-4">
-                        <label for="ward">Phường/Xã:</label>
+                        <label for="ward">Ward<span class="req">*</span></label>
                         <select class="form-select" id="ward" v-model="locationStore.selectedWard" @change="onWardChange">
                             <option disabled value="">Chọn phường/xã</option>
                             <option v-for="ward in locationStore.wards" :key="ward.code" :value="ward.code" :data-name="ward.name">
@@ -343,14 +325,14 @@
                 </div>
     
                 <div class="">
-                    <label for="benefits" class="mb-2">Benefits</label>
+                    <label for="benefits" class="mb-2">Benefits<span class="req">*</span></label>
                     <textarea :id="benefits" v-model="benefits" class="form-control" name="benefits" id="benefits" cols="5" rows="5"
                         placeholder="Benefits"></textarea>
                     <span class="text-danger ">{{ benefitsError }}</span>
                 </div>
                 
                 <div class="">
-                    <label for="requirements" class="mb-2">Requirements</label>
+                    <label for="requirements" class="mb-2">Requirements<span class="req">*</span></label>
                     <textarea :id="requirements" v-model="requirements" class="form-control" name="requirements" id="requirements" cols="5" rows="5"
                         placeholder="requirements"></textarea>
                     <span class="text-danger ">{{ requirementsError }}</span>
@@ -374,11 +356,11 @@
                 </div>
             </form>
 
-            <h3 class="fs-4 mb-1 mt-3 border-top pt-5">Company Details</h3>
+            <h3 class="fs-4 mb-1 mt-3 border-top pt-5">Info Company </h3>
 
             <div class="row">
                 <div class="mb-4 col-md-6">
-                    <label for="" class="mb-2">Name<span class="req">*</span></label>
+                    <label for="" class="mb-2">Name</label>
                     <input readonly type="text" placeholder="Company Name" id="company_name" name="company_name" :value="companyStore.userCompany.name"
                         class="form-control">
                 </div>

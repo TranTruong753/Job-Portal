@@ -1,17 +1,121 @@
 <script setup>
-import CardCompany from '@/components/companies/cardCompany.vue';
+
 import CardProduct from '@/components/jobs/cardJob.vue';
+import CardCompany from '@/components/companies/cardCompany.vue';
+import { useJobtore } from '@/stores/jobs.js'
+import { ref, watch, onMounted } from 'vue';
+import { calculateDaysAgo } from '@/assets/js/jsUtils.js'
+import { useRouter } from 'vue-router';
+import { debounce } from 'lodash';
+import { useCompanyStore } from '@/stores/company.js';
 
-import { ref, onMounted } from 'vue';
-import axios from 'axios';
+const router = useRouter();
 
-const apiData = ref(null);
-const error = ref(null);
+const jobStore = useJobtore();
+const pageSize = ref(6);
+const current = ref(1);
+
+const companyStore = useCompanyStore();
+const currentCompany = ref(6);
+const pageSizeCompany = ref(1);
 
 
-onMounted(() => {
+const loading = ref(true);
+const loadingCompany = ref(true);
+
+const queryTextSearch = ref('')
+const querylocationSearch = ref('')
+const queryJobType = ref('')
+const queryJobLevel = ref('')
+const IsDecsending = ref(true);
+
+const queryTextSearchCompany = ref('')
+const queryIndustry = ref('')
+
+
+onMounted(async () => {
+    pageSize.value = 10;
+    current.value = 1;
+    loading.value = true; // Mặc định bật loading trước khi lấy dữ liệu
+
+    pageSizeCompany.value = 10;
+    currentCompany.value = 1;
+    loadingCompany.value = true; // Mặc định bật loading trước khi lấy dữ liệu
+    try {
+        await Promise.all([
+            jobStore.getJob(pageSize.value, current.value),
+            jobStore.getTotal()
   
+        ]);
+        // Kiểm tra trạng thái dữ liệu
+        loading.value = !(jobStore.total && jobStore.listjobs.length !== 0);
+        if (!loading.value) {
+            console.log("jobStore.listjobs", jobStore.listjobs);
+        }
+    } catch (error) {
+        console.error("Lỗi khi tải dữ liệu:", error);
+        loading.value = true; // Giữ trạng thái loading khi có lỗi
+    }
+
+    try {
+        await Promise.all([
+            companyStore.getCompany(pageSizeCompany.value, currentCompany.value),
+            companyStore.getTotal()
+  
+        ]);
+        // Kiểm tra trạng thái dữ liệu
+        loadingCompany.value = !(companyStore.total && companyStore.listcompany.length !== 0);
+        if (!loadingCompany.value) {
+            console.log("companyStore.listcompany", companyStore.listcompany);
+        }
+    } catch (error) {
+        console.error("Lỗi khi tải dữ liệu:", error);
+        loadingCompany.value = true; // Giữ trạng thái loading khi có lỗi
+    }
 });
+
+
+watch([current, pageSize], async ([newCurrent, newPageSize]) => {
+
+console.log(newCurrent,newPageSize);
+ // await jobStore.getJob(newPageSize, newCurrent);
+ await Promise.all([
+         jobStore.searchJobs(queryTextSearch.value, querylocationSearch.value, queryJobType.value, queryJobLevel.value, IsDecsending.value, newPageSize, newCurrent),
+         jobStore.getTotalWithConditions(queryTextSearch.value, querylocationSearch.value, queryJobType.value, queryJobLevel.value, IsDecsending.value)
+     ]);
+
+
+
+});
+
+
+watch([currentCompany, pageSizeCompany], async ([newCurrent, newPageSize]) => {
+
+console.log(newCurrent,newPageSize);
+// await jobStore.getJob(newPageSize, newCurrent);
+await Promise.all([
+        companyStore.searchJobs(queryTextSearchCompany.value, queryIndustry.value, newPageSize, newCurrent),
+        companyStore.getTotalWithConditions(queryTextSearchCompany.value, queryIndustry.value)
+    ]);
+// await jobStore.searchJobs(queryTextSearch.value, querylocationSearch.value, queryJobType.value, queryJobLevel.value, pageSize.value, current.value);
+
+
+
+});
+
+
+
+// Hàm debounce để trì hoãn tìm kiếm
+const debounceSearch = debounce(async () => {
+  await Promise.all([
+            jobStore.searchJobs(queryTextSearch.value, querylocationSearch.value, queryJobType.value, queryJobLevel.value,  IsDecsending.value, pageSize.value, current.value),
+            jobStore.getTotalWithConditions(queryTextSearch.value, querylocationSearch.value, queryJobType.value, queryJobLevel.value,  IsDecsending.value,)
+        ]);
+  }, 300);
+
+const hangleSearch = async () => {
+  debounceSearch(); 
+}
 
 
 </script>
@@ -20,26 +124,7 @@ onMounted(() => {
 
 
 <template>
-    <!-- <div>
-        <h1>Chi tiết sản phẩm</h1>
-        Kiểm tra nếu có lỗi khi gọi API
-        <div v-if="error">
-            <p class="error-message">Lỗi khi tải dữ liệu: {{ error.message }}</p>
-        </div>
-
-      Kiểm tra nếu dữ liệu chưa tải xong 
-        <div v-else-if="!apiData">
-            <p>Đang tải dữ liệu...</p>
-        </div>
-
-         Hiển thị dữ liệu sau khi tải xong 
-        <div v-else>
-            <p><strong>ID:</strong> {{ apiData.id }}</p>
-            <p><strong>Tên:</strong> {{ apiData.name }}</p>
-            <p><strong>Giá:</strong> {{ apiData.price }} VND</p>
-        </div>
-    </div> -->
-    <!-- hero -->
+  
     <section class="section-0 lazy d-flex bg-image-style dark align-items-center "
         data-bg="/src/assets/img/banner5.jpg">
         <div class="container">
@@ -88,364 +173,104 @@ onMounted(() => {
         </div>
     </section>
 
-    <!-- slide Company-->
-    <section class="section-3  py-5 py-sm-4 bg-2">
+    <section class="section-2 py-5 py-sm-4">
         <div class="container">
-            <h2>Top Company</h2>
-            <div id="companySlideID" class="carousel slide pt-5 pt-sm-4 g-3" data-bs-ride="carousel"
-                data-bs-pause="hover" data-bs-wrap="true">
-                <div class="carousel-inner w-80 m-auto">
-                    <div class="carousel-item active" data-bs-interval="5000">
-                        <div class="row g-4">
-                            <!-- card 01 -->    
-                            <CardCompany :cardData="{
-                                imgSrc: '/src/assets/img/fpt_corporation_logo.jpg',
-                                imgAlt: 'FPT',
-                                name: 'Software Engineer',
-                                title: 'FPT Technology',
-                                salary: ' Sign in to view salary ',
-                                location: 'Default Location',
-                                type: 'Default Type',
-                                jobs: 4,
-                                cssStyle: 'col-12 col-lg-4 col-md-6 ',
-                                isShow: true,
-                                isSave: false
-                            }" />
-                          
-                          <!-- card 02 -->
-                          <CardCompany :cardData="{
-                                imgSrc: '/src/assets/img/fpt_corporation_logo.jpg',
-                                imgAlt: 'FPT',
-                                name: 'Software Engineer',
-                                title: 'FPT Technology',
-                                salary: ' Sign in to view salary ',
-                                location: 'Default Location',
-                                type: 'Default Type',
-                                jobs: 4,
-                                cssStyle: 'col-12 col-lg-4 col-md-6 ',
-                                isShow: true,
-                                isSave: false
-                            }" />
-
-                            <!-- card 03 -->
-                          <CardCompany :cardData="{
-                                imgSrc: '/src/assets/img/fpt_corporation_logo.jpg',
-                                imgAlt: 'FPT',
-                                name: 'Software Engineer',
-                                title: 'FPT Technology',
-                                salary: ' Sign in to view salary ',
-                                location: 'Default Location',
-                                type: 'Default Type',
-                                jobs: 4,
-                                cssStyle: 'col-12 col-lg-4 col-md-6 ',
-                                isShow: true,
-                                isSave: false
-                            }" />
-
-                           
-                        </div>
+            <h2>List Job</h2>
+            <div class="row pt-5 pt-sm-4 g-3">
+                <div v-if="loading && jobStore.listjobs.length !== 0" class="text-center">
+                    <div class="loading">
+                      <a-spin size="large" tip="Loading..."/>
                     </div>
-                    <div class="carousel-item" data-bs-interval="5000">
-                        <div class="row g-4">
-                            <!-- card 01 -->
-                          <CardCompany :cardData="{
-                                imgSrc: '/src/assets/img/fpt_corporation_logo.jpg',
-                                imgAlt: 'FPT',
-                                name: 'Software Engineer',
-                                title: 'FPT Technology',
-                                salary: ' Sign in to view salary ',
-                                location: 'Default Location',
-                                type: 'Default Type',
-                                jobs: 4,
-                                cssStyle: 'col-12 col-lg-4 col-md-6 ',
-                                isShow: true,
-                                isSave: false
-                            }" />
+                  </div>
 
-                            <!-- card 02 -->
-                          <CardCompany :cardData="{
-                                imgSrc: '/src/assets/img/fpt_corporation_logo.jpg',
-                                imgAlt: 'FPT',
-                                name: 'Software Engineer',
-                                title: 'FPT Technology',
-                                salary: ' Sign in to view salary ',
-                                location: 'Default Location',
-                                type: 'Default Type',
-                                jobs: 4,
-                                cssStyle: 'col-12 col-lg-4 col-md-6 ',
-                                isShow: true,
-                                isSave: false
-                            }" />
+                  <div v-else-if="jobStore.listjobs.length === 0">
+                    <h1 class="text-center text-primary">NOT FUND JOB </h1>
+                  </div>
 
-                            <!-- card 03 -->
-                          <CardCompany :cardData="{
-                                imgSrc: '/src/assets/img/fpt_corporation_logo.jpg',
-                                imgAlt: 'FPT',
-                                name: 'Software Engineer',
-                                title: 'FPT Technology',
-                                salary: ' Sign in to view salary ',
-                                location: 'Default Location',
-                                type: 'Default Type',
-                                jobs: 4,
-                                cssStyle: 'col-12 col-lg-4 col-md-6 ',
-                                isShow: true,
-                                isSave: false
-                            }" />
+                  <CardProduct
+                  v-else-if="jobStore.listjobs.length !== 0"
+                    v-for="(job, index) in jobStore.listjobs"
+                    :key="index"
+                    :card-data="{
+                      id: job.id,
+                      imgSrc: job.employer.company.logo,
+                      imgAlt: job.employer.company.name,
+                      name: job.title,
+                      nameCompany: job.employer.company.name,
+                      timePost: calculateDaysAgo(job.createOn),
+                      salary: job.salary + ' VNĐ',
+                      location: job.locationShort,
+                      type: job.jobType,
+                      skill: job.skills.map(skill => ({ msg: skill.name })),
+                      level: job.jobLevel,
+                      isShow: true,
+                      styleCss: 'card-h-100 col-12 col-lg-6',
+                      styleCard: 'card-h-100 card border-0 shadow'
+                    }"
+                   
+                  />
+               
 
-                           
-                        </div>
-                    </div>
-                </div>
-                <button class="carousel-control-prev" type="button" data-bs-target="#companySlideID"
-                    data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Previous</span>
-                </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#companySlideID"
-                    data-bs-slide="next">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Next</span>
-                </button>
+            </div>
+            <!-- pagination -->
+          
+            <div class="mt-3 d-flex justify-content-center">
+            <a-pagination
+            v-model:current="current"
+            v-model:pageSize="pageSize"
+            v-model:total="jobStore.total"
+             
+
+            />
             </div>
         </div>
     </section>
 
-    <!-- Featured Jobs -->
-    <section class="section-3  py-5 py-sm-4">
+    <section class="section-2 py-5 py-sm-4">
         <div class="container">
-            <h2>Featured Jobs</h2>
-            <div class="row pt-5 pt-sm-4">
-                <div class="job_listing_area">
-                    <div class="job_lists">
-                        <div class="row g-3">
-                            <!-- card 01 -->            
-                            <CardProduct :cardData="{
-                                imgSrc: '/src/assets/img/edutech_logo.png',
-                                imgAlt: 'Edutech',
-                                name: 'Frontend development',
-                                nameCompany: 'Edutech',
-                                timePost: 'Posted 3 days ago',
-                                salary: 'Salary negotiable',
-                                location: 'Default Location',
-                                type: 'Default Type',
-                                skill: [
-                                    { msg: 'HTML' },
-                                    { msg: 'CSS' },
-                                    { msg: 'JS' },
-                                    { msg: 'REACT' },
-                                    { msg: 'BOOSTRAP 5' },
-
-                                ],
-                                isShow: true,
-                                styleCss: 'card-h-100 col-12 col-lg-6'
-                            }" />
-
-                            <!-- card 02 -->
-                            <CardProduct :cardData="{
-                                imgSrc: '/src/assets/img/fpt_corporation_logo.jpg',
-                                imgAlt: 'FPT',
-                                name: 'Frontend development',
-                                nameCompany: 'FPT',
-                                timePost: 'Posted 3 days ago',
-                                salary: 'Salary negotiable',
-                                location: 'Default Location',
-                                type: 'Default Type',
-                                skill: [
-                                    { msg: 'HTML' },
-                                    { msg: 'CSS' },
-                                    { msg: 'JS' },
-                                    { msg: 'REACT' },
-                                    { msg: 'BOOSTRAP 5' },
-
-                                ],
-                                isShow: true,
-                                styleCss: 'card-h-100 col-12 col-lg-6'
-                            }" />
-
-                        </div>
+            <h2>List company</h2>
+            <div class="row pt-5 pt-sm-4 g-3">
+                <div v-if="loadingCompany" class="text-center">
+                    <div class="loading">
+                      <a-spin size="large" tip="Loading..."/>
                     </div>
                 </div>
+                <div v-else-if="companyStore.listcompany.length === 0">
+                    <h1 class="text-center text-primary">NOT FUND COMPANY </h1>
+                  </div>
+                <CardCompany v-else
+                    v-for="(company, index) in companyStore.listcompany"
+                    :key="index"
+                    :cardData="{
+                        id: company.id,
+                        imgSrc: company.logo ,  
+                        imgAlt: company.name || 'Default Company',
+                        name: company.name || 'Default Position',
+                        title: company.industry || 'Default Title',
+                        location: company.location || 'Default Location',
+                        type: company.type || 'Default Type',
+                        jobs: 4,
+                        cssStyle: 'col-12 col-lg-4 col-md-6',
+                        isShow: true,
+                        isSave: false
+                    }"
+                />
+               
+
+            </div>
+            <!-- pagination -->
+          
+            <div class="mt-3 d-flex justify-content-center">
+            <a-pagination
+                v-model:current="currentCompany"
+                v-model:pageSize="pageSizeCompany"
+                v-model:total="companyStore.total"
+           
+            />
             </div>
         </div>
     </section>
+   
 
-    <!-- Slide top job  -->
-    <section class="section-3  py-5 py-sm-4 bg-2">
-        <div class="container">
-            <h2>Top jobs</h2>
-            <div id="TopJobSlideId" class="carousel slide pt-5 pt-sm-4 g-3">
-
-                <div class="carousel-inner ">
-                    <div class="carousel-item active mb-2 pb-5 ">
-                        <div class="row g-4">
-                            <!-- card 01 -->                       
-                            <CardProduct :cardData="{
-                                imgSrc: '/src/assets/img/edutech_logo.png',
-                                imgAlt: 'Edutech',
-                                name: 'Frontend development',
-                                nameCompany: 'Edutech',
-                                timePost: 'Posted 3 days ago',
-                                salary: 'Salary negotiable',
-                                location: 'Default Location',
-                                type: 'Default Type',
-                                skill: [
-                                    { msg: 'HTML' },
-                                    { msg: 'CSS' },
-                                    { msg: 'JS' },
-                                    { msg: 'REACT' },
-                                    { msg: 'BOOSTRAP 5' },
-
-                                ],
-                                isShow: true,
-                                styleCss: 'card-h-100 col-12 col-lg-6'
-                            }" />
-
-                            <!-- card 02 -->          
-                            <CardProduct :cardData="{
-                                imgSrc: '/src/assets/img/edutech_logo.png',
-                                imgAlt: 'Edutech',
-                                name: 'Frontend development',
-                                nameCompany: 'Edutech',
-                                timePost: 'Posted 3 days ago',
-                                salary: 'Salary negotiable',
-                                location: 'Default Location',
-                                type: 'Default Type',
-                                skill: [
-                                    { msg: 'HTML' },
-                                    { msg: 'CSS' },
-                                    { msg: 'JS' },
-                                    { msg: 'REACT' },
-                                    { msg: 'BOOSTRAP 5' },
-
-                                ],
-                                isShow: true,
-                                styleCss: 'card-h-100 col-12 col-lg-6'
-                            }" />
-
-                        </div>
-
-                    </div>
-                    <div class="carousel-item  mb-2 pb-5">
-                        <div class="row g-4">
-                            <!-- card 01 -->                           
-                            <CardProduct :cardData="{
-                                imgSrc: '/src/assets/img/edutech_logo.png',
-                                imgAlt: 'Edutech',
-                                name: 'Frontend development',
-                                nameCompany: 'Edutech',
-                                timePost: 'Posted 3 days ago',
-                                salary: 'Salary negotiable',
-                                location: 'Default Location',
-                                type: 'Default Type',
-                                skill: [
-                                    { msg: 'HTML' },
-                                    { msg: 'CSS' },
-                                    { msg: 'JS' },
-                                    { msg: 'REACT' },
-                                    { msg: 'BOOSTRAP 5' },
-
-                                ],
-                                isShow: true,
-                                styleCss: 'card-h-100 col-12 col-lg-6'
-                            }" />
-
-                            <!-- card 02 -->           
-                            <CardProduct :cardData="{
-                                imgSrc: '/src/assets/img/edutech_logo.png',
-                                imgAlt: 'Edutech',
-                                name: 'Frontend development',
-                                nameCompany: 'Edutech',
-                                timePost: 'Posted 3 days ago',
-                                salary: 'Salary negotiable',
-                                location: 'Default Location',
-                                type: 'Default Type',
-                                skill: [
-                                    { msg: 'HTML' },
-                                    { msg: 'CSS' },
-                                    { msg: 'JS' },
-                                    { msg: 'REACT' },
-                                    { msg: 'BOOSTRAP 5' },
-
-                                ],
-                                isShow: true,
-                                styleCss: 'card-h-100 col-12 col-lg-6'
-                            }" />
-
-                        </div>
-                    </div>
-                    <div class="carousel-item  mb-2 pb-5">
-                        <div class="row g-4">
-                           <!-- card 01 -->            
-                           <CardProduct :cardData="{
-                                imgSrc: '/src/assets/img/edutech_logo.png',
-                                imgAlt: 'Edutech',
-                                name: 'Frontend development',
-                                nameCompany: 'Edutech',
-                                timePost: 'Posted 3 days ago',
-                                salary: 'Salary negotiable',
-                                location: 'Default Location',
-                                type: 'Default Type',
-                                skill: [
-                                    { msg: 'HTML' },
-                                    { msg: 'CSS' },
-                                    { msg: 'JS' },
-                                    { msg: 'REACT' },
-                                    { msg: 'BOOSTRAP 5' },
-
-                                ],
-                                isShow: true,
-                                styleCss: 'card-h-100 col-12 col-lg-6'
-                            }" />
-
-                            <!-- card 02 -->          
-                           <CardProduct :cardData="{
-                                imgSrc: '/src/assets/img/edutech_logo.png',
-                                imgAlt: 'Edutech',
-                                name: 'Frontend development',
-                                nameCompany: 'Edutech',
-                                timePost: 'Posted 3 days ago',
-                                salary: 'Salary negotiable',
-                                location: 'Default Location',
-                                type: 'Default Type',
-                                skill: [
-                                    { msg: 'HTML' },
-                                    { msg: 'CSS' },
-                                    { msg: 'JS' },
-                                    { msg: 'REACT' },
-                                    { msg: 'BOOSTRAP 5' },
-
-                                ],
-                                isShow: true,
-                                styleCss: 'card-h-100 col-12 col-lg-6'
-                            }" />
-                        </div>
-                    </div>
-                </div>
-
-                <div class="carousel-indicators">
-                    <button class="btn-icon-chevron-left" type="button" data-bs-target="#TopJobSlideId"
-                        data-bs-slide="prev">
-                        <i class="fa-solid fa-chevron-left"></i>
-                    </button>
-                    <button type="button" data-bs-target="#TopJobSlideId" data-bs-slide-to="0" class="active"
-                        aria-label="Slide 1" aria-current="true"></button>
-                    <button type="button" data-bs-target="#TopJobSlideId" data-bs-slide-to="1" aria-label="Slide 2"
-                        class=""></button>
-                    <button type="button" data-bs-target="#TopJobSlideId" data-bs-slide-to="2" aria-label="Slide 3"
-                        class=""></button>
-                    <button class="btn-icon-chevron-right" type="button" data-bs-target="#TopJobSlideId"
-                        data-bs-slide="next">
-                        <i class="fa-solid fa-chevron-right"></i>
-                    </button>
-                </div>
-
-            </div>
-        </div>
-    </section>
-
-    <!-- Latest Jobs -->
-    
-
-    <!-- Slide job hot -->
-    
+   
 </template>

@@ -8,6 +8,7 @@ export const useBlogStore = defineStore('blog', {
     state: () => ({
         listBlog: [],
         detailBlog: [],
+        detailBlogEmployer: [],
       }),
     
       actions: {
@@ -110,7 +111,34 @@ export const useBlogStore = defineStore('blog', {
             console.error("Error submitting application:", error);
             return false
           }
-        }
+        },
+
+        async getDetailBlogEmployer(idBlog){
+          const url = '/api/blog/GetBlogById';
+          try {
+            const response = await axios.get(url,
+             {
+              headers:{
+                Authorization: `Bearer ${getCookie('token')}`, 
+              },
+              params:{
+                'blogId' : idBlog
+              }
+             }
+            );
+            if(response.data || response.status === 200){  
+                this.detailBlogEmployer = response.data;
+                console.log('respone',response);
+                return true
+            }else{
+                return false;
+            }
+          } catch (error) {
+            console.error("Error submitting application:", error);
+            return false
+          }
+        },
+        
 
       }
 

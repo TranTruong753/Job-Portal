@@ -12,6 +12,7 @@ export const useJobtore = defineStore('job', {
     state: () => ({
         listjobs: [],
         job: [],
+        jobEmployer: [],
         total: 0,
         pageSize: 6,
         currentPage: 1,
@@ -107,6 +108,31 @@ export const useJobtore = defineStore('job', {
                 if (response.status === 200 || response.data) {
                     this.job = response.data;
                     return true;
+                } else {
+                    console.error("Error fetching job detail:");
+                    return false;
+                }
+            } catch (errors) {
+                console.error(errors);
+                return false;
+            }
+        },
+
+        async getDetailEmployerJobs(idJob) {
+            const url = '/api/appuserjob/employer-jobById'
+            try {
+                const response = await axios.get(url, {
+                  headers:{
+                    Authorization: `Bearer ${getCookie('token')}`, 
+                  },
+                    params: {
+                        jobId: idJob
+                    }
+                });
+                if (response.status === 200 || response.data) {
+                    console.log(response.data);
+                    this.jobEmployer = response.data;
+                    return  true;
                 } else {
                     console.error("Error fetching job detail:");
                     return false;

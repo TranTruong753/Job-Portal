@@ -1,18 +1,33 @@
 
 <script setup>
 import { useAuthStore } from '@/stores/auth.js';
-import { reactive, watchEffect } from "vue";
+import { onMounted, reactive, ref, watchEffect } from "vue";
 import { useRoute } from 'vue-router';
+import { convertToUrl,closeModal } from '@/assets/js/jsUtils';
 
 const authStore = useAuthStore();
 const route = useRoute();
-
+const urlImg = ref('/src/assets/img/avatar7.png');
+const img = ref('');
+const errorSrc = ref('');
 console.log(route.fullPath)
+
+onMounted(async ()=>{
+    console.log(authStore.role);
+    if(authStore.role === 'User'){
+        await authStore.getUserData();
+    }else if(authStore.role === 'Employer'){
+        await authStore.getEmployer()
+    }
+    if(authStore.userData.length !== 0){
+        urlImg.value = convertToUrl(authStore.userData.img);
+    }
+})
 
 const data = reactive({
     content: [
         {
-            id: 11,
+            id: 13,
             titleNav: 'Account Settings',
             linkNav: '/account',
             isShow: true,
@@ -55,34 +70,41 @@ const data = reactive({
         },
         {
             id: 7,
+            titleNav: 'My Blogs',
+            linkNav: '/account/my-blogs',
+            isShow: authStore.role === 'Employer',
+            isActive: false,
+        },
+        {
+            id: 8,
             titleNav: 'Jobs Applied',
             linkNav: '/account/jobs-applied',
             isShow: authStore.role === 'User',
             isActive: false,
         },
         {
-            id: 8,
+            id: 9,
             titleNav: 'Saved Jobs',
             linkNav: '/account/saved-jobs',
             isShow: authStore.role === 'User',
             isActive: false,
         },
         {
-            id: 9,
+            id: 10,
             titleNav: 'Create CV test',
             linkNav: '/account/create-cv-test',
             isShow: true,
             isActive: false,
         },
         {
-            id: 10,
+            id: 11,
             titleNav: 'Create CV',
             linkNav: '/account/create-cv',
             isShow: true,
             isActive: false,
         },
         {
-            id: 11,
+            id: 12,
             titleNav: 'Charts',
             linkNav: '/account/charts-employer',
             isShow: authStore.role === 'Employer',
@@ -91,11 +113,66 @@ const data = reactive({
     ],
 });
 
+
+const handleFileChange = (event) => {
+    const fileInput = document.getElementById("imgSrc"); 
+    const file = event.target.files[0];  // Lấy file đã chọn
+    if (file && file instanceof File) {
+        // Kiểm tra xem file có phải là hình ảnh hay không
+        const allowedImageTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/jpg'];
+        if (allowedImageTypes.includes(file.type)) {
+            img.value = file;
+            errorSrc.value = '';
+        } else {
+            // Thông báo nếu không phải là hình ảnh
+            errorSrc.value = 'Vui lòng chọn một file hình ảnh (JPEG, PNG, GIF)'
+            // img.value = null; // Xóa giá trị file nếu không phải hình ảnh
+           
+            if (fileInput) { 
+                fileInput.value = ''; // Reset input file thực sự 
+            }
+        }
+    }
+};
+
+const handleAddFile = () => {
+    // console.log(img.value)
+    // console.log(errorSrc.value)
+    const fileInput = document.getElementById("imgSrc"); 
+    if( img.value && errorSrc.value === ''){
+       
+        console.log(img.value, 'img.value');
+        closeModal('#exampleModal');
+        errorSrc.value = ''
+        if(changeAvater(img.value)){
+            urlImg.value = URL.createObjectURL(img.value); // Tạo URL tạm thời từ file
+            if (fileInput) { 
+                fileInput.value = ''; // Reset input file thực sự 
+                img.value = ''
+            }
+        }
+    }else{
+         errorSrc.value = 'Vui lòng chọn một file hình ảnh (JPEG, PNG, GIF)'
+         
+    }
+}
+
+const changeAvater = async (img) => {
+    const isSuccess = await authStore.postAvatar(img);
+    if(authStore.role === 'User'){
+        await authStore.getUserData();
+    }else if(authStore.role === 'Employer'){
+        await authStore.getEmployer()
+    }
+    return isSuccess;
+}
+
 // Watch the route and update isActive accordingly
 watchEffect(() => {
     data.content.forEach(navItem => {
         navItem.isActive = route.fullPath === navItem.linkNav;
     });
+    console.log('watchEffect:',urlImg.value)
 });
 
 const onClick = (item) => {
@@ -126,8 +203,8 @@ const onClick = (item) => {
                 <div class="col-lg-3">
                     <div class="card border-0 shadow mb-4 p-3">
                         <div class="s-body text-center mt-3">
-                            <img src="/src/assets/img/avatar7.png" alt="avatar" class="rounded-circle img-fluid"
-                                style="width: 150px;">
+                            <img :src="urlImg" alt="avatar" class="rounded-circle img-fluid object-fit-cover"
+                                style="width: 150px;height: 150px;">
                             <h5 class="mt-3 pb-0 mb-2 fs-4">{{authStore.fullname}}</h5>
                             <!-- <p class="text-muted mb-1 fs-6">Full Stack Developer</p> -->
                             <div class="d-flex justify-content-center mb-2">
@@ -234,7 +311,7 @@ const onClick = (item) => {
     </section>
 
     <!-- Modal -->   
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
@@ -245,10 +322,11 @@ const onClick = (item) => {
                     <form>
                         <div class="mb-3">
                             <label for="exampleInputEmail1" class="form-label">Profile Image</label>
-                            <input type="file" class="form-control" id="image" name="image">
+                            <input  type="file" class="form-control" id="imgSrc" name="image"  @change="handleFileChange">
+                            <span class="text-danger">{{errorSrc}}</span>
                         </div>
                         <div class="d-flex justify-content-end">
-                            <button type="submit" class="btn btn-primary mx-3">Update</button>
+                            <button type="button" class="btn btn-primary mx-3" @click="handleAddFile">Update</button>
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         </div>
 

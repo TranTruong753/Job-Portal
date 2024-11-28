@@ -13,7 +13,7 @@ const loading = ref(false);
 
 onMounted(async () => {
     await authStore.getApplycationByJob(idJob);
-    listUser.value = authStore.listApplicantsByJob[0].users;
+    listUser.value = authStore.listApplicantsByJob.users;
 });
 
 // Hàm cập nhật trạng thái
@@ -45,6 +45,7 @@ const handleRemove = async (item) => {
                 });
                 await authStore.getApplycationByJob(idJob);
                 listUser.value = authStore.listApplicantsByJob[0].users;
+                // item.
             }else{
                 Swal.fire({
                     title: "Deleted failed!",

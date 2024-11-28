@@ -30,7 +30,8 @@ onMounted(async () => {
         if(dataSaveOrApply){
         checkStatusJob.isSave = dataSaveOrApply.issave ;
         checkStatusJob.isApply = dataSaveOrApply.status ;
-        console.log(checkStatusJob)
+
+        console.log('checkStatusJob',checkStatusJob)
     }
     }
     await jobStore.getDetailJobs(jobId);
@@ -67,10 +68,20 @@ const handleApply = async() => {
 }
 
 const handleFileChange = (event) => {
-  file.value = event.target.files[0];  // Lưu trữ file đã chọn
-  if(file.value){
-    errorText.value = "";
-  }
+    file.value = event.target.files[0]; // Lưu trữ file đã chọn
+    if (file.value) {
+        // Kiểm tra nếu file không phải PDF
+        if (file.value.type !== 'application/pdf' || !file.value.name.endsWith('.pdf')) {
+            errorText.value = "Please upload a valid PDF file.";
+            file.value = null; // Reset file nếu không hợp lệ
+            const fileInput = document.getElementById("cv");
+            if (fileInput) {
+                fileInput.value = ''; // Reset input file
+            }
+        } else {
+            errorText.value = ""; // Reset lỗi nếu file hợp lệ
+        }
+    }
 };
 
 const handleSaveJob = async() => {
@@ -150,8 +161,8 @@ const handleSaveJob = async() => {
                                 </div>
                                 <div class="jobs_right">
                                     <div class="apply_now">
-                                        <a class="heart_mark" href="#"> <i class="fa fa-heart-o"
-                                                aria-hidden="true"></i></a>
+                                        <!-- <a class="heart_mark" href="#"> <i class="fa fa-heart-o"
+                                                aria-hidden="true"></i></a> -->
                                     </div>
                                 </div>
                             </div>
@@ -209,12 +220,12 @@ const handleSaveJob = async() => {
 
                             <div class="border-bottom"></div>
                             <div class="pt-3 text-end">
-                                <button type="button" class="btn btn-secondary" @click="handleSaveJob">
+                                <button type="button" :class="checkStatusJob.isSave ? 'btn btn-outline-primary' : 'btn btn-secondary'" @click="handleSaveJob">
                                     {{ checkStatusJob.isSave ? 'saved' : 'save' }}
                                 </button>
                                 
-                                <button v-if="authStore.role === 'User' && checkStatusJob.isApply !== 1" type="button" class="ms-2 btn btn-primary" @click="handleApply" data-bs-toggle="modal" data-bs-target="#addCvJob">Apply</button>
-                                <button v-else-if="authStore.role === 'User' && checkStatusJob.isApply === 1" type="button" class="ms-2 btn btn-primary" disabled>Applied</button>
+                                <button v-if="authStore.role === 'User' && checkStatusJob.isApply === 0" type="button" class="ms-2 btn btn-primary" @click="handleApply" data-bs-toggle="modal" data-bs-target="#addCvJob">Apply</button>
+                                <button v-else-if="authStore.role === 'User' && checkStatusJob.isApply !== 1" type="button" class="ms-2 btn btn-primary" disabled>Applied</button>
                          
                             </div>
                         </div>
@@ -223,10 +234,10 @@ const handleSaveJob = async() => {
                 <!-- column right -->
                 <div class="col-lg-4 col-md-12 ">
                     <div class="">
-                        <button v-if="authStore.role === 'User' && checkStatusJob.isApply !== 1" type="button" class="mb-4 btn btn-primary w-100 p-lg-3" data-bs-toggle="modal" data-bs-target="#addCvJob">
+                        <button v-if="authStore.role === 'User' && checkStatusJob.isApply === 0" type="button" class="mb-4 btn btn-primary w-100 p-lg-3" data-bs-toggle="modal" data-bs-target="#addCvJob">
                             <span> Apply Now </span>
                         </button>
-                        <button v-else-if="authStore.role === 'User' && checkStatusJob.isApply == 1" type="button" class="mb-4 btn btn-primary w-100 p-lg-3" disabled>
+                        <button v-else-if="authStore.role === 'User' " type="button" class="mb-4 btn btn-primary w-100 p-lg-3" disabled>
                             <span> Applied </span>
                         </button>
                         <router-link v-else-if="authStore.role !== 'Employer'" to="/login"

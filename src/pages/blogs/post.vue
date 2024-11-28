@@ -48,6 +48,10 @@ const onSubmit = handleSubmit(
          blogStore.postBlog(values);
      
          imgSrc.value = ''
+         const editor = tinymce.get('description'); // Thay 'editorId' bằng ID của TinyMCE
+        if (editor) {
+            editor.setContent(''); // Đặt nội dung trống
+        }
          resetForm();
          
    
@@ -148,7 +152,7 @@ const handleAddFile = () => {
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form>
+                        <form >
                             <div class="mb-3">
                                 <label for="exampleInputEmail1" class="form-label">Logo Image</label>
                                 <input  type="file" class="form-control" id="imgSrc" name="image"  @change="handleFileChange">

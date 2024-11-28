@@ -4,7 +4,7 @@ import { onMounted, ref, watch } from 'vue';
 import { formatDateV2 } from '@/assets/js/jsUtils'
 import { debounce } from 'lodash';
 
-const pageSize = ref(6);
+const pageSize = ref(5);
 const current = ref(1);
 const total = ref(0);
 const loading = ref(true);
@@ -57,6 +57,11 @@ watch([current, pageSize], async ([newCurrent, newPageSize]) => {
 
 });
 
+const handleCheck = async (item) => {
+    console.log(item.title);
+    await authStore.isShowJobPost(item.id, item.isShow);
+}
+
 
 </script>
 <template>
@@ -78,51 +83,55 @@ watch([current, pageSize], async ([newCurrent, newPageSize]) => {
                         @input="handleQuery" />
                 </div>
             </div>
-            <div class="table-responsive pt-3 pe-3" style="height: 70vh;overflow: auto">
-                <table class="table ">
+            <div class="table-responsive pt-3 pe-3 position-relative " style="height: 80vh;overflow: auto">
+                <div v-if="loading" class="d-flex align-items-center justify-content-center"  style="height: 70vh;">
+                    <div class="">
+                        <a-spin size="large" tip="Loading..."/>
+                    </div>
+                </div>
+                <table v-else class="table"  >
                     <thead class="bg-light">
                         <tr>
                             <th scope="col">Title</th>
                             <th scope="col">Job Created</th>
-                            <th scope="col">Job type</th>
                             <th scope="col">Status</th>
+                            <th scope="col">Is Show</th>
                             <th scope="col">Action</th>
                         </tr>
                     </thead>
                     <tbody class="border-0">
-                        <div v-if="loading" class="text-center">
-                            <div class="loading">
-                                <a-spin size="large" tip="Loading..."/>
-                            </div>
-                        </div>
-                        <tr v-else v-for="(item, index) in authStore.listJobPost">
+                       
+                        <tr v-for="(item, index) in authStore.listJobPost">
                             <td v-if="item.isShowEmployer">
                                 <div class="job-name fw-500">{{ item.title }}</div>
                                 <div class="info1">{{ item.jobLevel }}</div>
                             </td>
                             <td v-if="item.isShowEmployer">{{ formatDateV2(item.createOn) }}</td>
-                            <td v-if="item.isShowEmployer">{{ item.jobType }}</td>
+                          
                             <td v-if="item.isShowEmployer">
                                 <div class="job-status text-capitalize">
                                     {{ item.jobStatus }}
 
                                 </div>
                             </td>
+                            <td v-if="item.isShowEmployer"><a-switch v-model:checked="item.isShow" @change="handleCheck(item)"  :disabled="item.jobStatus !== 'Approved'" /></td>
                             <td v-if="item.isShowEmployer">
                                 <div class="action-dots float-end">
                                     <a href="#" class="" data-bs-toggle="dropdown" aria-expanded="false">
                                         <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
                                     </a>
                                     <ul class="dropdown-menu dropdown-menu-end">
-                                        <li><router-link :to="`/job/detail/${item.id}`" class="dropdown-item"> <i
-                                                    class="fa fa-eye" aria-hidden="true"></i> View</router-link></li>
+                                        <li>
+                                            <router-link :to="`/job/detailEmployer/${item.id}`" class="dropdown-item"> <i
+                                                    class="fa fa-eye" aria-hidden="true"></i> View</router-link>
+                                        </li>
                                         <li>
                                             <a class="dropdown-item" href="#"
                                                 @click="authStore.updateIsShowUserForJobPost(item.id)">
                                                 <i class="fa fa-trash" aria-hidden="true"></i> Remove
                                             </a>
                                         </li>
-                                        <li>
+                                        <li >
                                             <router-link :to="`/account/list-applicants/${item.id}`"
                                                 class="dropdown-item">
                                                 <i class="fa-solid fa-list" aria-hidden="true"></i> List Applicants
@@ -263,10 +272,19 @@ watch([current, pageSize], async ([newCurrent, newPageSize]) => {
 
 
                 </table>
-                <div class="d-flex justify-content-center">
+                <div class="pagination d-flex justify-content-center position-absolute">
                     <a-pagination v-model:current="current" :total="total"  :pageSize="pageSize"  show-less-items />
                 </div>
             </div>
         </div>
     </div>
 </template>
+
+<style scoped>
+.pagination {
+    left: 50%;
+    bottom: 1%;
+    translate: -50%;
+}
+
+</style>

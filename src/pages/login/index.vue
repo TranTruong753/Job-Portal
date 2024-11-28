@@ -30,10 +30,10 @@ const { handleSubmit, handleReset } = useForm({
 const { value: username, errorMessage: usernameError } = useField('username');
 const { value: password, errorMessage: passwordError } = useField('password');
 
+const loading = ref(false);
 
 // Trạng thái ẩn/hiện mật khẩu
 const isPasswordVisible = ref(false);
-
 // Lấy store auth
 const authStore = useAuthStore();
 
@@ -41,16 +41,20 @@ const authStore = useAuthStore();
 const onSubmit = handleSubmit(async (values) => {
     console.log('Form submitted:', values);
     try {
+        loading.value = true;
         await authStore.login('/api/account/login', values);
+        loading.value = false;
         console.log(authStore.role);
         if (authStore.isAuthenticated) {
-
-
 
             if (authStore.role === 'Admin') {
                 window.location.href = 'https://localhost:7283/home';
             } else {
-
+                if(authStore.role === 'User'){
+                    await authStore.getUserData();
+                }else if(authStore.role === 'Employer'){
+                    await authStore.getEmployer()
+                }
                 const Toast = Swal.mixin({
                     toast: true,
                     position: "top-end",
@@ -72,20 +76,20 @@ const onSubmit = handleSubmit(async (values) => {
         }
 
     } catch (error) {
+        loading.value = false;
         console.error('Đăng nhập thất bại:', error);
     }
 
 
 });
 
-// onUnmounted(() => {
-//     if (cancelRequest) {
-//         cancelRequest('Component unmounted, request canceled');
-//     }
-// });
 </script>
 
 <template>
+    <div :class="{ overlay: loading }" id="overlay"></div>
+    <div v-if="loading" class="loading ">
+        <a-spin size="large" tip="Loading..." />
+    </div>
     <!-- <section class="section-5">
         <div class="container my-5">
             <div class="py-lg-2">&nbsp;</div>
@@ -199,6 +203,7 @@ const onSubmit = handleSubmit(async (values) => {
 </template>
 
 <style>
+
 .text-danger {
     display: block;
     height: 24px;
@@ -228,4 +233,25 @@ const onSubmit = handleSubmit(async (values) => {
     border-radius: 0 10px 10px 0;
     /* Bo góc phải phù hợp */
 }
+
+.overlay {
+  position: fixed; /* Gắn cố định với màn hình */
+  top: 0;
+  left: 0;
+  width: 100%; /* Phủ toàn màn hình */
+  height: 100%;
+  background: rgba(0, 0, 0, 0.05); /* Màu đen mờ */
+  z-index: 999; /* Nổi trên các thành phần khác */
+  display: block; /* Ẩn mặc định */
+}
+
+.loading {
+    z-index: 999;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    translate: -50% -50%
+}
+
+
 </style>

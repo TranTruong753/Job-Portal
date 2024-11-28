@@ -8,6 +8,7 @@ import { useRouter } from 'vue-router';
 import { debounce } from 'lodash';
 
 const router = useRouter();
+
 const jobStore = useJobtore();
 const pageSize = ref(6);
 const current = ref(1);
@@ -235,7 +236,7 @@ const hangleSearch = async () => {
               <div class="job_lists">
                 <div class="row g-3">
 
-                  <div v-if="loading" class="text-center">
+                  <div v-if="loading && jobStore.listjobs.length !== 0" class="text-center">
                     <div class="loading">
                       <a-spin size="large" tip="Loading..."/>
                     </div>

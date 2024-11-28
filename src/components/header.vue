@@ -1,7 +1,8 @@
 <script setup>
-import { onBeforeMount,onMounted, ref } from 'vue';
+import { onBeforeMount,onMounted, ref, watch } from 'vue';
 import {getCookie } from '@/assets/js/cookieUtils.js'
 import { useCompanyStore } from '@/stores/company';
+import { convertToUrl,closeModal } from '@/assets/js/jsUtils';
 
 import {useLocationStore} from '@/stores/locationStore';
 import { useAuthStore } from '@/stores/auth.js';
@@ -11,8 +12,11 @@ import { useSkillStore } from '@/stores/skill';
    
 
 const router = useRouter(); // Sử dụng router
-
 const authStore = useAuthStore();
+const img = ref('/src/assets/img/avatar7.png');
+
+
+
 const locationStore = useLocationStore();
 const companyStore = useCompanyStore();
 const jobStore = useJobtore();
@@ -24,7 +28,7 @@ const handleLogout = () => {
     companyStore.$reset();
     jobStore.$reset();
     skills.$reset();
-    // authStore.
+    // authStore.$reset();
     // router.push('/home');
   } catch (error) {
     console.error('Error during logout:', error);
@@ -104,7 +108,7 @@ const handleLogout = () => {
                 </a>
                 <button class="p-0 btn border-0 bg-transparent dropdown-toggle d-flex align-items-center gap-2" 
                         data-bs-toggle="dropdown" aria-expanded="false" data-bs-offset="20,20">
-                  <img class="object-fit-cover img-thumbnail rounded-circle" style="max-width: 40px;" src="../assets/img/avatar7.png"
+                  <img class="object-fit-cover img-thumbnail rounded-circle" style="width: 3rem;height: 3rem" :src="authStore.urlImg || img"
                     alt="avatar7" />
                  
                 </button>
@@ -113,7 +117,7 @@ const handleLogout = () => {
                   <li class=" p-0 overflow-hidden border-bottom ">
                     <div
                       class="  d-flex flex-lg-column flex-xl-row align-items-xl-center align-items-lg-start gap-2 p-0 m-2  overflow-hidden">
-                      <img class="object-fit-cover img-thumbnail rounded-circle" style="max-width: 40px;" src="../assets/img/avatar7.png"
+                      <img class="object-fit-cover img-thumbnail rounded-circle" style="width: 3rem;height: 3rem;" :src="authStore.urlImg || img"
                         alt="avatar7" />
                       <span class="small">{{ authStore.fullname }}</span>
                     </div>

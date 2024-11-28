@@ -84,7 +84,11 @@ const obj = reactive({
 const schema = yup.object({
     fullname: yup.string().required('Full name is required'),
     email: yup.string().email('Email must be a valid email').required('Email is required'),
-    birthdate: yup.date().required('Date of birth is required'),
+    birthdate: yup.date().required('Date of birth is required').test(
+            'is-future-date',
+            'Date of birth must be earlier  than today',
+            (value) => value && value < new Date()
+        ),
     sex: yup.string().required('Sex is required'),
     phone: yup
         .string()
@@ -169,7 +173,7 @@ const onSubmit = handleSubmit(
     <div class="card border-0 shadow mb-4  ">
         <div class="card-body p-4">
             <h3 class="mt-3 fs-4 mb-1">Personal Information</h3>
-           <form @submit.prevent="onSubmit" id="formProfileEmployer">
+           <form @submit.prevent="onSubmit" id="formProfileEmployer" autocomplete="off">
                 <div class="pt-0 row g-3">
                     <div class="col-lg-6">
                         <label for="" class="mb-2">Full Name<span class="text-primary">*</span></label>

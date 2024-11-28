@@ -85,8 +85,8 @@ import { calculateDaysAgo } from '@/assets/js/jsUtils.js'
                                 </div>
                                 <div class="jobs_right">
                                     <div class="apply_now">
-                                        <a class="heart_mark" href="#"> <i class="fa fa-heart-o"
-                                                aria-hidden="true"></i></a>
+                                        <!-- <a class="heart_mark" href="#"> <i class="fa fa-heart-o"
+                                                aria-hidden="true"></i></a> -->
                                     </div>
                                 </div>
                             </div>
@@ -119,7 +119,7 @@ import { calculateDaysAgo } from '@/assets/js/jsUtils.js'
 
 
                     <!-- Our key skills -->
-                    <div class="card shadow border-0 my-4">
+                    <!-- <div class="card shadow border-0 my-4">
                         <div class="descript_wrap white-bg">
                             <div class="single_wrap">
                                 <h4>Our key skills</h4>
@@ -145,7 +145,7 @@ import { calculateDaysAgo } from '@/assets/js/jsUtils.js'
                             </div>
                         </div>
 
-                    </div>
+                    </div> -->
 
                     <!-- Why you'll love working here -->
                     <div class="card shadow border-0 my-4">
