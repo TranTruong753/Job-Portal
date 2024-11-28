@@ -1,19 +1,25 @@
 <script setup>
 import { useBlogStore } from '@/stores/blog';
 import { onMounted, ref } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute,useRouter } from 'vue-router';
 import {formatDateV2} from '@/assets/js/jsUtils'
 
 const blogStore = useBlogStore(); 
 const route = useRoute();
+const router = useRouter();
 const poster = ref([]);
 const blog = ref([]);
 const idBlog = route.params.id;
 onMounted(async ()=>{
-    await blogStore.getDetailBlog(idBlog); 
-    console.log(blogStore.detailBlog)
-    blog.value = blogStore.detailBlog;
-    poster.value = blogStore.detailBlog.user;
+    if(await blogStore.getDetailBlogEmployer(idBlog)){
+        console.log(blogStore.detailBlogEmployer)
+        blog.value = blogStore.detailBlogEmployer;
+        poster.value = blogStore.detailBlogEmployer.user;
+    }else{
+        console.log('out')
+        router.push('/')
+    } 
+  
 })
 
 </script>
@@ -25,9 +31,9 @@ onMounted(async ()=>{
                     <nav aria-label="breadcrumb" class=" rounded-3 p-3">
                         <ol class="breadcrumb mb-0">
                             <li class="breadcrumb-item">
-                                <RouterLink to="/blog">
+                                <RouterLink to="/account/my-blogs">
                                     <i class="fa fa-arrow-left" aria-hidden="true">
-                                    </i> &nbsp;Back to Blogs
+                                    </i> &nbsp;Back to My Blogs
                                 </RouterLink>
                             </li>
                         </ol>

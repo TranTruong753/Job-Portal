@@ -3,6 +3,7 @@ import { useAuthStore } from '@/stores/auth';
 import { onMounted, ref } from 'vue';
 import {formatDateV2} from '@/assets/js/jsUtils'
 import { debounce } from 'lodash';
+import { formatCurrencyVND } from '@/assets/js/jsUtils.js'
 
     const authStore = useAuthStore();
     onMounted(async ()=>{
@@ -48,7 +49,7 @@ import { debounce } from 'lodash';
                             <td  v-if="item.isShowUser">{{formatDateV2(item.createOn)}}</td>
                             <td  v-if="item.isShowUser">{{ item.jobType }}</td>
                             <td  v-if="item.isShowUser">
-                                <div class="job-status text-capitalize">{{ item.salary }} VND</div>
+                                <div class="job-status text-capitalize">{{ formatCurrencyVND(item.salary) }} VND</div>
                             </td>
                             <td  v-if="item.isShowUser">
                                 <div class="action-dots float-end">

@@ -4,7 +4,7 @@ import CardProduct from '@/components/jobs/cardJob.vue';
 import CardCompany from '@/components/companies/cardCompany.vue';
 import { useJobtore } from '@/stores/jobs.js'
 import { ref, watch, onMounted } from 'vue';
-import { calculateDaysAgo } from '@/assets/js/jsUtils.js'
+import { calculateDaysAgo,formatCurrencyVND } from '@/assets/js/jsUtils.js'
 import { useRouter } from 'vue-router';
 import { debounce } from 'lodash';
 import { useCompanyStore } from '@/stores/company.js';
@@ -34,7 +34,7 @@ const queryIndustry = ref('')
 
 
 onMounted(async () => {
-    pageSize.value = 10;
+    pageSize.value = 6;
     current.value = 1;
     loading.value = true; // Mặc định bật loading trước khi lấy dữ liệu
 
@@ -145,28 +145,17 @@ const hangleSearch = async () => {
     <section class="section-1 py-5 ">
         <div class="container">
             <div class="card border-0 shadow p-5">
-                <div class="row">
-                    <div class="col-md-3 mb-3 mb-sm-3 mb-lg-0">
-                        <input type="text" class="form-control" name="search" id="search" placeholder="Keywords">
+                <div class="row justify-content-center">
+                    <div class="col-md-8 mb-3 mb-sm-3 mb-lg-0">
+                        <input v-model="queryTextSearch" type="text" class="form-control" name="search" id="search" placeholder="Keywords">
                     </div>
-                    <div class="col-md-3 mb-3 mb-sm-3 mb-lg-0">
-                        <input type="text" class="form-control" name="search" id="search" placeholder="Location">
-                    </div>
-                    <div class="col-md-3 mb-3 mb-sm-3 mb-lg-0">
-                        <select name="category" id="category" class="form-control">
-                            <option value="">Select a Category</option>
-                            <option value="">Engineering</option>
-                            <option value="">Accountant</option>
-                            <option value="">Information Technology</option>
-                            <option value="">Fashion designing</option>
-                        </select>
-                    </div>
+                  
+                  
 
                     <div class=" col-md-3 mb-xs-3 mb-sm-3 mb-lg-0">
                         <div class="d-grid gap-2">
-                            <a href="jobs.html" class="btn btn-primary btn-block">Search</a>
+                            <button type="button" class="btn btn-primary btn-block" @click="hangleSearch">Search</button>
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -175,53 +164,55 @@ const hangleSearch = async () => {
 
     <section class="section-2 py-5 py-sm-4">
         <div class="container">
-            <h2>List Job</h2>
-            <div class="row pt-5 pt-sm-4 g-3">
-                <div v-if="loading && jobStore.listjobs.length !== 0" class="text-center">
-                    <div class="loading">
-                      <a-spin size="large" tip="Loading..."/>
-                    </div>
-                  </div>
-
-                  <div v-else-if="jobStore.listjobs.length === 0">
-                    <h1 class="text-center text-primary">NOT FUND JOB </h1>
-                  </div>
-
-                  <CardProduct
-                  v-else-if="jobStore.listjobs.length !== 0"
-                    v-for="(job, index) in jobStore.listjobs"
-                    :key="index"
-                    :card-data="{
-                      id: job.id,
-                      imgSrc: job.employer.company.logo,
-                      imgAlt: job.employer.company.name,
-                      name: job.title,
-                      nameCompany: job.employer.company.name,
-                      timePost: calculateDaysAgo(job.createOn),
-                      salary: job.salary + ' VNĐ',
-                      location: job.locationShort,
-                      type: job.jobType,
-                      skill: job.skills.map(skill => ({ msg: skill.name })),
-                      level: job.jobLevel,
-                      isShow: true,
-                      styleCss: 'card-h-100 col-12 col-lg-6',
-                      styleCard: 'card-h-100 card border-0 shadow'
-                    }"
+            <h2 class="mb-3">List Job</h2>
+          <div class="overflow-auto vh-100 px-3">
+                <div class="row  g-3">
+                    <div v-if="loading && jobStore.listjobs.length !== 0" class="text-center">
+                        <div class="loading">
+                          <a-spin size="large" tip="Loading..."/>
+                        </div>
+                      </div>
+    
+                      <div v-else-if="jobStore.listjobs.length === 0">
+                      
+                      </div>
+    
+                      <CardProduct
+                      v-else-if="jobStore.listjobs.length !== 0"
+                        v-for="(job, index) in jobStore.listjobs"
+                        :key="index"
+                        :card-data="{
+                          id: job.id,
+                          imgSrc: job.employer.company.logo,
+                          imgAlt: job.employer.company.name,
+                          name: job.title,
+                          nameCompany: job.employer.company.name,
+                          timePost: calculateDaysAgo(job.createOn),
+                          salary: formatCurrencyVND(job.salary) + ' VNĐ',
+                          location: job.locationShort,
+                          type: job.jobType,
+                          skill: job.skills.map(skill => ({ msg: skill.name })),
+                          level: job.jobLevel,
+                          isShow: true,
+                          styleCss: 'card-h-100 col-12 col-lg-6',
+                          styleCard: 'card-h-100 card border-0 shadow '
+                        }"
+                       
+                      />
                    
-                  />
-               
-
-            </div>
+    
+                </div>
+          </div>
             <!-- pagination -->
           
             <div class="mt-3 d-flex justify-content-center">
-            <a-pagination
-            v-model:current="current"
-            v-model:pageSize="pageSize"
-            v-model:total="jobStore.total"
-             
+                <a-pagination
+                v-model:current="current"
+                v-model:pageSize="pageSize"
+                v-model:total="jobStore.total"
+                
 
-            />
+                />
             </div>
         </div>
     </section>

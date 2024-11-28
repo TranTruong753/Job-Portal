@@ -3,7 +3,7 @@
     <div v-show="cardData.isShow" :class="cardData.styleCss">
         <div :class="cardData.isShowStyle">
             <router-link :to="`/blog/detail/${cardData.id}`" > 
-                <img :src="cardData.imgSrc" class="card-img-top img-fluid card-img-height"
+                <img :src="cardData.imgSrc" class=" img-fluid card-img-height"
                     :alt="cardData.imgAlt">
             </router-link>
             <div class="card-body">

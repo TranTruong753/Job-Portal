@@ -3,7 +3,7 @@ import { RouterLink, useRoute, useRouter } from 'vue-router';
 import { useJobtore } from '@/stores/jobs';
 import { useAuthStore } from '@/stores/auth';
 import { onMounted, reactive, ref, watch } from 'vue';
-import { formatDateV2, closeModal } from '@/assets/js/jsUtils.js'
+import { formatDateV2, closeModal, formatCurrencyVND } from '@/assets/js/jsUtils.js'
 
 
 const route = useRoute();
@@ -39,22 +39,22 @@ onMounted(async () => {
 
 <template>
     <section class="section-4 bg-2">
-        <div class="container pt-5">
-            <div class="row">
-                <div class="col">
-                    <nav aria-label="breadcrumb" class=" rounded-3 p-3">
-                        <ol class="breadcrumb mb-0">
-                            <li class="breadcrumb-item">
-                                <RouterLink to="/job">
-                                    <i class="fa fa-arrow-left" aria-hidden="true">
-                                    </i> &nbsp;Back to Jobs
-                                </RouterLink>
-                            </li>
-                        </ol>
-                    </nav>
-                </div>
+    <div class="container pt-5">
+        <div class="row">
+            <div class="col">
+                <nav aria-label="breadcrumb" class=" rounded-3 p-3">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item">
+                            <RouterLink to="/account/my-jobs">
+                                <i class="fa fa-arrow-left" aria-hidden="true">
+                                </i> &nbsp;Back to My Jobs
+                            </RouterLink>
+                        </li>
+                    </ol>
+                </nav>
             </div>
         </div>
+    </div>
         <div class="container job_details_area">
             <div class="row pb-5">
                 <!-- column left -->
@@ -140,7 +140,7 @@ onMounted(async () => {
                                 <ul>
                                     <li>Published on: <span>{{ formatDateV2(jobStore.jobEmployer.createOn) }}</span></li>
 
-                                    <li>Salary: <span>{{ jobStore.jobEmployer.salary }} VNĐ</span></li>
+                                    <li>Salary: <span>{{ formatCurrencyVND(jobStore.jobEmployer.salary) }} VNĐ</span></li>
                                     <li>Location: <span>{{ jobStore.jobEmployer.location }}</span></li>
                                     <li>Street: <span>{{ jobStore.jobEmployer.locationShort }}</span></li>
                                     <li>Job Nature: <span> {{ jobStore.jobEmployer.jobType }}</span></li>

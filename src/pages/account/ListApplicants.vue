@@ -66,6 +66,16 @@ const handleRemove = async (item) => {
             <a-spin size="large" tip="Loading..." />
         </div>
         <div class="card-body card-form">
+            <nav class=" rounded-3 mb-3">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item">
+                        <RouterLink to="/account/my-jobs">
+                            <i class="fa fa-arrow-left" aria-hidden="true">
+                            </i> &nbsp;Back to My Jobs
+                        </RouterLink>
+                    </li>
+                </ol>
+            </nav>
             <div class="d-flex justify-content-between">
                 <div>
                     <h3 class="fs-4 mb-1">Applicant</h3>

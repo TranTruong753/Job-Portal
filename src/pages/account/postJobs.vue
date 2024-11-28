@@ -5,6 +5,7 @@
     import {useAuthStore} from '@/stores/auth';
     import {useSkillStore} from '@/stores/skill';
     import { useForm, useField } from 'vee-validate';
+
     import * as yup from 'yup';
 // Sử dụng Pinia store
     const locationStore = useLocationStore();
@@ -88,7 +89,15 @@
         description: yup.string().required('Description is required'),
         requirements: yup.string().required('Requirements are required'),
         benefits: yup.string().required('Benefits are required'),
-        salary: yup.number().positive('Salary must be a positive number').required('Salary is required'),
+        salary: yup
+        .string()
+        .required('Salary is required')
+        .test(
+            'is-valid-salary',
+            'Chỉ được nhập số.',
+            (value) => /^\d+(\.\d{3})*$/.test(value) // Cho phép số có định dạng như 1.000 hoặc 1000
+        ),
+        // salary: yup.number().positive('Salary must be a positive number').required('Salary is required'),
         jobLevel: yup.string().required('Job level is required'),
         jobType: yup.string().required('Job type is required'),
         street: yup.string().required('Street is required'),
@@ -116,6 +125,7 @@
     const onSubmit = handleSubmit(
         async values => {
             // console.log('Form submitted:', values);
+            const parsedSalary = parseCurrencyVND(values.salary); // Chuyển giá trị về số
             const selectedIds = value.value.map(value => {
                 const selectedOption = options.value.find(option => option.value === value);
                 return selectedOption ? selectedOption.id : null;
@@ -125,8 +135,10 @@
                 createOn: new Date().toISOString(),
                 updatedOn: new Date().toISOString(),
                 skillIds: selectedIds,  // Include the selected skill IDs
+                salary: parsedSalary,
             };
 
+             
             try{
                 const isSuccess = await authStore.postJob(dataToSubmit);
              
@@ -196,7 +208,9 @@
         setjobskill(value);
     };
 
-  
+    const parseCurrencyVND = (value) => {
+        return parseInt(value.replace(/\./g, ""), 10) || 0; // Loại bỏ dấu "." và chuyển thành số
+    };
 
 
     const onJoblevelChange = (event) => {
@@ -207,6 +221,17 @@
     const onJobTypeChange = (event) => {
         setJobType(event.target.value); //
         // console.log(event.target.value);
+    };
+
+    const changeSalary = (event) => {
+        const rawValue = event.target.value.replace(/\./g, ""); // Loại bỏ dấu chấm cũ
+        salary.value = formatCurrencyVND(rawValue); // Cập nhật lại với định dạng mới
+
+        }
+
+    const formatCurrencyVND = (value) => {
+        if (!value) return ""; // Trả về chuỗi rỗng nếu không có giá trị
+        return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     };
 
 </script>
@@ -264,7 +289,7 @@
     
                     <div class="mb-4 col-md-4">
                         <label for="salary" class="mb-2">Salary<span class="req">*</span></label>
-                        <input :id="salary" v-model="salary" type="number" placeholder="Salary" id="salary" name="salary" class="form-control">
+                        <input :id="salary" v-model="salary" type="text" placeholder="Salary" id="salary" name="salary" class="form-control" @input="changeSalary">
                         <span class="text-danger ">{{ salaryError }}</span>
                     </div>
                     <div class="mb-4 col-md-5">

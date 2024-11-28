@@ -121,8 +121,8 @@ const status = ref({
                                         <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
                                     </a>
                                     <ul class="dropdown-menu dropdown-menu-end">
-                                        <li v-if="item.status === 1&&item.isShow    ">
-                                            <router-link :to="`/blog/detail/${item.id}`" class="dropdown-item"> <i
+                                        <li >
+                                            <router-link :to="`/blog/detailEmployer/${item.id}`" class="dropdown-item"> <i
                                                     class="fa fa-eye" aria-hidden="true"></i> View</router-link>
                                         </li>
                                         <!-- <li>

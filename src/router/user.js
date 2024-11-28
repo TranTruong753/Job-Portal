@@ -12,8 +12,12 @@ const user = [
             const authStore = useAuthStore();
             // Kiểm tra xác thực
             const token = getCookie('token');
-            if(token){
-                next()
+            if(token){            
+                if(authStore.role === 'Admin'){
+                    authStore.$reset();
+                    next({name:'not-found'})
+                }
+                next()               
             }else{
                 authStore.$reset();
                 next()
@@ -243,6 +247,11 @@ const user = [
                 path: "/blog/detail/:id",
                 name: "blog-detail",
                 component: () => import("../pages/blogs/detail.vue"),
+            },
+            {
+                path: "/blog/detailEmployer/:id",
+                name: "blog-detail-employer",
+                component: () => import("../pages/blogs/detailEmployer.vue"),
             },
             {
                 path: "/login",

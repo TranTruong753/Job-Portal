@@ -225,80 +225,8 @@ const onClick = (item) => {
                                     </router-link>
                                 </div>
                             </ul>
-                            <!-- <NavAccount :cardData="{
-                                content: [
-                                    {
-                                        id: 11,
-                                        titleNav: 'Account Settings',
-                                        linkNav: '/account', 
-                                        isShow: true,
-
-                                    },
-                                    {
-                                        id: 2,
-                                        titleNav: 'My Profile',
-                                        linkNav: '/account/profile',
-                                        isShow: authStore.role === 'User',
-                                    },
-                                    {
-                                        id: 3,
-                                        titleNav: 'My Profile Employer',
-                                        linkNav: '/account/profile-employer',
-                                        isShow: authStore.role === 'Employer',
-                                    },
-                                    {
-                                        id: 4,
-                                        titleNav: 'Post a Job',
-                                        linkNav: '/account/post-job',
-                                        isShow: authStore.role === 'Employer',
-                                    },
-                                    {
-                                        id: 5,
-                                        titleNav: 'Post a Blog',
-                                        linkNav: '/account/post-blog',
-                                        isShow: authStore.role === 'Employer',
-                                    },
-                                    {
-                                        id: 6,
-                                        titleNav: 'My Jobs',
-                                        linkNav: '/account/my-jobs',
-                                        isShow: authStore.role === 'Employer',
-                                    },
-                                    {
-                                        id: 7,
-                                        titleNav: 'Jobs Applied',
-                                        linkNav: '/account/jobs-applied',
-                                        isShow: authStore.role === 'User',
-                                    },
-                                    {
-                                        id: 8,
-                                        titleNav: 'Saved Jobs',
-                                        linkNav: '/account/saved-jobs',
-                                        isShow: authStore.role === 'User',   
-                                    },
-                                    {
-                                        id: 9,
-                                        titleNav: 'Create CV test',
-                                        linkNav: '/account/create-cv-test',
-                                        isShow: true,
-                                    },
-                                    {
-                                        id: 10,
-                                        titleNav: 'Create CV',
-                                        linkNav: '/account/create-cv',
-                                        isShow: true,
-                                    },
-                                    {
-                                        id: 11,
-                                        titleNav: 'Charts ',
-                                        linkNav: '/account/charts-employer',
-                                        isShow: authStore.role === 'Employer',
-            
-                                    },
-                                ],
-                            }" 
-                           
-                            />  -->
+                        
+                        
                         </div>
                     </div>
                 </div>

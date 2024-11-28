@@ -110,4 +110,15 @@ function formatDateForInput(dateString) {
     const formattedPath = path.replace(/\\/g, '/'); // Thay thế \ thành /
     return baseUrl + formattedPath.split('wwwroot')[1]; // Thêm phần sau 'wwwroot' vào URL
 }
-export { formatDate, closeModal, checkAuth, checkUserInDb, calculateDaysAgo, formatDateV2, formatDateForInput, convertToUrl }
+
+function convertToUrlV2(path) {
+    // Thay thế dấu \ thành dấu / và thêm tiền tố base URL
+    const baseUrl = 'https://localhost:7283/';
+   
+    return baseUrl + path; // Thêm phần sau 'wwwroot' vào URL
+}
+
+function formatCurrencyVND(number) {
+    return new Intl.NumberFormat('vi-VN').format(number);
+}
+export { formatDate, closeModal, checkAuth, checkUserInDb, calculateDaysAgo, formatDateV2, formatDateForInput, convertToUrl, formatCurrencyVND, convertToUrlV2 }

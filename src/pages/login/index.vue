@@ -1,11 +1,19 @@
 <script setup>
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { useForm, useField } from 'vee-validate';
 import * as yup from 'yup';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth.js';
 import Swal from 'sweetalert2';
 
+
+onMounted(()=>{
+    if(authStore.role === 'User' ||authStore.role === 'Employer'){
+        router.push('/');
+    }else{
+        authStore.$reset
+    }
+})
 
 const router = useRouter(); // Sử dụng router
 

@@ -4,7 +4,7 @@ import { useCompanyStore } from '@/stores/company.js';
 import { useAuthStore } from '@/stores/auth';
 import { onMounted, ref } from 'vue';
 import CardProduct from '@/components/jobs/cardJob.vue';
-import { calculateDaysAgo } from '@/assets/js/jsUtils.js'
+import { calculateDaysAgo, convertToUrlV2 } from '@/assets/js/jsUtils.js'
 
     const route = useRoute();
 
@@ -59,7 +59,7 @@ import { calculateDaysAgo } from '@/assets/js/jsUtils.js'
                                     <div class="" style="max-width: 150px;">
                                         <a href="#!" class="card-img ">
                                             <img class="center rounded border object-fit-cover"
-                                            :src="companyDto.logo" :alt="companyDto.name"
+                                            :src="convertToUrlV2(companyDto.logo)" :alt="companyDto.name"
                                                 >
                                         </a>
                                     </div>
@@ -181,7 +181,7 @@ import { calculateDaysAgo } from '@/assets/js/jsUtils.js'
                                 :key="index"
                                 :card-data="{
                                 id: job.id,
-                                imgSrc: job.employer.company.logo,
+                                imgSrc: convertToUrlV2(job.employer.company.logo),
                                 imgAlt: job.employer.company.name,
                                 name: job.title,
                                 nameCompany: job.employer.company.name,

@@ -3,6 +3,7 @@ import CardCompany from '@/components/companies/cardCompany.vue';
 import { onMounted, ref, watch } from 'vue';
 import { useCompanyStore } from '@/stores/company.js';
 import { debounce } from 'lodash';
+import { convertToUrlV2 } from '@/assets/js/jsUtils';
 
 const companyStore = useCompanyStore();
 const pageSize = ref(6);
@@ -43,9 +44,6 @@ await Promise.all([
         companyStore.searchJobs(queryTextSearch.value, queryIndustry.value, pageSize, current),
         companyStore.getTotalWithConditions(queryTextSearch.value, queryIndustry.value)
     ]);
-// await jobStore.searchJobs(queryTextSearch.value, querylocationSearch.value, queryJobType.value, queryJobLevel.value, pageSize.value, current.value);
-
-
 
 };
 
@@ -57,9 +55,6 @@ await Promise.all([
         companyStore.searchJobs(queryTextSearch.value, queryIndustry.value, newPageSize, newCurrent),
         companyStore.getTotalWithConditions(queryTextSearch.value, queryIndustry.value)
     ]);
-// await jobStore.searchJobs(queryTextSearch.value, querylocationSearch.value, queryJobType.value, queryJobLevel.value, pageSize.value, current.value);
-
-
 
 });
 
@@ -232,7 +227,7 @@ const hangleSearch = async () => {
         <div class="container">
             <h2>List company</h2>
             <div class="row pt-5 pt-sm-4 g-3">
-                <div v-if="loading" class="text-center">
+                <div v-if="loading && companyStore.listcompany.length !== 0" class="text-center">
                     <div class="loading">
                       <a-spin size="large" tip="Loading..."/>
                     </div>
@@ -245,7 +240,7 @@ const hangleSearch = async () => {
                     :key="index"
                     :cardData="{
                         id: company.id,
-                        imgSrc: company.logo ,  
+                        imgSrc: convertToUrlV2(company.logo) ,  
                         imgAlt: company.name || 'Default Company',
                         name: company.name || 'Default Position',
                         title: company.industry || 'Default Title',

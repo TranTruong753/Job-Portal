@@ -3,14 +3,14 @@
 import CardProduct from '@/components/jobs/cardJob.vue';
 import { useJobtore } from '@/stores/jobs.js'
 import { ref, watch, onMounted } from 'vue';
-import { calculateDaysAgo } from '@/assets/js/jsUtils.js'
+import { calculateDaysAgo,formatCurrencyVND } from '@/assets/js/jsUtils.js'
 import { useRouter } from 'vue-router';
 import { debounce } from 'lodash';
 
 const router = useRouter();
 
 const jobStore = useJobtore();
-const pageSize = ref(6);
+const pageSize = ref(8);
 const current = ref(1);
 
 
@@ -22,11 +22,6 @@ const queryJobType = ref('')
 const queryJobLevel = ref('')
 const IsDecsending = ref(true);
 
-// if(jobStore.listjobs.length === 0){
-//      loading.value = true;
-// }else {
-//     loading.value = false;
-// }
 
 
 onMounted(async () => {
@@ -52,30 +47,18 @@ onMounted(async () => {
 
 
 
+// const onShowSizeChange = async (current, pageSize) => {
+
+//     // await jobStore.getJob(pageSize, current);
+//     await Promise.all([
+//             jobStore.searchJobs(queryTextSearch.value, querylocationSearch.value, queryJobType.value, queryJobLevel.value, IsDecsending.value, pageSize, current),
+//             jobStore.getTotalWithConditions(queryTextSearch.value, querylocationSearch.value, queryJobType.value, queryJobLevel.value, IsDecsending.value)
+//         ]);
+//     // await jobStore.searchJobs(queryTextSearch.value, querylocationSearch.value, queryJobType.value, queryJobLevel.value, pageSize.value, current.value);
 
 
-// const onShowSizeChange = (current, pageSize) => {
-// console.log(current, pageSize);
+
 // };
-// watch(pageSize, () => {
-//     console.log('pageSize', pageSize.value);
-// });
-// watch(current, () => {
-//     console.log('current', current.value);
-// });
-
-const onShowSizeChange = async (current, pageSize) => {
-
-    // await jobStore.getJob(pageSize, current);
-    await Promise.all([
-            jobStore.searchJobs(queryTextSearch.value, querylocationSearch.value, queryJobType.value, queryJobLevel.value, IsDecsending.value, pageSize, current),
-            jobStore.getTotalWithConditions(queryTextSearch.value, querylocationSearch.value, queryJobType.value, queryJobLevel.value, IsDecsending.value)
-        ]);
-    // await jobStore.searchJobs(queryTextSearch.value, querylocationSearch.value, queryJobType.value, queryJobLevel.value, pageSize.value, current.value);
-
-
-
-};
 
 watch([current, pageSize], async ([newCurrent, newPageSize]) => {
 
@@ -91,9 +74,7 @@ watch([current, pageSize], async ([newCurrent, newPageSize]) => {
 
 });
 
-// const goToDetail = (job) => {
-//     router.push(`/job/detail/${job.id}`);
-// };
+
 
 // Hàm debounce để trì hoãn tìm kiếm
 const debounceSearch = debounce(async () => {
@@ -112,20 +93,6 @@ const hangleSearch = async () => {
 
 <template>
 
-
-    <!-- <div v-if="loading" class="text-center">
-      <div class="example">
-        <a-spin tip="Loading...">
-          <a-alert
-            message="Loading jobs"
-            description="Fetching job listings. Please wait."
-          ></a-alert>
-        </a-spin>
-      </div> 
-      <div class="loading">
-        <a-spin />
-      </div>
-    </div> -->
 
     <section class="section-3 py-5 bg-2">
       <div class="container">
@@ -231,7 +198,7 @@ const hangleSearch = async () => {
           </div>
   
           <!-- Job Listings -->
-          <div class="col-md-8 col-lg-9">
+          <div class="col-md-8 col-lg-9 overflow-auto vh-100" >
             <div class="job_listing_area">
               <div class="job_lists">
                 <div class="row g-3">
@@ -257,7 +224,7 @@ const hangleSearch = async () => {
                       name: job.title,
                       nameCompany: job.employer.company.name,
                       timePost: calculateDaysAgo(job.createOn),
-                      salary: job.salary + ' VNĐ',
+                      salary: formatCurrencyVND(job.salary) + ' VNĐ',
                       location: job.locationShort,
                       type: job.jobType,
                       skill: job.skills.map(skill => ({ msg: skill.name })),
@@ -280,8 +247,7 @@ const hangleSearch = async () => {
             v-model:current="current"
             v-model:pageSize="pageSize"
             v-model:total="jobStore.total"
-            show-size-changer
-            @showSizeChange="onShowSizeChange"
+         
           />
         </div>
       </div>

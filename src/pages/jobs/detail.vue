@@ -3,7 +3,7 @@ import { RouterLink, useRoute, useRouter } from 'vue-router';
 import { useJobtore } from '@/stores/jobs';
 import { useAuthStore } from '@/stores/auth';
 import { onMounted, reactive, ref, watch } from 'vue';
-import { formatDateV2, closeModal } from '@/assets/js/jsUtils.js'
+import { formatDateV2, closeModal, formatCurrencyVND } from '@/assets/js/jsUtils.js'
 
 
 const route = useRoute();
@@ -254,7 +254,7 @@ const handleSaveJob = async() => {
                                 <ul>
                                     <li>Published on: <span>{{ formatDateV2(jobStore.job.createOn) }}</span></li>
 
-                                    <li>Salary: <span>{{ jobStore.job.salary }} VNĐ</span></li>
+                                    <li>Salary: <span>{{ formatCurrencyVND(jobStore.job.salary) }} VNĐ</span></li>
                                     <li>Location: <span>{{ jobStore.job.location }}</span></li>
                                     <li>Street: <span>{{ jobStore.job.locationShort }}</span></li>
                                     <li>Job Nature: <span> {{ jobStore.job.jobType }}</span></li>

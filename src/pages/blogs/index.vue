@@ -68,7 +68,7 @@ watch([current, pageSize], async ([newCurrent, newPageSize]) => {
         <div class="container">
             <div class="card border-0 shadow p-5">
                 <div class="row">
-                    <div class="col-md-8 mb-3 mb-sm-3 mb-lg-0">
+                    <div class="col-md-7 mb-3 mb-sm-3 mb-lg-0">
                         <input type="text" class="form-control" name="search" id="search" placeholder="Keywords" v-model="query">
                     </div>
 
@@ -85,7 +85,7 @@ watch([current, pageSize], async ([newCurrent, newPageSize]) => {
 
     <!-- CONTENT -->
     <!-- slide blog-->
-    <section class="section-3  py-5 py-sm-4 bg-2">
+    <!-- <section class="section-3  py-5 py-sm-4 bg-2">
         <div class="container">
             <h2>Top blogs</h2>
             <div id="carouselExample" class="carousel slide pt-5 pt-sm-4 g-3" data-bs-ride="carousel"
@@ -104,7 +104,7 @@ watch([current, pageSize], async ([newCurrent, newPageSize]) => {
                                  isShowStyle: 'card-h-100 card border-0 '
                             }" />
 
-                            <!-- card 02 -->
+                        
                             <Cardblog :cardData="{
                                 imgSrc: '/src/assets/img/banner-1.jpg',
                                 imgAlt: 'blog 01',
@@ -120,7 +120,7 @@ watch([current, pageSize], async ([newCurrent, newPageSize]) => {
                     </div>
                     <div class="carousel-item" data-bs-interval="5000">
                         <div class="row g-3">
-                            <!-- card 01 -->
+           
                             <Cardblog :cardData="{
                                 imgSrc: '/src/assets/img/banner-1.jpg',
                                 imgAlt: 'blog 01',
@@ -132,7 +132,7 @@ watch([current, pageSize], async ([newCurrent, newPageSize]) => {
                                  isShowStyle: 'card-h-100 card border-0 '
                             }" />
 
-                            <!-- card 02 -->
+    
                             <Cardblog :cardData="{
                                 imgSrc: '/src/assets/img/banner-1.jpg',
                                 imgAlt: 'blog 01',
@@ -158,40 +158,42 @@ watch([current, pageSize], async ([newCurrent, newPageSize]) => {
                 </button>
             </div>
         </div>
-    </section>
+    </section> -->
 
     <!-- Featured BLOG -->
     <section class="section-3  py-5 py-sm-4">
         <div class="container">
-            <h2>Featured blogs</h2>
-            <div class="row pt-5 pt-sm-4">
-                <div class="blog_listing_area">
-                    <div class="blog_lists">
-                        <div class="row g-3">
-                            <div v-if="loading" class="text-center">
-                                <div class="loading">
-                                    <a-spin size="large" tip="Loading..."/>
+            <h2>List blogs</h2>
+            <div class="overflow-auto px-3" style="height: 90vh;">
+                <div class="row pt-5 pt-sm-4">
+                    <div class="blog_listing_area">
+                        <div class="blog_lists">
+                            <div class="row g-3">
+                                <div v-if="loading" class="text-center ">
+                                    <div class="loading">
+                                        <a-spin size="large" tip="Loading..."/>
+                                    </div>
                                 </div>
+                                <div v-else-if="blogStore.listBlog.length === 0">
+                                    <h1 class="text-center text-primary">NOT FUND BLOG </h1>
+                                </div>
+                                <!-- card 01 -->
+                                <Cardblog v-else v-for="(item,index) in blogStore.listBlog" :key="index"
+                                
+                                :cardData="{
+                                    id: item.id,
+                                    imgSrc: convertToUrl(item.img),
+                                    imgAlt: item.title,
+                                    name: item.title,
+                                    description: 'Poster: ' + item.username,
+                                    timePost: calculateDaysAgo(item.createOn),
+                                    isShow: true,
+                                    styleCss: 'col-12 col-lg-4 col-md-6 ',
+                                    isShowStyle: 'card-h-100 card border-0 shadow overflow-hidden'
+                                }" />
+                           
+                                
                             </div>
-                            <div v-else-if="blogStore.listBlog.length === 0">
-                                <h1 class="text-center text-primary">NOT FUND BLOG </h1>
-                            </div>
-                            <!-- card 01 -->
-                            <Cardblog v-else v-for="(item,index) in blogStore.listBlog" :key="index"
-                            
-                            :cardData="{
-                                id: item.id,
-                                imgSrc: convertToUrl(item.img),
-                                imgAlt: item.title,
-                                name: item.title,
-                                description: 'Poster: ' + item.username,
-                                timePost: calculateDaysAgo(item.createOn),
-                                isShow: true,
-                                styleCss: 'col-12 col-lg-4 col-md-6 ',
-                                isShowStyle: 'card-h-100 card border-0 shadow'
-                            }" />
-                       
-                            
                         </div>
                     </div>
                 </div>
@@ -212,38 +214,7 @@ watch([current, pageSize], async ([newCurrent, newPageSize]) => {
                 <div class="blog_listing_area">
                     <div class="blog_lists">
                         <div class="row g-3">
-                            <!-- card 01 -->
-                            <!-- <Cardblog02 :cardData="{
-                                imgSrc: '/src/assets/img/banner-1.jpg',
-                                imgAlt: 'blog 01',
-                                name: 'HTML CSS làm sao cho hiểu quả',
-                                description: 'Để css html hiểu quả bạn cần thông qua lí thuyết kết hợp thực hành',
-                                timePost: '24/10/2024',
-                                isShow: true,
-                                styleCss: 'col-12 col-lg-4 col-md-6'
-                            }" /> -->
-
-                            <!-- card 02 -->
-                            <!-- <Cardblog02 :cardData="{
-                                imgSrc: '/src/assets/img/banner-1.jpg',
-                                imgAlt: 'blog 01',
-                                name: 'HTML CSS làm sao cho hiểu quả',
-                                description: 'Để css html hiểu quả bạn cần thông qua lí thuyết kết hợp thực hành',
-                                timePost: '24/10/2024',
-                                isShow: true,
-                                styleCss: 'col-12 col-lg-4 col-md-6'
-                            }" /> -->
-
-                            <!-- card 03 -->
-                            <!-- <Cardblog02 :cardData="{
-                                imgSrc: '/src/assets/img/banner-1.jpg',
-                                imgAlt: 'blog 01',
-                                name: 'HTML CSS làm sao cho hiểu quả',
-                                description: 'Để css html hiểu quả bạn cần thông qua lí thuyết kết hợp thực hành',
-                                timePost: '24/10/2024',
-                                isShow: true,
-                                styleCss: 'col-12 col-lg-4 col-md-6'
-                            }" /> -->
+                            
                         </div>
                     </div>
                 </div>

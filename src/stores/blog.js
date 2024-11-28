@@ -114,7 +114,7 @@ export const useBlogStore = defineStore('blog', {
         },
 
         async getDetailBlogEmployer(idBlog){
-          const url = '/api/blog/GetBlogById';
+          const url = '/api/blog/GetBlogByIdForEmployer';
           try {
             const response = await axios.get(url,
              {
