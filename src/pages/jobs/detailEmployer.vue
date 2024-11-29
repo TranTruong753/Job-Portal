@@ -16,12 +16,6 @@ const file = ref(null);
 
 const errorText = ref("");
 
-const checkStatusJob = reactive({
-    isSave: '',
-    isApply: 0
-})
-
-
 
 onMounted(async () => {
 

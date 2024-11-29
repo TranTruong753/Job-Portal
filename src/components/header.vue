@@ -102,10 +102,10 @@ const handleLogout = () => {
   
             <!-- đã đăng nhập -->
             <div v-if="authStore.isAuthenticated" class="w-25 ms-sm-0 ps-xxl-5 ps-xl-3 ps-lg-1">
-              <div class="dropdown d-flex align-items-center gap-3 justify-content-lg-end">
-                <a href="#!" class="fs-5">
+              <div class="d-none dropdown d-lg-flex align-items-center gap-3 justify-content-lg-end">
+                <!-- <a href="#!" class="fs-5">
                   <i class="fa-solid fa-bell"></i>
-                </a>
+                </a> -->
                 <button class="p-0 btn border-0 bg-transparent dropdown-toggle d-flex align-items-center gap-2" 
                         data-bs-toggle="dropdown" aria-expanded="false" data-bs-offset="20,20">
                   <img class="object-fit-cover img-thumbnail rounded-circle" style="width: 3rem;height: 3rem" :src="authStore.urlImg || img"
@@ -116,27 +116,51 @@ const handleLogout = () => {
                 <ul class="dropdown-menu mt-2 end-0" style="    min-width: 16rem;">
                   <li class=" p-0 overflow-hidden border-bottom ">
                     <div
-                      class="  d-flex flex-lg-column flex-xl-row align-items-xl-center align-items-lg-start gap-2 p-0 m-2  overflow-hidden">
-                      <img class="object-fit-cover img-thumbnail rounded-circle" style="width: 3rem;height: 3rem;" :src="authStore.urlImg || img"
+                      class=" d-flex flex-lg-column flex-xl-row align-items-xl-center  align-items-lg-start gap-2 p-0 m-2  overflow-hidden">
+                      <img class=" d-none d-xl-block object-fit-cover img-thumbnail rounded-circle" style="width: 3rem;height: 3rem;" :src="authStore.urlImg || img"
                         alt="avatar7" />
-                      <span class="small">{{ authStore.fullname }}</span>
+                      <span class="ps-2 ps-xl-0 ">{{ authStore.fullname }}</span>
                     </div>
                   </li>
-                  <li>
+                  <li  class="py-1">
                     <router-link class="dropdown-item" to="/account">Account Setting</router-link>
                   </li>
                   <!-- <li>
                     <router-link class="dropdown-item" to="/account/post-blog">Post a Blog</router-link>
                   </li> -->
-                  <li>
+                  <li class="py-1">
                     <router-link class="dropdown-item" to="/account/create-cv">Create CV</router-link>
                   </li>
-                  <li>
-                    <router-link class="dropdown-item" @click.native="handleLogout" to="/home">Log out</router-link>
+                  <li class="py-1">
+                    <router-link class="dropdown-item text-primary" @click.native="handleLogout" to="/home">Log out</router-link>
 
                   </li>
                 </ul>
               </div>
+             
+            </div>
+            <div v-if="authStore.isAuthenticated" class="d-lg-none d-block">
+              <div 
+                  class=" d-flex flex-lg-column flex-xl-row t align-items-center gap-2 p-0 m-2 border-top border-1 pt-3">
+                  <img class="object-fit-cover img-thumbnail rounded-circle" style="width: 3rem;height: 3rem;" :src="authStore.urlImg || img"
+                    alt="avatar7" />
+                  <span class="small">{{ authStore.fullname }}</span>
+                  
+              </div>
+              <ul class=" mb-2 mb-lg-0 ms-lg-4 m-2">
+                <li class=" active small p-1">
+                  <router-link class="dropdown-item " to="/account">Account Setting</router-link>
+                </li>
+                <li class=" small p-1">
+                  <router-link class="dropdown-item" to="/account/create-cv">Create CV</router-link>
+                </li>
+                <li class=" small p-1">
+                  <router-link class="btn btn-primary w-25  dropdown-item " @click.native="handleLogout" to="/home">Log out</router-link>
+                </li>
+    
+              
+            </ul>
+                
             </div>
             <!-- chưa đăng nhập -->
            <div v-else>

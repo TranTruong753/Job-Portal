@@ -104,7 +104,7 @@ const hangleSearch = async () => {
     </section>
 
     <!-- slide Company-->
-    <section class="section-3  py-5 py-sm-4 bg-2">
+    <!-- <section class="section-3  py-5 py-sm-4 bg-2">
         <div class="container">
             <h2>Top Company</h2>
             <div id="companySlideID" class="carousel slide pt-5 pt-sm-4 g-3" data-bs-ride="carousel"
@@ -112,7 +112,7 @@ const hangleSearch = async () => {
                 <div class="carousel-inner w-80 m-auto">
                     <div class="carousel-item active " data-bs-interval="5000">
                         <div class="row g-4">
-                            <!-- card 01 -->
+             
                             <CardCompany :cardData="{
                                 imgSrc: '/src/assets/img/fpt_corporation_logo.jpg',
                                 imgAlt: 'FPT',
@@ -127,7 +127,7 @@ const hangleSearch = async () => {
                                 isSave: false
                             }" />
 
-                            <!-- card 02 -->
+                     
                             <CardCompany :cardData="{
                                 imgSrc: '/src/assets/img/fpt_corporation_logo.jpg',
                                 imgAlt: 'FPT',
@@ -142,7 +142,7 @@ const hangleSearch = async () => {
                                 isSave: false
                             }" />
 
-                            <!-- card 03 -->
+                 
                             <CardCompany :cardData="{
                                 imgSrc: '/src/assets/img/fpt_corporation_logo.jpg',
                                 imgAlt: 'FPT',
@@ -161,7 +161,7 @@ const hangleSearch = async () => {
                     </div>
                     <div class="carousel-item" data-bs-interval="5000">
                         <div class="row g-4">
-                            <!-- card 01 -->
+                            
                             <CardCompany :cardData="{
                                 imgSrc: '/src/assets/img/fpt_corporation_logo.jpg',
                                 imgAlt: 'FPT',
@@ -176,7 +176,7 @@ const hangleSearch = async () => {
                                 isSave: false
                             }" />
 
-                            <!-- card 02 -->
+                           
                             <CardCompany :cardData="{
                                 imgSrc: '/src/assets/img/fpt_corporation_logo.jpg',
                                 imgAlt: 'FPT',
@@ -191,7 +191,6 @@ const hangleSearch = async () => {
                                 isSave: false
                             }" />
 
-                            <!-- card 03 -->
                             <CardCompany :cardData="{
                                 imgSrc: '/src/assets/img/fpt_corporation_logo.jpg',
                                 imgAlt: 'FPT',
@@ -220,7 +219,7 @@ const hangleSearch = async () => {
                 </button>
             </div>
         </div>
-    </section>
+    </section> -->
 
     <!-- Most followed company -->
     <section class="section-2 py-5 py-sm-4">

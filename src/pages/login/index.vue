@@ -144,7 +144,7 @@ const onSubmit = handleSubmit(async (values) => {
     </section> -->
     <section class="vh-100" style="">
         <div class="container h-100">
-            <div class="row d-flex justify-content-center align-items-center h-100 ">
+            <div class="row d-flex justify-content-center align-items-lg-center align-items-start h-100 mt-5 mt-lg-0">
                 <div class="col col-xl-10">
                     <div class="card" style="border-radius: 1rem;">
                         <div class="row g-0">

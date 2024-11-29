@@ -93,14 +93,14 @@ const data = reactive({
             id: 10,
             titleNav: 'Create CV test',
             linkNav: '/account/create-cv-test',
-            isShow: true,
+            isShow: authStore.role === 'User',
             isActive: false,
         },
         {
             id: 11,
             titleNav: 'Create CV',
             linkNav: '/account/create-cv',
-            isShow: true,
+            isShow: authStore.role === 'User',
             isActive: false,
         },
         {
