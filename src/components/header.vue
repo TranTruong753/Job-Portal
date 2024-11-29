@@ -67,7 +67,7 @@ const handleLogout = () => {
                 <router-link class="nav-link" to="/blog">Blog</router-link>
               </li>
   
-              <li class="nav-item dropdown">
+              <!-- <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">More items</a>
                 <ul class="dropdown-menu">
                   <li>
@@ -97,7 +97,7 @@ const handleLogout = () => {
                     </ul>
                   </li>
                 </ul>
-              </li>
+              </li> -->
             </ul>
   
             <!-- đã đăng nhập -->

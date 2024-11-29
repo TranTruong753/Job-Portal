@@ -10,7 +10,7 @@ const route = useRoute();
 const urlImg = ref('/src/assets/img/avatar7.png');
 const img = ref('');
 const errorSrc = ref('');
-console.log(route.fullPath)
+console.log(route.path)
 
 onMounted(async ()=>{
     console.log(authStore.role);
@@ -113,6 +113,7 @@ const data = reactive({
     ],
 });
 
+const linktitle = ref('');
 
 const handleFileChange = (event) => {
     const fileInput = document.getElementById("imgSrc"); 
@@ -172,7 +173,18 @@ watchEffect(() => {
     data.content.forEach(navItem => {
         navItem.isActive = route.fullPath === navItem.linkNav;
     });
-    console.log('watchEffect:',urlImg.value)
+    console.log('route:',route.path);
+    const activeItem = data.content.find(navItem => navItem.isActive);
+    if (activeItem) {
+        linktitle.value = activeItem.titleNav;
+    } else {
+        linktitle.value = ''; // Giá trị mặc định nếu không có route nào khớp
+     
+        if(route.name === 'account-list-applicants'){
+            linktitle.value = 'Applicant'
+        }
+        
+    }
 });
 
 const onClick = (item) => {
@@ -182,6 +194,7 @@ const onClick = (item) => {
     });
     // Set isActive to true for the clicked item
     item.isActive = true;
+    linktitle.value = item.titleNav;
 };
 </script>
 
@@ -193,8 +206,8 @@ const onClick = (item) => {
                 <div class="col">
                     <nav aria-label="breadcrumb" class=" rounded-3 p-3 mb-4">
                         <ol class="breadcrumb mb-0">
-                            <li class="breadcrumb-item"><a href="#">Home</a></li>
-                            <li class="breadcrumb-item active">Account Settings</li>
+                            <li class="breadcrumb-item"><router-link to="/">Home</router-link></li>
+                            <li class="breadcrumb-item active">{{linktitle}}</li>
                         </ol>
                     </nav>
                 </div>
@@ -203,13 +216,13 @@ const onClick = (item) => {
                 <div class="col-lg-3">
                     <div class="card border-0 shadow mb-4 p-3">
                         <div class="s-body text-center mt-3">
-                            <img :src="urlImg" alt="avatar" class="rounded-circle img-fluid object-fit-cover"
+                            <img :src="urlImg" alt="avatar" class="shadow rounded-circle img-fluid object-fit-cover"
                                 style="width: 150px;height: 150px;">
-                            <h5 class="mt-3 pb-0 mb-2 fs-4">{{authStore.fullname}}</h5>
+                            <h5 class="mt-3 pb-0 mb-3 fs-4">{{authStore.fullname}}</h5>
                             <!-- <p class="text-muted mb-1 fs-6">Full Stack Developer</p> -->
                             <div class="d-flex justify-content-center mb-2">
                                 <button data-bs-toggle="modal" data-bs-target="#exampleModal" type="button"
-                                    class="btn btn-primary">Change Profile Picture</button>
+                                    class="btn btn-primary w-">Add Avatar</button>
                             </div>
                         </div>
                     </div>

@@ -72,7 +72,7 @@ onMounted(() => {
                 <h3 class="fs-4 mb-1">Change Password</h3>
                 <div class="">
                     <label for="curentPass" class="mb-2">Old Password</label>
-                    <input readonly id="curentPass" v-model="curentPass" type="text" placeholder="Old Password" class="form-control">
+                    <input readonly id="curentPass" v-model="curentPass" type="password" placeholder="Old Password" class="form-control">
                     <span class="text-danger ">{{ curentPassError }}</span>
                 </div>
                 <div class="">
