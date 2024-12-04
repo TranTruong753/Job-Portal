@@ -5,7 +5,7 @@ import { useAuthStore } from '@/stores/auth';
 import { onMounted, reactive, ref } from 'vue';
 import { useForm, useField } from 'vee-validate';
 import * as yup from 'yup';
-import {formatDateForInput} from '@/assets/js/jsUtils'
+import {formatDateForInput, convertToUrlV2} from '@/assets/js/jsUtils'
 
 const authStore = useAuthStore();
 const locationStore = useLocationStore();
@@ -273,7 +273,8 @@ const onSubmit = handleSubmit(
                 <div class="col-lg-3">
                     <div class="d-flex flex-column m-4 align-items-center gap-3">
                         <div class="">
-                            <img class="img-thumbnai object-fit-cover shadow" src="/src/assets/img/edutech_logo.png"
+                            <!-- /src/assets/img/edutech_logo.png -->
+                            <img class="img-thumbnai object-fit-cover shadow" :src="convertToUrlV2(authStore.userCompany.logo)"
                                 alt="">
                         </div>
                         <!-- <button class=" btn btn-primary w-75" data-bs-toggle="modal" data-bs-target="#changeLogo"
@@ -306,12 +307,12 @@ const onSubmit = handleSubmit(
                         class="form-control" value="">
                 </div>
 
-                <div class="col-lg-12">
+                <!-- <div class="col-lg-12">
                     <label for="" class="mb-2">Description<span class="req">*</span></label>
                     <textarea readonly v-model="authStore.userCompany.description" class="form-control" name="description"
                         id="description" cols="5" rows="5" placeholder="Description"></textarea>
 
-                </div>
+                </div> -->
 
             </div>
 

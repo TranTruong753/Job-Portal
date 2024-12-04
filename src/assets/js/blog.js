@@ -7,7 +7,7 @@
 //   });
 // }
 
-export function initializeTinyMCE(options = {}) {
+export async function initializeTinyMCE(options = {}) {
   tinymce.init({
       selector: options.selector || '#description',
       menubar: false,

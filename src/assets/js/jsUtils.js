@@ -121,4 +121,15 @@ function convertToUrlV2(path) {
 function formatCurrencyVND(number) {
     return new Intl.NumberFormat('vi-VN').format(number);
 }
-export { formatDate, closeModal, checkAuth, checkUserInDb, calculateDaysAgo, formatDateV2, formatDateForInput, convertToUrl, formatCurrencyVND, convertToUrlV2 }
+
+
+function resetTiny(id) {
+    const editor = tinymce.get(id); // Thay 'editorId' bằng ID của TinyMCE
+    if (editor) {
+        editor.setContent(''); // Đặt nội dung trống
+        return true
+    }
+    return false
+}
+
+export { resetTiny,formatDate, closeModal, checkAuth, checkUserInDb, calculateDaysAgo, formatDateV2, formatDateForInput, convertToUrl, formatCurrencyVND, convertToUrlV2 }

@@ -13,10 +13,6 @@ const user = [
             // Kiểm tra xác thực
             const token = getCookie('token');
             if(token){            
-                if(authStore.role === 'Admin'){
-                    authStore.$reset();
-                    next({name:'not-found'})
-                }
                 next()               
             }else{
                 authStore.$reset();
@@ -64,7 +60,9 @@ const user = [
 
                         if (role === 'User' || role === 'Employer') {
                             next();
-                        } 
+                        } else{
+                            next({ name: 'user-home' });
+                        }
                     }
                    else {
                         next({ name: 'user-login' });

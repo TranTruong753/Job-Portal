@@ -3,6 +3,7 @@ import { useAuthStore } from '@/stores/auth';
 import { onMounted, ref, watch } from 'vue';
 import { formatDateV2 } from '@/assets/js/jsUtils'
 import { debounce } from 'lodash';
+import Swal from 'sweetalert2';
 
 const pageSize = ref(5);
 const current = ref(1);
@@ -65,6 +66,24 @@ const status = ref({
     2: 'Rejected'
 
 })
+
+const handleRemove = async (item) => {
+    console.log(item.id)
+    Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!"
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            await authStore.deleteBlog(item.id);
+          
+        }
+    });
+}
 </script>
 
 <template>
@@ -83,10 +102,13 @@ const status = ref({
                         @input="handleQuery" />
                 </div>
             </div>
-            <div class="table-responsive pt-3 pe-3  position-relative" style="height: 80vh;overflow: auto">
-                <div v-if="loading" class="d-flex align-items-center justify-content-center"  style="height: 70vh;">
-                    <div class="">
+            <div class="table-responsive pt-3 pe-3  position-relative" style="height: 70vh;overflow: auto">
+                <div v-if="loading" class="d-flex align-items-center justify-content-center"  style="height: 60vh;">
+                    <div v-if="authStore.listBlogPost.length !== 0" class="">
                         <a-spin size="large" tip="Loading..."/>
+                    </div>
+                    <div v-else>
+                        <h3 class="text-center text-primary">NOT FUND MY BLOGS </h3>
                     </div>
                 </div>
                 <table v-else class="table "  >
@@ -125,6 +147,8 @@ const status = ref({
                                             <router-link :to="`/blog/detailEmployer/${item.id}`" class="dropdown-item"> <i
                                                     class="fa fa-eye" aria-hidden="true"></i> View</router-link>
                                         </li>
+                                        <li><a @click="handleRemove(item)" class="dropdown-item"><i class="fa fa-trash"
+                                            aria-hidden="true"></i> Remove</a></li>
                                         <!-- <li>
                                             <a class="dropdown-item" href="#"
                                                 @click="authStore.updateIsShowUserForJobPost(item.id)">

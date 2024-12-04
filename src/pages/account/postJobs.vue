@@ -4,8 +4,10 @@
     import { useLocationStore } from '@/stores/locationStore';
     import {useAuthStore} from '@/stores/auth';
     import {useSkillStore} from '@/stores/skill';
+    import {resetTiny} from '@/assets/js/jsUtils'
     import { useForm, useField } from 'vee-validate';
-
+    import {initializeTinyMCE} from '@/assets/js/tiny'
+    import Editor from '@tinymce/tinymce-vue'
     import * as yup from 'yup';
 // Sử dụng Pinia store
     const locationStore = useLocationStore();
@@ -35,14 +37,34 @@
             locationCity.value = companyStore.address.street + ', ' + companyStore.address.province + ', ' + companyStore.address.ward + ', ' + companyStore.address.district;
         }
 
-    })
+        // initializeTinyMCE({
+        //     selector: '#requirements', // Chỉ định selector cho textarea
+        //     setup: (editor) => {
+        //         editor.on('change', () => {
+        //             requirements.value = editor.getContent(); // Đồng bộ nội dung từ TinyMCE vào content
+        //         });
+        //     }
+        // },'#requirements');
 
-    onUnmounted(()=>{
-        // locationStore.$reset();
-        // // companyStore.$reset();
-        // skillStore.$reset();
-    })
+        // initializeTinyMCE({
+        //     selector: '#benefits', // Chỉ định selector cho textarea
+        //     setup: (editor) => {
+        //         editor.on('change', () => {
+        //             benefits.value = editor.getContent(); // Đồng bộ nội dung từ TinyMCE vào content
+        //         });
+        //     }
+        // },'#benefits');
 
+        // initializeTinyMCE({
+        //     selector: '#description', // Chỉ định selector cho textarea
+        //     setup: (editor) => {
+        //         editor.on('change', () => {
+        //         description.value = editor.getContent(); // Đồng bộ nội dung từ TinyMCE vào content
+        //         });
+        //     }
+        // },'#description');
+
+    })
 
 
     // Hàm xử lý thay đổi
@@ -120,6 +142,13 @@
         validateOnBlur: true,
     });
 
+    
+    const editorConfig = {
+    height: 400,
+    menubar: false,
+    plugins: ['link', 'image', 'lists'],
+    toolbar: 'undo redo | bold italic | alignleft aligncenter alignright | link image | bullist numlist',
+    };
 
 
     const onSubmit = handleSubmit(
@@ -143,8 +172,13 @@
                 const isSuccess = await authStore.postJob(dataToSubmit);
              
                 if(isSuccess){
+                    
+                    resetTiny('benefits');
+                    resetTiny('requirements');
+                    resetTiny('description');
                     resetForm();
                     locationStore.$reset();
+                    await locationStore.fetchProvinces();
                     value.value = [];
                 }
                
@@ -344,22 +378,43 @@
     
                 <div class="">
                     <label for="description" class="mb-2">Description<span class="req">*</span></label>
-                    <textarea :id="description" v-model="description" class="form-control" name="description" id="description" cols="5" rows="5"
-                        placeholder="Description"></textarea>
+                    <!-- <textarea v-model="description" class="form-control" name="description" id="description" cols="5" rows="5"
+                        placeholder="Description"></textarea> -->
+                        <Editor
+                            v-model="description"
+                            apiKey="2ejhh9vscfzh8ssrdz6zerfb93x9zmatio3l0iwfcbfkd8w8"
+                            :init="editorConfig"
+                            name="description"
+                            id="description"
+                        />
                     <span class="text-danger ">{{ descriptionError }}</span>
                 </div>
     
                 <div class="">
                     <label for="benefits" class="mb-2">Benefits<span class="req">*</span></label>
-                    <textarea :id="benefits" v-model="benefits" class="form-control" name="benefits" id="benefits" cols="5" rows="5"
-                        placeholder="Benefits"></textarea>
+                    <!-- <textarea v-model="benefits" class="form-control" name="benefits" id="benefits" cols="5" rows="5"
+                        placeholder="Benefits"></textarea> -->
+                    <Editor
+                        v-model="benefits"
+                        apiKey="2ejhh9vscfzh8ssrdz6zerfb93x9zmatio3l0iwfcbfkd8w8"
+                        :init="editorConfig"
+                        name="benefits"
+                        id="benefits"
+                    />
                     <span class="text-danger ">{{ benefitsError }}</span>
                 </div>
                 
                 <div class="">
                     <label for="requirements" class="mb-2">Requirements<span class="req">*</span></label>
-                    <textarea :id="requirements" v-model="requirements" class="form-control" name="requirements" id="requirements" cols="5" rows="5"
-                        placeholder="requirements"></textarea>
+                    <!-- <textarea id="requirements" v-model="requirements" class="form-control" name="requirements" cols="5" rows="5"
+                        placeholder="requirements"></textarea> -->
+                        <Editor
+                        v-model="requirements"
+                        apiKey="2ejhh9vscfzh8ssrdz6zerfb93x9zmatio3l0iwfcbfkd8w8"
+                        :init="editorConfig"
+                        name="requirements"
+                        id="requirements"
+                    />
                     <span class="text-danger ">{{ requirementsError }}</span>
                 </div>
      

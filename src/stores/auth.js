@@ -2,7 +2,7 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
 import { getCookie, setCookie, deleteCookie } from '../assets/js/cookieUtils.js'
-import { convertToUrl } from '@/assets/js/jsUtils.js';
+import { convertToUrlV2 } from '@/assets/js/jsUtils.js';
 import Swal from 'sweetalert2';
 import { jwtDecode } from 'jwt-decode';
 
@@ -45,7 +45,7 @@ export const useAuthStore = defineStore('auth', {
         if (this.token) {
           setCookie('token', this.token);
           this.password = values.password;
-        }
+        } 
 
 
 
@@ -193,7 +193,7 @@ export const useAuthStore = defineStore('auth', {
           this.userData = response.data;
           // console.log("userData: ",  this.userData);
           if(this.userData.img){
-            this.urlImg = convertToUrl(this.userData.img);
+            this.urlImg = convertToUrlV2(this.userData.img);
           }
           this.addressCompany = response.data.address;
           this.userCompany = response.data.company;
@@ -222,7 +222,7 @@ export const useAuthStore = defineStore('auth', {
           console.log("response: ", response.data);
           this.userData = response.data;
           if(this.userData.img){
-            this.urlImg = convertToUrl(this.userData.img);
+            this.urlImg = convertToUrlV2(this.userData.img);
           }
           return true;  // Trả về true nếu thành công
         } else {
@@ -827,6 +827,33 @@ export const useAuthStore = defineStore('auth', {
     }
   },
   
+  async deleteBlog(id){
+    const url = `/api/blog/Delete-Blog?blogId=${id}`;
+  try {
+    const response = await axios.post(url);
+   
+    console.log(response.data);
+    if(response.status === 200 || response.status === 201 || response.status === 204){
+      Swal.fire({
+        title: 'Delete Blog Success!',
+        text:  'Delete Blog successfully!',
+        icon: 'success',
+        confirmButtonText: 'OK',
+      });
+      return true;
+    }else{
+      Swal.fire({
+        title: 'Delete Blog Fail!',
+        text: response.data.message || 'Something went wrong!',
+        icon: 'error',
+        confirmButtonText: 'OK',
+      });
+      return false;
+    }
+  } catch (error) {
+    console.error('Error deleting blog:', error);
+  }
+  }
   
 
 

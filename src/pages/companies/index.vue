@@ -233,7 +233,7 @@ const hangleSearch = async () => {
                 </div>
                 <div v-else-if="companyStore.listcompany.length === 0">
                     <h1 class="text-center text-primary">NOT FUND COMPANY </h1>
-                  </div>
+                </div>
                 <CardCompany v-else
                     v-for="(company, index) in companyStore.listcompany"
                     :key="index"

@@ -16,7 +16,7 @@
                     </button>
                 </div>
                 <router-link :to="`/job/detail/${cardData.id}`">
-                    <p class="card-title h5 fw-bolder ">
+                    <p class="card-title h5 fw-bolder truncate-1 ">
                         {{ cardData.name }}
                     </p>
                 </router-link>
@@ -66,7 +66,7 @@
                         <span class="ps-1">: {{cardData.type}}</span>
                     </p>
                 </div>
-                <div class="">
+                <div class=" truncate-1">
                     <button type="button" class="mt-1 me-1 btn btn-outline-secondary btn-skill" v-for="skill in cardData.skill">{{skill.msg}}</button>
                 </div>
             </div>

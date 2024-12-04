@@ -3,7 +3,7 @@ import { RouterLink, useRoute, useRouter } from 'vue-router';
 import { useJobtore } from '@/stores/jobs';
 import { useAuthStore } from '@/stores/auth';
 import { onMounted, reactive, ref, watch } from 'vue';
-import { formatDateV2, closeModal, formatCurrencyVND } from '@/assets/js/jsUtils.js'
+import { formatDateV2, closeModal, formatCurrencyVND, convertToUrlV2 } from '@/assets/js/jsUtils.js'
 
 
 const route = useRoute();
@@ -125,7 +125,7 @@ const handleSaveJob = async() => {
                                 <div class="jobs_left d-flex align-items-sm-center gap-4">
                                     <div class="" style="max-width: 150px;">
                                         <RouterLink  :to="`/company/detail/${companyInfo.id}`" class="card-img ">
-                                            <img class="center rounded border object-fit-cover" :src="companyInfo.logo" :alt=" companyInfo.name ">
+                                            <img class="center rounded border object-fit-cover" :src="convertToUrlV2(companyInfo.logo)" :alt=" companyInfo.name ">
                                         </RouterLink>
                                     </div>
                                     <div class="jobs_conetent">
@@ -198,17 +198,17 @@ const handleSaveJob = async() => {
                         <div class="descript_wrap white-bg">
                             <div class="single_wrap">
                                 <h4>Job description</h4>
-                                <p>{{ jobStore.job.description }}</p>
+                                <p v-html="jobStore.job.description"></p>
                             </div>
                             <div class="single_wrap">
-                                <h4>requirements</h4>
+                                <h4>Requirements</h4>
 
-                                <p>{{ jobStore.job.requirements }}</p>
+                                <p v-html="jobStore.job.requirements"></p>
                             </div>
 
                             <div class="single_wrap">
                                 <h4>Benefits</h4>
-                                <p>{{ jobStore.job.benefits }}</p>
+                                <p v-html="jobStore.job.benefits"></p>
                             </div>
 
                             <div class="single_wrap">

@@ -1,24 +1,18 @@
 <script setup>
-import { onMounted, ref } from 'vue';
+import { ref } from 'vue';
 import { initializeTinyMCE } from '@/assets/js/blog.js';
 import { useForm, useField } from 'vee-validate';
 import * as yup from 'yup';
-import { closeModal } from '@/assets/js/jsUtils.js'
+import { closeModal,resetTiny } from '@/assets/js/jsUtils.js'
 import { useBlogStore } from '@/stores/blog';
+import Editor from '@tinymce/tinymce-vue'
+
+
 
 
 const blogStore = useBlogStore();
 
-onMounted(() => {
-    initializeTinyMCE({
-        selector: '#description', // Chỉ định selector cho textarea
-        setup: (editor) => {
-            editor.on('change', () => {
-                content.value = editor.getContent(); // Đồng bộ nội dung từ TinyMCE vào content
-            });
-        }
-    });
-});
+
 
 
 
@@ -42,16 +36,23 @@ const { value: content, errorMessage: contentError } = useField('content');
 // Thêm ref cho src của img
 const imgSrc = ref('');
 const errorSrc = ref('')
+
+
+const editorConfig = {
+  height: 400,
+  menubar: false,
+  plugins: ['link', 'image', 'lists'],
+  toolbar: 'undo redo | bold italic | alignleft aligncenter alignright | link image | bullist numlist',
+};
+
+
 const onSubmit = handleSubmit(
         async values => {
          console.log('submit:',values)
          blogStore.postBlog(values);
      
          imgSrc.value = ''
-         const editor = tinymce.get('description'); // Thay 'editorId' bằng ID của TinyMCE
-        if (editor) {
-            editor.setContent(''); // Đặt nội dung trống
-        }
+         resetTiny('content')
          resetForm();
          
    
@@ -116,10 +117,21 @@ const handleAddFile = () => {
                     <input v-model="title" type="text" placeholder="Job Title" id="title" name="title" class="form-control">
                     <span class="text-danger">{{ titleError }}</span>
                     
-                    <label for="" class="mb-2">Description<span class="req">*</span></label>
+                    <!-- <label for="" class="mb-2">Description<span class="req">*</span></label>
                     <textarea v-model="content" class="form-control" name="description" id="description" cols="5" rows="5"
                         placeholder="Description"></textarea>
+                        <span class="text-danger">{{ contentError }}</span> -->
+                         <!-- Quill Editor -->
+                         <label for="content" class="mb-2">Content<span class="req">*</span></label>
+                        <Editor
+                            v-model="content"
+                            apiKey="2ejhh9vscfzh8ssrdz6zerfb93x9zmatio3l0iwfcbfkd8w8"
+                            :init="editorConfig"
+                            name="content"
+                            id="content"
+                        />
                         <span class="text-danger">{{ contentError }}</span>
+                                
                 </div>
 
                   <div class="col-lg-3">
@@ -169,3 +181,12 @@ const handleAddFile = () => {
             </div>
         </div>
 </template>
+
+<style scoped>
+
+textarea {
+        height: 50vh !important; 
+        resize: none;
+    }
+
+</style>

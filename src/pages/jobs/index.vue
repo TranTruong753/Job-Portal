@@ -3,7 +3,7 @@
 import CardProduct from '@/components/jobs/cardJob.vue';
 import { useJobtore } from '@/stores/jobs.js'
 import { ref, watch, onMounted } from 'vue';
-import { calculateDaysAgo,formatCurrencyVND } from '@/assets/js/jsUtils.js'
+import { calculateDaysAgo,formatCurrencyVND,convertToUrlV2 } from '@/assets/js/jsUtils.js'
 import { useRouter } from 'vue-router';
 import { debounce } from 'lodash';
 
@@ -201,7 +201,7 @@ const hangleSearch = async () => {
           <div class="col-md-8 col-lg-9 overflow-auto vh-100" >
             <div class="job_listing_area">
               <div class="job_lists">
-                <div class="row g-3">
+                <div class="row g-3 ">
 
                   <div v-if="loading && jobStore.listjobs.length !== 0" class="text-center">
                     <div class="loading">
@@ -219,7 +219,7 @@ const hangleSearch = async () => {
                     :key="index"
                     :card-data="{
                       id: job.id,
-                      imgSrc: job.employer.company.logo,
+                      imgSrc: convertToUrlV2(job.employer.company.logo),
                       imgAlt: job.employer.company.name,
                       name: job.title,
                       nameCompany: job.employer.company.name,
@@ -231,7 +231,7 @@ const hangleSearch = async () => {
                       level: job.jobLevel,
                       isShow: true,
                       styleCss: 'card-h-100 col-12 col-lg-6',
-                      styleCard: 'card-h-100 card border-0 shadow'
+                      styleCard: ' border-0 shadow'
                     }"
                    
                   />

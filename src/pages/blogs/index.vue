@@ -3,7 +3,7 @@ import Cardblog from '@/components/blogs/cardBlog.vue';
 import { useBlogStore } from '@/stores/blog';
 import { ref, onMounted, watch } from 'vue';
 import { debounce } from 'lodash';
-import {convertToUrl, calculateDaysAgo} from '@/assets/js/jsUtils'
+import {convertToUrlV2, calculateDaysAgo} from '@/assets/js/jsUtils'
 
 const current = ref(1);
 const total = ref(0);
@@ -83,82 +83,7 @@ watch([current, pageSize], async ([newCurrent, newPageSize]) => {
         </div>
     </section>
 
-    <!-- CONTENT -->
-    <!-- slide blog-->
-    <!-- <section class="section-3  py-5 py-sm-4 bg-2">
-        <div class="container">
-            <h2>Top blogs</h2>
-            <div id="carouselExample" class="carousel slide pt-5 pt-sm-4 g-3" data-bs-ride="carousel"
-                data-bs-pause="hover" data-bs-wrap="true">
-                <div class="carousel-inner w-80 m-auto">
-                    <div class="carousel-item active" data-bs-interval="5000">
-                        <div class="row g-3">
-                            <Cardblog :cardData="{
-                                imgSrc: '/src/assets/img/banner-1.jpg',
-                                imgAlt: 'blog 01',
-                                name: 'HTML CSS làm sao cho hiểu quả',
-                                description: 'Để css html hiểu quả bạn cần thông qua lí thuyết kết hợp thực hành',
-                                timePost: '24/10/2024',
-                                isShow: true,
-                                styleCss: 'col-12 col-lg-4 col-md-6',
-                                 isShowStyle: 'card-h-100 card border-0 '
-                            }" />
-
-                        
-                            <Cardblog :cardData="{
-                                imgSrc: '/src/assets/img/banner-1.jpg',
-                                imgAlt: 'blog 01',
-                                name: 'HTML CSS làm sao cho hiểu quả',
-                                description: 'Để css html hiểu quả bạn cần thông qua lí thuyết kết hợp thực hành',
-                                timePost: '24/10/2024',
-                                isShow: true,
-                                styleCss: 'col-12 col-lg-4 col-md-6',
-                                 isShowStyle: 'card-h-100 card border-0 '
-                            }" />
-                         
-                        </div>
-                    </div>
-                    <div class="carousel-item" data-bs-interval="5000">
-                        <div class="row g-3">
-           
-                            <Cardblog :cardData="{
-                                imgSrc: '/src/assets/img/banner-1.jpg',
-                                imgAlt: 'blog 01',
-                                name: 'HTML CSS làm sao cho hiểu quả',
-                                description: 'Để css html hiểu quả bạn cần thông qua lí thuyết kết hợp thực hành',
-                                timePost: '24/10/2024',
-                                isShow: true,
-                                styleCss: 'col-12 col-lg-4 col-md-6',
-                                 isShowStyle: 'card-h-100 card border-0 '
-                            }" />
-
-    
-                            <Cardblog :cardData="{
-                                imgSrc: '/src/assets/img/banner-1.jpg',
-                                imgAlt: 'blog 01',
-                                name: 'HTML CSS làm sao cho hiểu quả',
-                                description: 'Để css html hiểu quả bạn cần thông qua lí thuyết kết hợp thực hành',
-                                timePost: '24/10/2024',
-                                isShow: true,
-                                styleCss: 'col-12 col-lg-4 col-md-6',
-                                 isShowStyle: 'card-h-100 card border-0 '
-                            }" />
-                        </div>
-                    </div>
-                </div>
-                <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample"
-                    data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Previous</span>
-                </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#carouselExample"
-                    data-bs-slide="next">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Next</span>
-                </button>
-            </div>
-        </div>
-    </section> -->
+   
 
     <!-- Featured BLOG -->
     <section class="section-3  py-5 py-sm-4">
@@ -169,20 +94,20 @@ watch([current, pageSize], async ([newCurrent, newPageSize]) => {
                     <div class="blog_listing_area">
                         <div class="blog_lists">
                             <div class="row g-3">
-                                <div v-if="loading" class="text-center ">
+                                <div v-if="blogStore.listBlog.length === 0">
+                                    <h1 class="text-center text-primary">NOT FUND BLOG </h1>
+                                </div>
+                                <div v-else-if="loading" class="text-center ">
                                     <div class="loading">
                                         <a-spin size="large" tip="Loading..."/>
                                     </div>
-                                </div>
-                                <div v-else-if="blogStore.listBlog.length === 0">
-                                    <h1 class="text-center text-primary">NOT FUND BLOG </h1>
                                 </div>
                                 <!-- card 01 -->
                                 <Cardblog v-else v-for="(item,index) in blogStore.listBlog" :key="index"
                                 
                                 :cardData="{
                                     id: item.id,
-                                    imgSrc: convertToUrl(item.img),
+                                    imgSrc: convertToUrlV2(item.img),
                                     imgAlt: item.title,
                                     name: item.title,
                                     description: 'Poster: ' + item.username,

@@ -2,7 +2,7 @@
 import { onBeforeMount,onMounted, ref, watch } from 'vue';
 import {getCookie } from '@/assets/js/cookieUtils.js'
 import { useCompanyStore } from '@/stores/company';
-import { convertToUrl,closeModal } from '@/assets/js/jsUtils';
+import { convertToUrlV2,closeModal } from '@/assets/js/jsUtils';
 
 import {useLocationStore} from '@/stores/locationStore';
 import { useAuthStore } from '@/stores/auth.js';
@@ -101,7 +101,7 @@ const handleLogout = () => {
             </ul>
   
             <!-- đã đăng nhập -->
-            <div v-if="authStore.isAuthenticated" class="w-25 ms-sm-0 ps-xxl-5 ps-xl-3 ps-lg-1">
+            <div v-if="authStore.isAuthenticated && authStore.role !== 'Admin'" class="w-25 ms-sm-0 ps-xxl-5 ps-xl-3 ps-lg-1">
               <div class="d-none dropdown d-lg-flex align-items-center gap-3 justify-content-lg-end">
                 <!-- <a href="#!" class="fs-5">
                   <i class="fa-solid fa-bell"></i>
@@ -128,9 +128,9 @@ const handleLogout = () => {
                   <!-- <li>
                     <router-link class="dropdown-item" to="/account/post-blog">Post a Blog</router-link>
                   </li> -->
-                  <li class="py-1">
+                  <!-- <li class="py-1">
                     <router-link class="dropdown-item" to="/account/create-cv">Create CV</router-link>
-                  </li>
+                  </li> -->
                   <li class="py-1">
                     <router-link class="dropdown-item text-primary" @click.native="handleLogout" to="/home">Log out</router-link>
 
@@ -139,7 +139,7 @@ const handleLogout = () => {
               </div>
              
             </div>
-            <div v-if="authStore.isAuthenticated" class="d-lg-none d-block">
+            <div v-if="authStore.isAuthenticated && authStore.role !== 'Admin'" class="d-lg-none d-block">
               <div 
                   class=" d-flex flex-lg-column flex-xl-row t align-items-center gap-2 p-0 m-2 border-top border-1 pt-3">
                   <img class="object-fit-cover img-thumbnail rounded-circle" style="width: 3rem;height: 3rem;" :src="authStore.urlImg || img"
@@ -151,9 +151,9 @@ const handleLogout = () => {
                 <li class=" active small p-1">
                   <router-link class="dropdown-item " to="/account">Account Setting</router-link>
                 </li>
-                <li class=" small p-1">
+                <!-- <li class=" small p-1">
                   <router-link class="dropdown-item" to="/account/create-cv">Create CV</router-link>
-                </li>
+                </li> -->
                 <li class=" small p-1">
                   <router-link class="btn btn-primary w-25  dropdown-item " @click.native="handleLogout" to="/home">Log out</router-link>
                 </li>

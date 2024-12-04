@@ -4,7 +4,7 @@ import CardProduct from '@/components/jobs/cardJob.vue';
 import CardCompany from '@/components/companies/cardCompany.vue';
 import { useJobtore } from '@/stores/jobs.js'
 import { ref, watch, onMounted } from 'vue';
-import { calculateDaysAgo,formatCurrencyVND } from '@/assets/js/jsUtils.js'
+import { calculateDaysAgo,formatCurrencyVND, convertToUrlV2 } from '@/assets/js/jsUtils.js'
 import { useRouter } from 'vue-router';
 import { debounce } from 'lodash';
 import { useCompanyStore } from '@/stores/company.js';
@@ -38,7 +38,7 @@ onMounted(async () => {
     current.value = 1;
     loading.value = true; // Mặc định bật loading trước khi lấy dữ liệu
 
-    pageSizeCompany.value = 10;
+    pageSizeCompany.value = 6;
     currentCompany.value = 1;
     loadingCompany.value = true; // Mặc định bật loading trước khi lấy dữ liệu
     try {
@@ -117,6 +117,10 @@ const hangleSearch = async () => {
   debounceSearch(); 
 }
 
+const onShowSizeChange = (current, pageSize) => {
+ 
+};
+
 
 </script>
 
@@ -126,15 +130,15 @@ const hangleSearch = async () => {
 <template>
   
     <section class="section-0 lazy d-flex bg-image-style dark align-items-center "
-        data-bg="/src/assets/img/banner5.jpg">
+        style="background-image: url(/src/assets/img/banner5.jpg);">
         <div class="container">
             <div class="row">
                 <div class="col-12 col-xl-8">
                     <h1>Find your dream job</h1>
                     <p>Thounsands of jobs available.</p>
                     <div class="banner-btn mt-5">
-                        <a asp-area="EndUser" asp-controller="Job" asp-action="Index"
-                            class="btn btn-primary mb-4 mb-sm-0">Explore Now</a>
+                        <router-link to="/job"
+                            class="btn btn-primary mb-4 mb-sm-0">Explore Now</router-link> 
                     </div>
                 </div>
             </div>
@@ -183,7 +187,7 @@ const hangleSearch = async () => {
                         :key="index"
                         :card-data="{
                           id: job.id,
-                          imgSrc: job.employer.company.logo,
+                          imgSrc: convertToUrlV2(job.employer.company.logo),
                           imgAlt: job.employer.company.name,
                           name: job.title,
                           nameCompany: job.employer.company.name,
@@ -210,6 +214,8 @@ const hangleSearch = async () => {
                 v-model:current="current"
                 v-model:pageSize="pageSize"
                 v-model:total="jobStore.total"
+
+                
                 
 
                 />
@@ -234,7 +240,7 @@ const hangleSearch = async () => {
                     :key="index"
                     :cardData="{
                         id: company.id,
-                        imgSrc: company.logo ,  
+                        imgSrc: convertToUrlV2(company.logo) ,  
                         imgAlt: company.name || 'Default Company',
                         name: company.name || 'Default Position',
                         title: company.industry || 'Default Title',
@@ -256,7 +262,7 @@ const hangleSearch = async () => {
                 v-model:current="currentCompany"
                 v-model:pageSize="pageSizeCompany"
                 v-model:total="companyStore.total"
-           
+                 @showSizeChange="onShowSizeChange"
             />
             </div>
         </div>
@@ -265,3 +271,10 @@ const hangleSearch = async () => {
 
    
 </template>
+
+<style>
+.ant-pagination-item-active a{
+    background: blue !important;
+}
+
+</style>

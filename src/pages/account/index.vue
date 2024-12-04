@@ -3,7 +3,7 @@
 import { useAuthStore } from '@/stores/auth.js';
 import { onMounted, reactive, ref, watchEffect } from "vue";
 import { useRoute } from 'vue-router';
-import { convertToUrl,closeModal } from '@/assets/js/jsUtils';
+import { convertToUrlV2,closeModal } from '@/assets/js/jsUtils';
 
 const authStore = useAuthStore();
 const route = useRoute();
@@ -19,8 +19,8 @@ onMounted(async ()=>{
     }else if(authStore.role === 'Employer'){
         await authStore.getEmployer()
     }
-    if(authStore.userData.length !== 0){
-        urlImg.value = convertToUrl(authStore.userData.img);
+    if(authStore.userData.img){
+        urlImg.value = convertToUrlV2(authStore.userData.img);
     }
 })
 
@@ -93,14 +93,14 @@ const data = reactive({
             id: 10,
             titleNav: 'Create CV test',
             linkNav: '/account/create-cv-test',
-            isShow: authStore.role === 'User',
+            isShow: false,
             isActive: false,
         },
         {
             id: 11,
             titleNav: 'Create CV',
             linkNav: '/account/create-cv',
-            isShow: authStore.role === 'User',
+            isShow: false,
             isActive: false,
         },
         {
