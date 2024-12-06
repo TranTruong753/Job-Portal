@@ -272,9 +272,3 @@ const onShowSizeChange = (current, pageSize) => {
    
 </template>
 
-<style>
-.ant-pagination-item-active a{
-    background: blue !important;
-}
-
-</style>

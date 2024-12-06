@@ -5,11 +5,12 @@ import router from './router'
 import 'ant-design-vue/dist/reset.css';
 import plugin from 'pinia-plugin-persistedstate';
 
-import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/css/bootstrap.min.css';   
 
-import './assets/css/footer.css';
-import './assets/css/style.css';
-import './assets/css/mycss.css';
+// import '@/assets/css/footer.css';
+// import '@/assets/css/style.css';
+// import '@/assets/css/mycss.css';
+
 import VChart from 'vue-echarts';
 import { use } from 'echarts/core';
 
