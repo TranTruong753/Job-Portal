@@ -6,7 +6,7 @@ import axios from 'axios';
 export const useBlogAdminStore = defineStore('blogAdmin', {
     state: () => ({
         listBlog: [],
-      
+        blogData: null
     }),
     actions: {
         async getBlogAdminAll(query, currentPage, pageSize) {
@@ -98,6 +98,30 @@ export const useBlogAdminStore = defineStore('blogAdmin', {
                 return false
             }
         },
+
+        async getBlogById(idBlog){
+            const url = '/api/admin/GetBlogById';
+            try {
+                const response = await axios.get(url,{
+                    headers: {
+                        Authorization: `Bearer ${getCookie('token')}`, // Thêm token vào header
+                    },
+                    params: {
+                        blogId: idBlog,
+                    }
+                })
+                console.log('getBlogById', response.data)
+                if (response.data || response.status === 200) {
+                    this.blogData = response.data
+                   return true
+                } else {
+                    return false
+                }
+            } catch (error) {
+                console.log(error)
+                return false
+            }
+        }
 
 
      

@@ -2,6 +2,7 @@
 
 import CardProduct from '@/components/jobs/cardJob.vue';
 import CardCompany from '@/components/companies/cardCompany.vue';
+
 import { useJobtore } from '@/stores/jobs.js'
 import { ref, watch, onMounted } from 'vue';
 import { calculateDaysAgo,formatCurrencyVND, convertToUrlV2 } from '@/assets/js/jsUtils.js'

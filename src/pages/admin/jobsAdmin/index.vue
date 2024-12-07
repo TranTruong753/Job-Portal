@@ -105,7 +105,7 @@ const handleUpdateStatus = async(item,status) => {
                                             class="btn btn-sm btn-success mx-1">
                                             <i class="fa-solid fa-unlock"></i>
                                         </button>
-                                        <router-link :to="`/admin/company/detail/${item.id}`"
+                                        <router-link :to="`/admin/job/detail/${item.id}`"
                                             class="btn btn-sm btn-info mx-1">
                                             <i class="fa-solid fa-eye"></i>
                                         </router-link>

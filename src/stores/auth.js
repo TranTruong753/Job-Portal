@@ -853,7 +853,9 @@ export const useAuthStore = defineStore('auth', {
   } catch (error) {
     console.error('Error deleting blog:', error);
   }
-  }
+  },
+
+
   
 
 

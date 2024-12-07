@@ -7,7 +7,8 @@ export const useAccountStore = defineStore('account', {
     state: () => ({
         listAccount: [],
         listAccountUser: [],
-        litsAccountEmployer: []
+        listAccountEmployer: [],
+        userData: null
     }),
     actions: {
         async getAccountAll(query, currentPage, pageSize) {
@@ -23,6 +24,7 @@ export const useAccountStore = defineStore('account', {
                         PageSize: pageSize,
                     }
                 })
+                console.log(response.data)
                 if (response.data || response.status === 200) {
                     this.listAccount = response.data;
                 } else {
@@ -148,6 +150,30 @@ export const useAccountStore = defineStore('account', {
                 return false
             }
         },
+
+        async getAccountById(idAccount){
+            const url = '/api/admin/Get-ById';
+            try {
+                const response = await axios.get(url, {
+                    headers: {
+                        Authorization: `Bearer ${getCookie('token')}`, // Thêm token vào header
+                    },
+                    params: {
+                       Id: idAccount
+                    }
+                })
+                console.log('getAccountById',response.data)
+                if (response.data || response.status === 200) {
+                    this.userData = response.data;
+                    return true
+                } else {
+                    return false
+                }
+            } catch (error) {
+                console.log(error)
+                return false
+            }
+        }
      
     }
 })

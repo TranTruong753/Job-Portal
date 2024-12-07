@@ -1,13 +1,16 @@
 <script setup>
-import '@/assets/admin/css/bootstrap.css'
-import '@/assets/admin/css/style.css'
-
+import { useAuthStore } from '@/stores/auth';
 import navAdmin from '@/components/admin/navAdmin.vue';
 import sidebarAdmin from '@/components/admin/sidebarAdmin.vue';
 import footerAdmin from '@/components/admin/footerAdmin.vue';
 
-import { ref } from 'vue';
-
+import { onMounted, ref } from 'vue';
+const authStore = useAuthStore();
+onMounted(async ()=>{
+    if(authStore.userData.length === 0){
+        authStore.getUserData()
+    }
+})
 
 // Trạng thái để điều khiển mở/đóng
 const isContentOpen = ref(false);
@@ -40,3 +43,8 @@ const toggleContent = () => {
     <!-- Back to Top -->
     <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
 </template>
+
+<style>
+@import '@/assets/admin/css/bootstrap.css';
+@import '@/assets/admin/css/style.css';
+</style>

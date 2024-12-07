@@ -66,6 +66,11 @@ const handleLogout = () => {
               <li class="nav-item">
                 <router-link class="nav-link" to="/blog">Blog</router-link>
               </li>
+              <li v-if="authStore.role==='Admin'" class="nav-item">
+                <!-- <router-link to="/admin/home" class="nav-link btn btn-outline-primary text-primary" >Admin</router-link> -->
+                <a href="/admin/home" class="nav-link btn btn-outline-primary text-primary" >Admin</a>
+              </li>
+
   
               <!-- <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">More items</a>
@@ -101,7 +106,7 @@ const handleLogout = () => {
             </ul>
   
             <!-- đã đăng nhập -->
-            <div v-if="authStore.isAuthenticated && authStore.role !== 'Admin'" class="w-25 ms-sm-0 ps-xxl-5 ps-xl-3 ps-lg-1">
+            <div v-if="authStore.isAuthenticated " class="w-25 ms-sm-0 ps-xxl-5 ps-xl-3 ps-lg-1">
               <div class="d-none dropdown d-lg-flex align-items-center gap-3 justify-content-lg-end">
                 <!-- <a href="#!" class="fs-5">
                   <i class="fa-solid fa-bell"></i>
@@ -139,7 +144,7 @@ const handleLogout = () => {
               </div>
              
             </div>
-            <div v-if="authStore.isAuthenticated && authStore.role !== 'Admin'" class="d-lg-none d-block">
+            <div v-if="authStore.isAuthenticated " class="d-lg-none d-block">
               <div 
                   class=" d-flex flex-lg-column flex-xl-row t align-items-center gap-2 p-0 m-2 border-top border-1 pt-3">
                   <img class="object-fit-cover img-thumbnail rounded-circle" style="width: 3rem;height: 3rem;" :src="authStore.urlImg || img"

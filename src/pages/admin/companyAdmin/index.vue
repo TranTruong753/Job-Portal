@@ -71,7 +71,7 @@ const handleUpdateStatus = async(item,status) => {
                     </div>
                   
                     <div class="ms-auto">
-                        <button class="btn btn-primary"><i class="fa-solid fa-plus me-2"></i> Company</button>
+                        <router-link  to="/admin/company/upsert" class="btn btn-primary"><i class="fa-solid fa-plus me-2"></i> Company</router-link>
                     </div>
                   
                 </div>
@@ -96,9 +96,9 @@ const handleUpdateStatus = async(item,status) => {
                                 <td>{{ formatDate(item.create) }}</td>
                                 <td>
                                     <div class="w-75 d-flex gap-1" role="">
-                                        <!-- <a class="btn btn-sm btn-warning mx-1">
-                                    <i class="fa-solid fa-pen-to-square"></i>
-                                </a> -->
+                                        <router-link  :to="`/admin/company/upsert/${item.id}`" class="btn btn-sm btn-warning mx-1">
+                                            <i class="fa-solid fa-pen-to-square"></i>
+                                        </router-link>
                                         <!-- <button v-if="item.status === 0" type="button"
                                             class="btn btn-sm btn-primary mx-1">
                                             <i class="fa-solid fa-check"></i>

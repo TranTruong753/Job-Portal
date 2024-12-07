@@ -6,6 +6,7 @@ import axios from 'axios';
 export const useJobAdminStore = defineStore('jobAdmin', {
     state: () => ({
         listJob: [],
+        jobData: null,
       
     }),
     actions: {
@@ -57,6 +58,29 @@ export const useJobAdminStore = defineStore('jobAdmin', {
             }
         },
 
+        async getJobById(idJob){
+            const url = '/api/admin/Get-Job-Id';
+            try {
+                const response = await axios.get(url,{
+                    headers: {
+                        Authorization: `Bearer ${getCookie('token')}`, // Thêm token vào header
+                    },
+                    params: {
+                        id: idJob,
+                    }
+                })
+                console.log('getJobById', response.data)
+                if (response.data || response.status === 200) {
+                    this.jobData = response.data
+                   return true
+                } else {
+                    return false
+                }
+            } catch (error) {
+                console.log(error)
+                return false
+            }
+        }
         
 
      

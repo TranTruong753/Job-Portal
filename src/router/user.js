@@ -58,7 +58,7 @@ const user = [
                     console.log('isUser',isUser);
                     if(isUser) {    
 
-                        if (role === 'User' || role === 'Employer') {
+                        if (role) {
                             next();
                         } else{
                             next({ name: 'user-home' });
@@ -81,7 +81,7 @@ const user = [
                         beforeEnter: (to, from, next) => {
                             const role = checkAuth(next);         
                            
-                            if (role === 'User') {
+                            if (role === 'User' ||  role === 'Admin') {
                                 next();
                             } else {
                                 next({name:'account-settings'})

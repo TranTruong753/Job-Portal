@@ -8,7 +8,7 @@ import Swal from 'sweetalert2';
 
 
 onMounted(()=>{
-    if(authStore.role === 'User' ||authStore.role === 'Employer'){
+    if(authStore.role ){
         router.push('/');
     }else{
         authStore.$reset
@@ -56,31 +56,31 @@ const onSubmit = handleSubmit(async (values) => {
         if (authStore.isAuthenticated) {
 
             if (authStore.role === 'Admin') {
-                window.location.href = 'https://localhost:7283/home';
-            } else {
-                if(authStore.role === 'User'){
-                    await authStore.getUserData();
-                }else if(authStore.role === 'Employer'){
-                    await authStore.getEmployer()
-                }
-                const Toast = Swal.mixin({
-                    toast: true,
-                    position: "top-end",
-                    showConfirmButton: false,
-                    timer: 2000,
-                    // timerProgressBar: true,
-                    didOpen: (toast) => {
-                        // toast.onmouseenter = Swal.stopTimer;
-                        // toast.onmouseleave = Swal.resumeTimer;
-                    }
-                });
-                Toast.fire({
-                    icon: "success",
-                    title: "Signed in successfully"
-                });
-
-                router.push('/');
+                await authStore.getUserData();
             }
+            else if(authStore.role === 'User'){
+                await authStore.getUserData();
+            }else if(authStore.role === 'Employer'){
+                await authStore.getEmployer()
+            }
+            const Toast = Swal.mixin({
+                toast: true,
+                position: "top-end",
+                showConfirmButton: false,
+                timer: 2000,
+                // timerProgressBar: true,
+                didOpen: (toast) => {
+                    // toast.onmouseenter = Swal.stopTimer;
+                    // toast.onmouseleave = Swal.resumeTimer;
+                }
+            });
+            Toast.fire({
+                icon: "success",
+                title: "Signed in successfully"
+            });
+
+            router.push('/');
+            
         }
 
     } catch (error) {

@@ -37,32 +37,7 @@
             locationCity.value = companyStore.address.street + ', ' + companyStore.address.province + ', ' + companyStore.address.ward + ', ' + companyStore.address.district;
         }
 
-        // initializeTinyMCE({
-        //     selector: '#requirements', // Chỉ định selector cho textarea
-        //     setup: (editor) => {
-        //         editor.on('change', () => {
-        //             requirements.value = editor.getContent(); // Đồng bộ nội dung từ TinyMCE vào content
-        //         });
-        //     }
-        // },'#requirements');
-
-        // initializeTinyMCE({
-        //     selector: '#benefits', // Chỉ định selector cho textarea
-        //     setup: (editor) => {
-        //         editor.on('change', () => {
-        //             benefits.value = editor.getContent(); // Đồng bộ nội dung từ TinyMCE vào content
-        //         });
-        //     }
-        // },'#benefits');
-
-        // initializeTinyMCE({
-        //     selector: '#description', // Chỉ định selector cho textarea
-        //     setup: (editor) => {
-        //         editor.on('change', () => {
-        //         description.value = editor.getContent(); // Đồng bộ nội dung từ TinyMCE vào content
-        //         });
-        //     }
-        // },'#description');
+        
 
     })
 

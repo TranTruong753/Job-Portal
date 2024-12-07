@@ -7,19 +7,8 @@ import { useAuthStore } from '@/stores/auth';
 const admin = [
     {
         path: "/",
-        component: () => import("../layouts/admin.vue"),
-        // beforeEnter: (to, from, next) => {
-        //     const authStore = useAuthStore();
-        //     // Kiểm tra xác thực
-        //     const token = getCookie('token');
-        //     if(token){            
-        //         next()               
-        //     }else{
-        //         authStore.$reset();
-        //         next()
-        //     }
-            
-               
+        component: () => import("../layouts/admin.vue"),            
+    
            
         // },
         children: [
@@ -64,6 +53,16 @@ const admin = [
                 component: () => import("../pages/admin/companyAdmin/detail.vue")
             },
             {
+                path: "/admin/company/upsert/:id",
+                name: "admin-company-upsert-id",
+                component: () => import("../pages/admin/companyAdmin/upsert.vue")
+            },
+            {
+                path: "/admin/company/upsert",
+                name: "admin-company-upsert",
+                component: () => import("../pages/admin/companyAdmin/upsert.vue")
+            },
+            {
                 path: "/admin/jobs",
                 name: "admin-job",
                 component: () => import("../pages/admin/jobsAdmin/index.vue")
@@ -74,9 +73,19 @@ const admin = [
                 component: () => import("../pages/admin/jobsAdmin/detail.vue")
             },
             {
+                path: "/admin/job/detail/:id",
+                name: "admin-job-detail",
+                component: () => import("../pages/admin/jobsAdmin/detail.vue")
+            },
+            {
                 path: "/admin/skills",
                 name: "admin-skill",
                 component: () => import("../pages/admin/skillsAdmin/index.vue")
+            },
+            {
+                path: "/admin/chart",
+                name: "admin-chart",
+                component: () => import("../pages/admin/chartAdmin/index.vue")
             },
             // Route lỗi 404
             // {

@@ -111,11 +111,28 @@ const handleInput = (event) => {
                         <td>{{ account.role }}</td>
                         <td>{{ status[account.status] }}</td>
                         <td>
-                            <div class="w-75 d-flex gap-1">
+                            <div v-if="account.statusCompany" class="w-75 d-flex gap-1">
                                 <!-- <a class="btn btn-sm btn-warning mx-1">
                                     <i class="fa-solid fa-pen-to-square"></i>
                                 </a> -->
                                 <button v-if="account.status === 0 " type="button" class="btn btn-sm btn-primary mx-1"  @click="handleUnLock(account)">
+                                    <i class="fa-solid fa-check"></i>
+                                </button>
+                                <button v-if="account.status === 1 " type="button" class="btn btn-sm btn-danger mx-1" @click="handleLock(account)" :disabled="account.role === 'Admin'">
+                                    <i class="fa-solid fa-lock"></i>
+                                </button>
+                                <button v-else-if="account.status === 2 " type="button" class="btn btn-sm btn-success mx-1" @click="handleUnLock(account)" :disabled="account.role === 'Admin'" >
+                                    <i class="fa-solid fa-unlock"></i>
+                                </button>
+                                <router-link :to="`/admin/account/detail/${account.id}`"  class="btn btn-sm btn-info mx-1">
+                                    <i class="fa-solid fa-eye"></i>
+                                </router-link>
+                            </div>
+                            <div v-else class="w-75 d-flex gap-1">
+                                <!-- <a class="btn btn-sm btn-warning mx-1">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                </a> -->
+                                <button v-if="account.status === 0 && account.role !== 'Employer'" type="button" class="btn btn-sm btn-primary mx-1"  @click="handleUnLock(account)">
                                     <i class="fa-solid fa-check"></i>
                                 </button>
                                 <button v-if="account.status === 1 " type="button" class="btn btn-sm btn-danger mx-1" @click="handleLock(account)" :disabled="account.role === 'Admin'">

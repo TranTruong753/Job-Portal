@@ -4,6 +4,9 @@ import { useAuthStore } from '@/stores/auth.js';
 import { onMounted, reactive, ref, watchEffect } from "vue";
 import { useRoute } from 'vue-router';
 import { convertToUrlV2,closeModal } from '@/assets/js/jsUtils';
+import '@/assets/css/footer.css';
+    import '@/assets/css/style.css';
+    import '@/assets/css/mycss.css';
 
 const authStore = useAuthStore();
 const route = useRoute();
@@ -14,7 +17,7 @@ console.log(route.path)
 
 onMounted(async ()=>{
     console.log(authStore.role);
-    if(authStore.role === 'User'){
+    if(authStore.role === 'User'|| authStore.role === 'Admin'){
         await authStore.getUserData();
     }else if(authStore.role === 'Employer'){
         await authStore.getEmployer()
@@ -37,7 +40,7 @@ const data = reactive({
             id: 2,
             titleNav: 'My Profile',
             linkNav: '/account/profile',
-            isShow: authStore.role === 'User',
+            isShow: authStore.role === 'User' || authStore.role === 'Admin',
             isActive: false,
         },
         {
@@ -160,7 +163,7 @@ const handleAddFile = () => {
 
 const changeAvater = async (img) => {
     const isSuccess = await authStore.postAvatar(img);
-    if(authStore.role === 'User'){
+    if(authStore.role === 'User'|| authStore.role === 'Admin'){
         await authStore.getUserData();
     }else if(authStore.role === 'Employer'){
         await authStore.getEmployer()
