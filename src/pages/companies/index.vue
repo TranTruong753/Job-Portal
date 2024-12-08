@@ -61,6 +61,7 @@ await Promise.all([
 
 // Hàm debounce để trì hoãn tìm kiếm
 const debounceSearch = debounce(async () => {
+    current.value = 1;
 await Promise.all([
         companyStore.searchJobs(queryTextSearch.value, queryIndustry.value, pageSize.value, current.value),
         companyStore.getTotalWithConditions(queryTextSearch.value, queryIndustry.value)

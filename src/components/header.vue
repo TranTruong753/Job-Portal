@@ -137,7 +137,7 @@ const handleLogout = () => {
                     <router-link class="dropdown-item" to="/account/create-cv">Create CV</router-link>
                   </li> -->
                   <li class="py-1">
-                    <router-link class="dropdown-item text-primary" @click.native="handleLogout" to="/home">Log out</router-link>
+                    <router-link class="dropdown-item text-primary" @click="handleLogout" to="/home">Log out</router-link>
 
                   </li>
                 </ul>
@@ -160,7 +160,7 @@ const handleLogout = () => {
                   <router-link class="dropdown-item" to="/account/create-cv">Create CV</router-link>
                 </li> -->
                 <li class=" small p-1">
-                  <router-link class="btn btn-primary w-25  dropdown-item " @click.native="handleLogout" to="/home">Log out</router-link>
+                  <router-link class="btn btn-primary w-25  dropdown-item " @click="handleLogout" to="/home">Log out</router-link>
                 </li>
     
               

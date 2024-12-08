@@ -1,12 +1,40 @@
 <script setup>
 import { useAuthStore } from '@/stores/auth';
+import { onBeforeMount,onMounted, ref, watch } from 'vue';
+import {getCookie } from '@/assets/js/cookieUtils.js'
+import { useCompanyStore } from '@/stores/company';
+import { convertToUrlV2,closeModal } from '@/assets/js/jsUtils';
+import {useLocationStore} from '@/stores/locationStore';
+import { useRouter } from 'vue-router';
+import { useJobtore } from '@/stores/jobs';
+import { useSkillStore } from '@/stores/skill';
+   
 
-
+const router = useRouter(); // Sử dụng router
+const authStore = useAuthStore();
+const img = ref('/src/assets/img/avatar7.png');
+const locationStore = useLocationStore();
+const companyStore = useCompanyStore();
+const jobStore = useJobtore();
+const skills = useSkillStore();
+const handleLogOut = () => {
+    try {
+    authStore.logout();
+    locationStore.$reset();
+    companyStore.$reset();
+    jobStore.$reset();
+    skills.$reset();
+    // authStore.$reset();
+    // router.push('/home');
+  } catch (error) {
+    console.error('Error during logout:', error);
+  }
+}
 
 // Phát sự kiện toggleContent khi nhấn nút
 const emit = defineEmits(['toggleContent']);
 
-const authStore = useAuthStore();
+
 </script>
 
 <template>
@@ -17,9 +45,9 @@ const authStore = useAuthStore();
         <a href="#" class="sidebar-toggler flex-shrink-0" @click="emit('toggleContent')">
             <i class="fa fa-bars"></i>
         </a>
-        <form class="d-none d-md-flex ms-4">
+        <!-- <form class="d-none d-md-flex ms-4">
             <input class="form-control border-0" type="search" placeholder="Search">
-        </form>
+        </form> -->
         <div class="navbar-nav align-items-center ms-auto">
             <!-- <div class="nav-item dropdown">
                 <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
@@ -90,7 +118,7 @@ const authStore = useAuthStore();
                     <span class="d-none d-lg-inline-flex">{{authStore.fullname}}</span>
                 </a>
                 <div class="dropdown-menu dropdown-menu-end bg-light border-0 rounded-0 rounded-bottom m-0">
-                    <a href="#" class="dropdown-item">Log Out</a>
+                    <a href="/" class="dropdown-item" @click="handleLogOut">Log Out</a>
                 </div>
             </div>
         </div>

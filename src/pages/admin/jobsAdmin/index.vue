@@ -44,6 +44,7 @@ watch([current, pageSize], async ([newCurrent, newPageSize]) => {
 });
 
 const handleSearch = debounce(async () => {
+    current.value = 1 
     await getJobAdminAllFuc(query.value, current.value, pageSize.value)
 }, 300)
 

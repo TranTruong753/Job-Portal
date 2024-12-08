@@ -89,6 +89,14 @@ const onRangeChange = async (value, dateString) => {
   if(value){
 
     dataAplly.value = await authStore.GetApplyAndDateRange(dateString[0],dateString[1]);
+    option2.value.series[0].data = [
+    
+      dataAplly.value.apply || 0, // Giá trị ứng tuyển   
+      dataAplly.value.approve || 0,// Giá trị phê duyệt 
+      dataAplly.value.reject || 0,
+     
+    
+  ];
   }
 };
 

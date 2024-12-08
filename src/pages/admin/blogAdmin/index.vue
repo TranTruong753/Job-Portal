@@ -49,7 +49,8 @@ watch([current, pageSize], async ([newCurrent, newPageSize]) => {
 });
 
 const handleSearch = debounce(async () => {
-    await getBlogAdminAllFuc(query.value, current.value, pageSize.value)
+    current.value = 1;
+    await getBlogAdminAllFuc(query.value, current.value , pageSize.value)
 }, 300)
 
 const handleUnlock = async(item) => {
@@ -92,7 +93,7 @@ const handleLock = async(item) => {
                         </thead>
                         <tbody>
                             <tr v-for="(item, index) in blogList">
-                                <th scope="row">{{ index + 1 }}</th>
+                                <th scope="row">{{ item.id }}</th>
                                 <td>{{ item.title }}</td>
                                 <td>{{ item.username }}</td>
                                 <td>{{ status[item.status] }}</td>

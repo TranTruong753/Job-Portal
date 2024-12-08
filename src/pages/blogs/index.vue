@@ -34,6 +34,7 @@ onMounted(async () => {
 
 
 const handleQuery = debounce(async () => {
+    current.value = 1;
     await Promise.all([
         blogStore.getBlog(query.value, current.value, pageSize.value),
         blogStore.getTotalBlog(query.value, current.value, pageSize.value).then(result => {

@@ -78,6 +78,7 @@ watch([current, pageSize], async ([newCurrent, newPageSize]) => {
 
 // Hàm debounce để trì hoãn tìm kiếm
 const debounceSearch = debounce(async () => {
+  current.value = 1;
   await Promise.all([
             jobStore.searchJobs(queryTextSearch.value, querylocationSearch.value, queryJobType.value, queryJobLevel.value,  IsDecsending.value, pageSize.value, current.value),
             jobStore.getTotalWithConditions(queryTextSearch.value, querylocationSearch.value, queryJobType.value, queryJobLevel.value,  IsDecsending.value,)

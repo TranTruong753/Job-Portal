@@ -49,6 +49,7 @@ watch([current, pageSize], async ([newCurrent, newPageSize]) => {
 });
 
 const handleSearch = debounce(async () => {
+    current.value = 1;
     await getSkillAdminAllFuc(query.value, current.value, pageSize.value)
 }, 300)
 
@@ -141,8 +142,8 @@ const resetData = () => {
                     <table class="table">
                         <thead>
                             <tr>
+                               
                                 <th scope="col">#</th>
-                                <th scope="col">id Skill</th>
                                 <th scope="col">Name</th>
                                 <th scope="col">Status</th>
                                 <th scope="col">Action</th>
@@ -150,8 +151,8 @@ const resetData = () => {
                         </thead>
                         <tbody>
                             <tr v-for="(item, index) in skillList">
-                                <th scope="row">{{ index + 1 }}</th>
-                                <td>Id_{{ item.id }}</td>
+                               
+                                <td>{{ item.id }}</td>
                                 <td>{{ item.name }}</td>
                                 <td>{{ !item.isDelete }}</td>
                               

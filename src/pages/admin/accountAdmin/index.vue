@@ -138,27 +138,27 @@ watch(
 
 
 const handleSearchAll = debounce(async () => {
-    
+    pagination.current = 1;
     await getAccountAllFuc(
         query.value,
-        paginationEmployer.current,
-        paginationEmployer.pageSize
+        pagination.current,
+        pagination.pageSize
     )
 }, 300)
 
 
 
 const handleSearchUser = debounce(async () => {
-    
+    paginationUser.current = 1
     await getAccountUser(
         queryUser.value,
-        paginationEmployer.current,
-        paginationEmployer.pageSize
+        paginationUser.current,
+        paginationUser.pageSize
     )
 }, 300)
 
 const handleSearchEmployer = debounce(async () => {
-    
+    paginationEmployer.current = 1;
     await getAccountEmployer(
         queryEmployer.value,
         paginationEmployer.current,

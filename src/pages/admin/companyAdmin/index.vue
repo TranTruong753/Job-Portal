@@ -44,6 +44,7 @@ watch([current, pageSize], async ([newCurrent, newPageSize]) => {
 });
 
 const handleSearch = debounce(async () => {
+    current.value = 1;
     await getCompanyAdminAllFuc(query.value, current.value, pageSize.value)
 }, 300)
 
@@ -89,7 +90,7 @@ const handleUpdateStatus = async(item,status) => {
                         </thead>
                         <tbody>
                             <tr v-for="(item, index) in companyList">
-                                <th scope="row">{{ index + 1 }}</th>
+                                <th scope="row">{{ item.id}}</th>
                                 <td>{{ item.name }}</td>
                                 <td>{{ item.industry }}</td>
                                 <td>{{ item.email }}</td>

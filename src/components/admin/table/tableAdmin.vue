@@ -99,6 +99,7 @@ const handleInput = (event) => {
                         <th scope="col">User Name</th>
                         <th scope="col">Email</th>
                         <th scope="col">Full Name</th>
+                        <th scope="col">Role</th>
                         <th scope="col">Status</th>
                         <th scope="col">Action</th>
                     </tr>
@@ -108,6 +109,7 @@ const handleInput = (event) => {
                         <td>{{ index + 1 }}</td>
                         <td>{{ account.username }}</td>
                         <td>{{ account.email }}</td>
+                        <td>{{ account.fullname }}</td>
                         <td>{{ account.role }}</td>
                         <td>{{ status[account.status] }}</td>
                         <td>
